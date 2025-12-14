@@ -1,0 +1,58 @@
+name: opsview
+description: "OpsView - Exam Center Operator Mobile Application"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI Components
+  shadcn_flutter: ^0.0.47
+
+  # State Management
+  flutter_riverpod: ^3.0.3
+  riverpod_annotation: ^3.0.3
+
+  # Database
+  drift: ^2.30.0
+  sqlite3_flutter_libs: ^0.5.20
+  path_provider: ^2.1.2
+  path: ^1.9.0
+
+  # API & Networking
+  dio: ^5.9.0
+  connectivity_plus: ^7.0.0
+
+  # Secure Storage
+  flutter_secure_storage: ^10.0.0
+
+  # Camera & Location
+  camera: ^0.11.3
+  geolocator: ^14.0.2
+  permission_handler: ^12.0.1
+
+  # Navigation
+  go_router: ^17.0.1
+
+  # Utilities
+  intl: ^0.20.2
+  uuid: ^4.5.2
+  flutter_image_compress: ^2.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.10.4
+  drift_dev: ^2.30.0
+  riverpod_generator: ^3.0.3
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
