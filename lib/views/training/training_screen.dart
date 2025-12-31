@@ -1,0 +1,187 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+
+import '../../core/localization/app_strings.dart';
+import '../../core/router/app_router.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../models/auth/shift.dart';
+import '../../viewmodels/training_viewmodel.dart';
+
+class TrainingScreen extends ConsumerWidget {
+  const TrainingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appStringsProvider);
+    final trainingState = ref.watch(trainingViewModelProvider);
+    final trainingViewModel = ref.read(trainingViewModelProvider.notifier);
+
+    final trainingService = trainingState.currentService;
+
+    return Scaffold(
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Text(strings.trainingRequired, style: AppTextStyles.h1),
+              const SizedBox(height: 8),
+              Text(
+                strings.completeBeforeShiftStart,
+                style: AppTextStyles.muted,
+              ),
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 24),
+
+              // Video Card
+              if (trainingService != null)
+                _buildVideoCard(trainingService, strings, trainingViewModel),
+
+              const Spacer(),
+
+              // Complete Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: PrimaryButton(
+                  onPressed: () async {
+                    await trainingViewModel.completeTraining();
+                    if (context.mounted) {
+                      context.go(AppRoutes.home);
+                    }
+                  },
+                  child: Text(
+                    strings.completed,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVideoCard(
+    ShiftService service,
+    AppStrings strings,
+    TrainingViewModel viewModel,
+  ) {
+    return GestureDetector(
+      onTap: () => viewModel.openTrainingVideo(),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Video Thumbnail with Play Button
+            Container(
+              height: 200,
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+              ),
+              child: Center(
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.cardBackground,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.play_arrow,
+                      size: 32,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Video Info
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    service.name.isNotEmpty ? service.name : 'Morning Shift SOP',
+                    style: AppTextStyles.h3,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      // Duration
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            strings.duration.toUpperCase(),
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '4m 20s',
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 32),
+                      // Priority
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            strings.priority.toUpperCase(),
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            strings.mandatory,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

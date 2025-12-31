@@ -8,107 +8,77 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $SessionsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _accessTokenMeta = const VerificationMeta(
-    'accessToken',
-  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> accessToken = GeneratedColumn<String>(
-    'access_token',
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  static const VerificationMeta _serviceMeta = const VerificationMeta(
+    'service',
+  );
   @override
-  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
-    'user_id',
+  late final GeneratedColumn<String> service = GeneratedColumn<String>(
+    'service',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _userJsonMeta = const VerificationMeta(
+    'userJson',
+  );
+  @override
+  late final GeneratedColumn<String> userJson = GeneratedColumn<String>(
+    'user_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _examJsonMeta = const VerificationMeta(
+    'examJson',
+  );
+  @override
+  late final GeneratedColumn<String> examJson = GeneratedColumn<String>(
+    'exam_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _centerJsonMeta = const VerificationMeta(
+    'centerJson',
+  );
+  @override
+  late final GeneratedColumn<String> centerJson = GeneratedColumn<String>(
+    'center_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _onboardingStepMeta = const VerificationMeta(
+    'onboardingStep',
+  );
+  @override
+  late final GeneratedColumn<String> onboardingStep = GeneratedColumn<String>(
+    'onboarding_step',
     aliasedName,
     false,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _usernameMeta = const VerificationMeta(
-    'username',
-  );
-  @override
-  late final GeneratedColumn<String> username = GeneratedColumn<String>(
-    'username',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _examIdMeta = const VerificationMeta('examId');
-  @override
-  late final GeneratedColumn<String> examId = GeneratedColumn<String>(
-    'exam_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
     requiredDuringInsert: false,
+    defaultValue: const Constant('confirmation'),
   );
-  static const VerificationMeta _centerIdMeta = const VerificationMeta(
-    'centerId',
-  );
-  @override
-  late final GeneratedColumn<String> centerId = GeneratedColumn<String>(
-    'center_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _examCodeMeta = const VerificationMeta(
-    'examCode',
+  static const VerificationMeta _selectedShiftIdMeta = const VerificationMeta(
+    'selectedShiftId',
   );
   @override
-  late final GeneratedColumn<String> examCode = GeneratedColumn<String>(
-    'exam_code',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _centerCodeMeta = const VerificationMeta(
-    'centerCode',
-  );
-  @override
-  late final GeneratedColumn<String> centerCode = GeneratedColumn<String>(
-    'center_code',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _centerNameMeta = const VerificationMeta(
-    'centerName',
-  );
-  @override
-  late final GeneratedColumn<String> centerName = GeneratedColumn<String>(
-    'center_name',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _examNameMeta = const VerificationMeta(
-    'examName',
-  );
-  @override
-  late final GeneratedColumn<String> examName = GeneratedColumn<String>(
-    'exam_name',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _userDataJsonMeta = const VerificationMeta(
-    'userDataJson',
-  );
-  @override
-  late final GeneratedColumn<String> userDataJson = GeneratedColumn<String>(
-    'user_data_json',
+  late final GeneratedColumn<String> selectedShiftId = GeneratedColumn<String>(
+    'selected_shift_id',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -128,16 +98,13 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
   );
   @override
   List<GeneratedColumn> get $columns => [
-    accessToken,
-    userId,
-    username,
-    examId,
-    centerId,
-    examCode,
-    centerCode,
-    centerName,
-    examName,
-    userDataJson,
+    id,
+    service,
+    userJson,
+    examJson,
+    centerJson,
+    onboardingStep,
+    selectedShiftId,
     createdAt,
   ];
   @override
@@ -152,75 +119,50 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('access_token')) {
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('service')) {
       context.handle(
-        _accessTokenMeta,
-        accessToken.isAcceptableOrUnknown(
-          data['access_token']!,
-          _accessTokenMeta,
+        _serviceMeta,
+        service.isAcceptableOrUnknown(data['service']!, _serviceMeta),
+      );
+    }
+    if (data.containsKey('user_json')) {
+      context.handle(
+        _userJsonMeta,
+        userJson.isAcceptableOrUnknown(data['user_json']!, _userJsonMeta),
+      );
+    }
+    if (data.containsKey('exam_json')) {
+      context.handle(
+        _examJsonMeta,
+        examJson.isAcceptableOrUnknown(data['exam_json']!, _examJsonMeta),
+      );
+    }
+    if (data.containsKey('center_json')) {
+      context.handle(
+        _centerJsonMeta,
+        centerJson.isAcceptableOrUnknown(data['center_json']!, _centerJsonMeta),
+      );
+    }
+    if (data.containsKey('onboarding_step')) {
+      context.handle(
+        _onboardingStepMeta,
+        onboardingStep.isAcceptableOrUnknown(
+          data['onboarding_step']!,
+          _onboardingStepMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_accessTokenMeta);
     }
-    if (data.containsKey('user_id')) {
+    if (data.containsKey('selected_shift_id')) {
       context.handle(
-        _userIdMeta,
-        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_userIdMeta);
-    }
-    if (data.containsKey('username')) {
-      context.handle(
-        _usernameMeta,
-        username.isAcceptableOrUnknown(data['username']!, _usernameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_usernameMeta);
-    }
-    if (data.containsKey('exam_id')) {
-      context.handle(
-        _examIdMeta,
-        examId.isAcceptableOrUnknown(data['exam_id']!, _examIdMeta),
-      );
-    }
-    if (data.containsKey('center_id')) {
-      context.handle(
-        _centerIdMeta,
-        centerId.isAcceptableOrUnknown(data['center_id']!, _centerIdMeta),
-      );
-    }
-    if (data.containsKey('exam_code')) {
-      context.handle(
-        _examCodeMeta,
-        examCode.isAcceptableOrUnknown(data['exam_code']!, _examCodeMeta),
-      );
-    }
-    if (data.containsKey('center_code')) {
-      context.handle(
-        _centerCodeMeta,
-        centerCode.isAcceptableOrUnknown(data['center_code']!, _centerCodeMeta),
-      );
-    }
-    if (data.containsKey('center_name')) {
-      context.handle(
-        _centerNameMeta,
-        centerName.isAcceptableOrUnknown(data['center_name']!, _centerNameMeta),
-      );
-    }
-    if (data.containsKey('exam_name')) {
-      context.handle(
-        _examNameMeta,
-        examName.isAcceptableOrUnknown(data['exam_name']!, _examNameMeta),
-      );
-    }
-    if (data.containsKey('user_data_json')) {
-      context.handle(
-        _userDataJsonMeta,
-        userDataJson.isAcceptableOrUnknown(
-          data['user_data_json']!,
-          _userDataJsonMeta,
+        _selectedShiftIdMeta,
+        selectedShiftId.isAcceptableOrUnknown(
+          data['selected_shift_id']!,
+          _selectedShiftIdMeta,
         ),
       );
     }
@@ -234,50 +176,38 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {userId};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Session map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Session(
-      accessToken: attachedDatabase.typeMapping.read(
+      id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}access_token'],
+        data['${effectivePrefix}id'],
       )!,
-      userId: attachedDatabase.typeMapping.read(
+      service: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}user_id'],
+        data['${effectivePrefix}service'],
+      ),
+      userJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_json'],
+      ),
+      examJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}exam_json'],
+      ),
+      centerJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}center_json'],
+      ),
+      onboardingStep: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}onboarding_step'],
       )!,
-      username: attachedDatabase.typeMapping.read(
+      selectedShiftId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}username'],
-      )!,
-      examId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}exam_id'],
-      ),
-      centerId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}center_id'],
-      ),
-      examCode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}exam_code'],
-      ),
-      centerCode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}center_code'],
-      ),
-      centerName: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}center_name'],
-      ),
-      examName: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}exam_name'],
-      ),
-      userDataJson: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}user_data_json'],
+        data['${effectivePrefix}selected_shift_id'],
       ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -293,56 +223,43 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
 }
 
 class Session extends DataClass implements Insertable<Session> {
-  final String accessToken;
-  final String userId;
-  final String username;
-  final String? examId;
-  final String? centerId;
-  final String? examCode;
-  final String? centerCode;
-  final String? centerName;
-  final String? examName;
-  final String? userDataJson;
+  final String id;
+  final String? service;
+  final String? userJson;
+  final String? examJson;
+  final String? centerJson;
+  final String onboardingStep;
+  final String? selectedShiftId;
   final DateTime createdAt;
   const Session({
-    required this.accessToken,
-    required this.userId,
-    required this.username,
-    this.examId,
-    this.centerId,
-    this.examCode,
-    this.centerCode,
-    this.centerName,
-    this.examName,
-    this.userDataJson,
+    required this.id,
+    this.service,
+    this.userJson,
+    this.examJson,
+    this.centerJson,
+    required this.onboardingStep,
+    this.selectedShiftId,
     required this.createdAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['access_token'] = Variable<String>(accessToken);
-    map['user_id'] = Variable<String>(userId);
-    map['username'] = Variable<String>(username);
-    if (!nullToAbsent || examId != null) {
-      map['exam_id'] = Variable<String>(examId);
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || service != null) {
+      map['service'] = Variable<String>(service);
     }
-    if (!nullToAbsent || centerId != null) {
-      map['center_id'] = Variable<String>(centerId);
+    if (!nullToAbsent || userJson != null) {
+      map['user_json'] = Variable<String>(userJson);
     }
-    if (!nullToAbsent || examCode != null) {
-      map['exam_code'] = Variable<String>(examCode);
+    if (!nullToAbsent || examJson != null) {
+      map['exam_json'] = Variable<String>(examJson);
     }
-    if (!nullToAbsent || centerCode != null) {
-      map['center_code'] = Variable<String>(centerCode);
+    if (!nullToAbsent || centerJson != null) {
+      map['center_json'] = Variable<String>(centerJson);
     }
-    if (!nullToAbsent || centerName != null) {
-      map['center_name'] = Variable<String>(centerName);
-    }
-    if (!nullToAbsent || examName != null) {
-      map['exam_name'] = Variable<String>(examName);
-    }
-    if (!nullToAbsent || userDataJson != null) {
-      map['user_data_json'] = Variable<String>(userDataJson);
+    map['onboarding_step'] = Variable<String>(onboardingStep);
+    if (!nullToAbsent || selectedShiftId != null) {
+      map['selected_shift_id'] = Variable<String>(selectedShiftId);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -350,30 +267,23 @@ class Session extends DataClass implements Insertable<Session> {
 
   SessionsCompanion toCompanion(bool nullToAbsent) {
     return SessionsCompanion(
-      accessToken: Value(accessToken),
-      userId: Value(userId),
-      username: Value(username),
-      examId: examId == null && nullToAbsent
+      id: Value(id),
+      service: service == null && nullToAbsent
           ? const Value.absent()
-          : Value(examId),
-      centerId: centerId == null && nullToAbsent
+          : Value(service),
+      userJson: userJson == null && nullToAbsent
           ? const Value.absent()
-          : Value(centerId),
-      examCode: examCode == null && nullToAbsent
+          : Value(userJson),
+      examJson: examJson == null && nullToAbsent
           ? const Value.absent()
-          : Value(examCode),
-      centerCode: centerCode == null && nullToAbsent
+          : Value(examJson),
+      centerJson: centerJson == null && nullToAbsent
           ? const Value.absent()
-          : Value(centerCode),
-      centerName: centerName == null && nullToAbsent
+          : Value(centerJson),
+      onboardingStep: Value(onboardingStep),
+      selectedShiftId: selectedShiftId == null && nullToAbsent
           ? const Value.absent()
-          : Value(centerName),
-      examName: examName == null && nullToAbsent
-          ? const Value.absent()
-          : Value(examName),
-      userDataJson: userDataJson == null && nullToAbsent
-          ? const Value.absent()
-          : Value(userDataJson),
+          : Value(selectedShiftId),
       createdAt: Value(createdAt),
     );
   }
@@ -384,16 +294,13 @@ class Session extends DataClass implements Insertable<Session> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Session(
-      accessToken: serializer.fromJson<String>(json['accessToken']),
-      userId: serializer.fromJson<String>(json['userId']),
-      username: serializer.fromJson<String>(json['username']),
-      examId: serializer.fromJson<String?>(json['examId']),
-      centerId: serializer.fromJson<String?>(json['centerId']),
-      examCode: serializer.fromJson<String?>(json['examCode']),
-      centerCode: serializer.fromJson<String?>(json['centerCode']),
-      centerName: serializer.fromJson<String?>(json['centerName']),
-      examName: serializer.fromJson<String?>(json['examName']),
-      userDataJson: serializer.fromJson<String?>(json['userDataJson']),
+      id: serializer.fromJson<String>(json['id']),
+      service: serializer.fromJson<String?>(json['service']),
+      userJson: serializer.fromJson<String?>(json['userJson']),
+      examJson: serializer.fromJson<String?>(json['examJson']),
+      centerJson: serializer.fromJson<String?>(json['centerJson']),
+      onboardingStep: serializer.fromJson<String>(json['onboardingStep']),
+      selectedShiftId: serializer.fromJson<String?>(json['selectedShiftId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -401,65 +308,53 @@ class Session extends DataClass implements Insertable<Session> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'accessToken': serializer.toJson<String>(accessToken),
-      'userId': serializer.toJson<String>(userId),
-      'username': serializer.toJson<String>(username),
-      'examId': serializer.toJson<String?>(examId),
-      'centerId': serializer.toJson<String?>(centerId),
-      'examCode': serializer.toJson<String?>(examCode),
-      'centerCode': serializer.toJson<String?>(centerCode),
-      'centerName': serializer.toJson<String?>(centerName),
-      'examName': serializer.toJson<String?>(examName),
-      'userDataJson': serializer.toJson<String?>(userDataJson),
+      'id': serializer.toJson<String>(id),
+      'service': serializer.toJson<String?>(service),
+      'userJson': serializer.toJson<String?>(userJson),
+      'examJson': serializer.toJson<String?>(examJson),
+      'centerJson': serializer.toJson<String?>(centerJson),
+      'onboardingStep': serializer.toJson<String>(onboardingStep),
+      'selectedShiftId': serializer.toJson<String?>(selectedShiftId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
   Session copyWith({
-    String? accessToken,
-    String? userId,
-    String? username,
-    Value<String?> examId = const Value.absent(),
-    Value<String?> centerId = const Value.absent(),
-    Value<String?> examCode = const Value.absent(),
-    Value<String?> centerCode = const Value.absent(),
-    Value<String?> centerName = const Value.absent(),
-    Value<String?> examName = const Value.absent(),
-    Value<String?> userDataJson = const Value.absent(),
+    String? id,
+    Value<String?> service = const Value.absent(),
+    Value<String?> userJson = const Value.absent(),
+    Value<String?> examJson = const Value.absent(),
+    Value<String?> centerJson = const Value.absent(),
+    String? onboardingStep,
+    Value<String?> selectedShiftId = const Value.absent(),
     DateTime? createdAt,
   }) => Session(
-    accessToken: accessToken ?? this.accessToken,
-    userId: userId ?? this.userId,
-    username: username ?? this.username,
-    examId: examId.present ? examId.value : this.examId,
-    centerId: centerId.present ? centerId.value : this.centerId,
-    examCode: examCode.present ? examCode.value : this.examCode,
-    centerCode: centerCode.present ? centerCode.value : this.centerCode,
-    centerName: centerName.present ? centerName.value : this.centerName,
-    examName: examName.present ? examName.value : this.examName,
-    userDataJson: userDataJson.present ? userDataJson.value : this.userDataJson,
+    id: id ?? this.id,
+    service: service.present ? service.value : this.service,
+    userJson: userJson.present ? userJson.value : this.userJson,
+    examJson: examJson.present ? examJson.value : this.examJson,
+    centerJson: centerJson.present ? centerJson.value : this.centerJson,
+    onboardingStep: onboardingStep ?? this.onboardingStep,
+    selectedShiftId: selectedShiftId.present
+        ? selectedShiftId.value
+        : this.selectedShiftId,
     createdAt: createdAt ?? this.createdAt,
   );
   Session copyWithCompanion(SessionsCompanion data) {
     return Session(
-      accessToken: data.accessToken.present
-          ? data.accessToken.value
-          : this.accessToken,
-      userId: data.userId.present ? data.userId.value : this.userId,
-      username: data.username.present ? data.username.value : this.username,
-      examId: data.examId.present ? data.examId.value : this.examId,
-      centerId: data.centerId.present ? data.centerId.value : this.centerId,
-      examCode: data.examCode.present ? data.examCode.value : this.examCode,
-      centerCode: data.centerCode.present
-          ? data.centerCode.value
-          : this.centerCode,
-      centerName: data.centerName.present
-          ? data.centerName.value
-          : this.centerName,
-      examName: data.examName.present ? data.examName.value : this.examName,
-      userDataJson: data.userDataJson.present
-          ? data.userDataJson.value
-          : this.userDataJson,
+      id: data.id.present ? data.id.value : this.id,
+      service: data.service.present ? data.service.value : this.service,
+      userJson: data.userJson.present ? data.userJson.value : this.userJson,
+      examJson: data.examJson.present ? data.examJson.value : this.examJson,
+      centerJson: data.centerJson.present
+          ? data.centerJson.value
+          : this.centerJson,
+      onboardingStep: data.onboardingStep.present
+          ? data.onboardingStep.value
+          : this.onboardingStep,
+      selectedShiftId: data.selectedShiftId.present
+          ? data.selectedShiftId.value
+          : this.selectedShiftId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -467,16 +362,13 @@ class Session extends DataClass implements Insertable<Session> {
   @override
   String toString() {
     return (StringBuffer('Session(')
-          ..write('accessToken: $accessToken, ')
-          ..write('userId: $userId, ')
-          ..write('username: $username, ')
-          ..write('examId: $examId, ')
-          ..write('centerId: $centerId, ')
-          ..write('examCode: $examCode, ')
-          ..write('centerCode: $centerCode, ')
-          ..write('centerName: $centerName, ')
-          ..write('examName: $examName, ')
-          ..write('userDataJson: $userDataJson, ')
+          ..write('id: $id, ')
+          ..write('service: $service, ')
+          ..write('userJson: $userJson, ')
+          ..write('examJson: $examJson, ')
+          ..write('centerJson: $centerJson, ')
+          ..write('onboardingStep: $onboardingStep, ')
+          ..write('selectedShiftId: $selectedShiftId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -484,133 +376,104 @@ class Session extends DataClass implements Insertable<Session> {
 
   @override
   int get hashCode => Object.hash(
-    accessToken,
-    userId,
-    username,
-    examId,
-    centerId,
-    examCode,
-    centerCode,
-    centerName,
-    examName,
-    userDataJson,
+    id,
+    service,
+    userJson,
+    examJson,
+    centerJson,
+    onboardingStep,
+    selectedShiftId,
     createdAt,
   );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Session &&
-          other.accessToken == this.accessToken &&
-          other.userId == this.userId &&
-          other.username == this.username &&
-          other.examId == this.examId &&
-          other.centerId == this.centerId &&
-          other.examCode == this.examCode &&
-          other.centerCode == this.centerCode &&
-          other.centerName == this.centerName &&
-          other.examName == this.examName &&
-          other.userDataJson == this.userDataJson &&
+          other.id == this.id &&
+          other.service == this.service &&
+          other.userJson == this.userJson &&
+          other.examJson == this.examJson &&
+          other.centerJson == this.centerJson &&
+          other.onboardingStep == this.onboardingStep &&
+          other.selectedShiftId == this.selectedShiftId &&
           other.createdAt == this.createdAt);
 }
 
 class SessionsCompanion extends UpdateCompanion<Session> {
-  final Value<String> accessToken;
-  final Value<String> userId;
-  final Value<String> username;
-  final Value<String?> examId;
-  final Value<String?> centerId;
-  final Value<String?> examCode;
-  final Value<String?> centerCode;
-  final Value<String?> centerName;
-  final Value<String?> examName;
-  final Value<String?> userDataJson;
+  final Value<String> id;
+  final Value<String?> service;
+  final Value<String?> userJson;
+  final Value<String?> examJson;
+  final Value<String?> centerJson;
+  final Value<String> onboardingStep;
+  final Value<String?> selectedShiftId;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const SessionsCompanion({
-    this.accessToken = const Value.absent(),
-    this.userId = const Value.absent(),
-    this.username = const Value.absent(),
-    this.examId = const Value.absent(),
-    this.centerId = const Value.absent(),
-    this.examCode = const Value.absent(),
-    this.centerCode = const Value.absent(),
-    this.centerName = const Value.absent(),
-    this.examName = const Value.absent(),
-    this.userDataJson = const Value.absent(),
+    this.id = const Value.absent(),
+    this.service = const Value.absent(),
+    this.userJson = const Value.absent(),
+    this.examJson = const Value.absent(),
+    this.centerJson = const Value.absent(),
+    this.onboardingStep = const Value.absent(),
+    this.selectedShiftId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SessionsCompanion.insert({
-    required String accessToken,
-    required String userId,
-    required String username,
-    this.examId = const Value.absent(),
-    this.centerId = const Value.absent(),
-    this.examCode = const Value.absent(),
-    this.centerCode = const Value.absent(),
-    this.centerName = const Value.absent(),
-    this.examName = const Value.absent(),
-    this.userDataJson = const Value.absent(),
+    required String id,
+    this.service = const Value.absent(),
+    this.userJson = const Value.absent(),
+    this.examJson = const Value.absent(),
+    this.centerJson = const Value.absent(),
+    this.onboardingStep = const Value.absent(),
+    this.selectedShiftId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : accessToken = Value(accessToken),
-       userId = Value(userId),
-       username = Value(username);
+  }) : id = Value(id);
   static Insertable<Session> custom({
-    Expression<String>? accessToken,
-    Expression<String>? userId,
-    Expression<String>? username,
-    Expression<String>? examId,
-    Expression<String>? centerId,
-    Expression<String>? examCode,
-    Expression<String>? centerCode,
-    Expression<String>? centerName,
-    Expression<String>? examName,
-    Expression<String>? userDataJson,
+    Expression<String>? id,
+    Expression<String>? service,
+    Expression<String>? userJson,
+    Expression<String>? examJson,
+    Expression<String>? centerJson,
+    Expression<String>? onboardingStep,
+    Expression<String>? selectedShiftId,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (accessToken != null) 'access_token': accessToken,
-      if (userId != null) 'user_id': userId,
-      if (username != null) 'username': username,
-      if (examId != null) 'exam_id': examId,
-      if (centerId != null) 'center_id': centerId,
-      if (examCode != null) 'exam_code': examCode,
-      if (centerCode != null) 'center_code': centerCode,
-      if (centerName != null) 'center_name': centerName,
-      if (examName != null) 'exam_name': examName,
-      if (userDataJson != null) 'user_data_json': userDataJson,
+      if (id != null) 'id': id,
+      if (service != null) 'service': service,
+      if (userJson != null) 'user_json': userJson,
+      if (examJson != null) 'exam_json': examJson,
+      if (centerJson != null) 'center_json': centerJson,
+      if (onboardingStep != null) 'onboarding_step': onboardingStep,
+      if (selectedShiftId != null) 'selected_shift_id': selectedShiftId,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   SessionsCompanion copyWith({
-    Value<String>? accessToken,
-    Value<String>? userId,
-    Value<String>? username,
-    Value<String?>? examId,
-    Value<String?>? centerId,
-    Value<String?>? examCode,
-    Value<String?>? centerCode,
-    Value<String?>? centerName,
-    Value<String?>? examName,
-    Value<String?>? userDataJson,
+    Value<String>? id,
+    Value<String?>? service,
+    Value<String?>? userJson,
+    Value<String?>? examJson,
+    Value<String?>? centerJson,
+    Value<String>? onboardingStep,
+    Value<String?>? selectedShiftId,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
     return SessionsCompanion(
-      accessToken: accessToken ?? this.accessToken,
-      userId: userId ?? this.userId,
-      username: username ?? this.username,
-      examId: examId ?? this.examId,
-      centerId: centerId ?? this.centerId,
-      examCode: examCode ?? this.examCode,
-      centerCode: centerCode ?? this.centerCode,
-      centerName: centerName ?? this.centerName,
-      examName: examName ?? this.examName,
-      userDataJson: userDataJson ?? this.userDataJson,
+      id: id ?? this.id,
+      service: service ?? this.service,
+      userJson: userJson ?? this.userJson,
+      examJson: examJson ?? this.examJson,
+      centerJson: centerJson ?? this.centerJson,
+      onboardingStep: onboardingStep ?? this.onboardingStep,
+      selectedShiftId: selectedShiftId ?? this.selectedShiftId,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
@@ -619,35 +482,26 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (accessToken.present) {
-      map['access_token'] = Variable<String>(accessToken.value);
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
     }
-    if (userId.present) {
-      map['user_id'] = Variable<String>(userId.value);
+    if (service.present) {
+      map['service'] = Variable<String>(service.value);
     }
-    if (username.present) {
-      map['username'] = Variable<String>(username.value);
+    if (userJson.present) {
+      map['user_json'] = Variable<String>(userJson.value);
     }
-    if (examId.present) {
-      map['exam_id'] = Variable<String>(examId.value);
+    if (examJson.present) {
+      map['exam_json'] = Variable<String>(examJson.value);
     }
-    if (centerId.present) {
-      map['center_id'] = Variable<String>(centerId.value);
+    if (centerJson.present) {
+      map['center_json'] = Variable<String>(centerJson.value);
     }
-    if (examCode.present) {
-      map['exam_code'] = Variable<String>(examCode.value);
+    if (onboardingStep.present) {
+      map['onboarding_step'] = Variable<String>(onboardingStep.value);
     }
-    if (centerCode.present) {
-      map['center_code'] = Variable<String>(centerCode.value);
-    }
-    if (centerName.present) {
-      map['center_name'] = Variable<String>(centerName.value);
-    }
-    if (examName.present) {
-      map['exam_name'] = Variable<String>(examName.value);
-    }
-    if (userDataJson.present) {
-      map['user_data_json'] = Variable<String>(userDataJson.value);
+    if (selectedShiftId.present) {
+      map['selected_shift_id'] = Variable<String>(selectedShiftId.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -661,16 +515,13 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   @override
   String toString() {
     return (StringBuffer('SessionsCompanion(')
-          ..write('accessToken: $accessToken, ')
-          ..write('userId: $userId, ')
-          ..write('username: $username, ')
-          ..write('examId: $examId, ')
-          ..write('centerId: $centerId, ')
-          ..write('examCode: $examCode, ')
-          ..write('centerCode: $centerCode, ')
-          ..write('centerName: $centerName, ')
-          ..write('examName: $examName, ')
-          ..write('userDataJson: $userDataJson, ')
+          ..write('id: $id, ')
+          ..write('service: $service, ')
+          ..write('userJson: $userJson, ')
+          ..write('examJson: $examJson, ')
+          ..write('centerJson: $centerJson, ')
+          ..write('onboardingStep: $onboardingStep, ')
+          ..write('selectedShiftId: $selectedShiftId, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -687,6 +538,17 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _shiftIdMeta = const VerificationMeta(
+    'shiftId',
+  );
+  @override
+  late final GeneratedColumn<String> shiftId = GeneratedColumn<String>(
+    'shift_id',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -712,6 +574,15 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _ageMeta = const VerificationMeta('age');
+  @override
+  late final GeneratedColumn<int> age = GeneratedColumn<int>(
+    'age',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _aadhaarMeta = const VerificationMeta(
     'aadhaar',
   );
@@ -734,32 +605,40 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _mobileVerificationIdMeta =
-      const VerificationMeta('mobileVerificationId');
-  @override
-  late final GeneratedColumn<String> mobileVerificationId =
-      GeneratedColumn<String>(
-        'mobile_verification_id',
-        aliasedName,
-        true,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-      );
-  static const VerificationMeta _isVerifiedMeta = const VerificationMeta(
-    'isVerified',
+  static const VerificationMeta _livenessStatusMeta = const VerificationMeta(
+    'livenessStatus',
   );
   @override
-  late final GeneratedColumn<bool> isVerified = GeneratedColumn<bool>(
-    'is_verified',
+  late final GeneratedColumn<String> livenessStatus = GeneratedColumn<String>(
+    'liveness_status',
     aliasedName,
     false,
-    type: DriftSqlType.bool,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_verified" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
+    defaultValue: const Constant('PENDING'),
   );
+  static const VerificationMeta _livenessScoreMeta = const VerificationMeta(
+    'livenessScore',
+  );
+  @override
+  late final GeneratedColumn<double> livenessScore = GeneratedColumn<double>(
+    'liveness_score',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _livenessAttemptedAtMeta =
+      const VerificationMeta('livenessAttemptedAt');
+  @override
+  late final GeneratedColumn<DateTime> livenessAttemptedAt =
+      GeneratedColumn<DateTime>(
+        'liveness_attempted_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _latitudeMeta = const VerificationMeta(
     'latitude',
   );
@@ -793,6 +672,28 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _mobileVerificationIdMeta =
+      const VerificationMeta('mobileVerificationId');
+  @override
+  late final GeneratedColumn<String> mobileVerificationId =
+      GeneratedColumn<String>(
+        'mobile_verification_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _backendProfileIdMeta = const VerificationMeta(
+    'backendProfileId',
+  );
+  @override
+  late final GeneratedColumn<String> backendProfileId = GeneratedColumn<String>(
+    'backend_profile_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -808,15 +709,20 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    shiftId,
     name,
     contact,
+    age,
     aadhaar,
     selfieLocalPath,
-    mobileVerificationId,
-    isVerified,
+    livenessStatus,
+    livenessScore,
+    livenessAttemptedAt,
     latitude,
     longitude,
     location,
+    mobileVerificationId,
+    backendProfileId,
     createdAt,
   ];
   @override
@@ -827,1463 +733,6 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
   @override
   VerificationContext validateIntegrity(
     Insertable<Profile> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    if (data.containsKey('contact')) {
-      context.handle(
-        _contactMeta,
-        contact.isAcceptableOrUnknown(data['contact']!, _contactMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_contactMeta);
-    }
-    if (data.containsKey('aadhaar')) {
-      context.handle(
-        _aadhaarMeta,
-        aadhaar.isAcceptableOrUnknown(data['aadhaar']!, _aadhaarMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_aadhaarMeta);
-    }
-    if (data.containsKey('selfie_local_path')) {
-      context.handle(
-        _selfieLocalPathMeta,
-        selfieLocalPath.isAcceptableOrUnknown(
-          data['selfie_local_path']!,
-          _selfieLocalPathMeta,
-        ),
-      );
-    }
-    if (data.containsKey('mobile_verification_id')) {
-      context.handle(
-        _mobileVerificationIdMeta,
-        mobileVerificationId.isAcceptableOrUnknown(
-          data['mobile_verification_id']!,
-          _mobileVerificationIdMeta,
-        ),
-      );
-    }
-    if (data.containsKey('is_verified')) {
-      context.handle(
-        _isVerifiedMeta,
-        isVerified.isAcceptableOrUnknown(data['is_verified']!, _isVerifiedMeta),
-      );
-    }
-    if (data.containsKey('latitude')) {
-      context.handle(
-        _latitudeMeta,
-        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
-      );
-    }
-    if (data.containsKey('longitude')) {
-      context.handle(
-        _longitudeMeta,
-        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
-      );
-    }
-    if (data.containsKey('location')) {
-      context.handle(
-        _locationMeta,
-        location.isAcceptableOrUnknown(data['location']!, _locationMeta),
-      );
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Profile map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Profile(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
-      name: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}name'],
-      )!,
-      contact: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}contact'],
-      )!,
-      aadhaar: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}aadhaar'],
-      )!,
-      selfieLocalPath: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}selfie_local_path'],
-      ),
-      mobileVerificationId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}mobile_verification_id'],
-      ),
-      isVerified: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_verified'],
-      )!,
-      latitude: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}latitude'],
-      ),
-      longitude: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}longitude'],
-      ),
-      location: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}location'],
-      ),
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-    );
-  }
-
-  @override
-  $ProfilesTable createAlias(String alias) {
-    return $ProfilesTable(attachedDatabase, alias);
-  }
-}
-
-class Profile extends DataClass implements Insertable<Profile> {
-  final String id;
-  final String name;
-  final String contact;
-  final String aadhaar;
-  final String? selfieLocalPath;
-  final String? mobileVerificationId;
-  final bool isVerified;
-  final double? latitude;
-  final double? longitude;
-  final String? location;
-  final DateTime createdAt;
-  const Profile({
-    required this.id,
-    required this.name,
-    required this.contact,
-    required this.aadhaar,
-    this.selfieLocalPath,
-    this.mobileVerificationId,
-    required this.isVerified,
-    this.latitude,
-    this.longitude,
-    this.location,
-    required this.createdAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['name'] = Variable<String>(name);
-    map['contact'] = Variable<String>(contact);
-    map['aadhaar'] = Variable<String>(aadhaar);
-    if (!nullToAbsent || selfieLocalPath != null) {
-      map['selfie_local_path'] = Variable<String>(selfieLocalPath);
-    }
-    if (!nullToAbsent || mobileVerificationId != null) {
-      map['mobile_verification_id'] = Variable<String>(mobileVerificationId);
-    }
-    map['is_verified'] = Variable<bool>(isVerified);
-    if (!nullToAbsent || latitude != null) {
-      map['latitude'] = Variable<double>(latitude);
-    }
-    if (!nullToAbsent || longitude != null) {
-      map['longitude'] = Variable<double>(longitude);
-    }
-    if (!nullToAbsent || location != null) {
-      map['location'] = Variable<String>(location);
-    }
-    map['created_at'] = Variable<DateTime>(createdAt);
-    return map;
-  }
-
-  ProfilesCompanion toCompanion(bool nullToAbsent) {
-    return ProfilesCompanion(
-      id: Value(id),
-      name: Value(name),
-      contact: Value(contact),
-      aadhaar: Value(aadhaar),
-      selfieLocalPath: selfieLocalPath == null && nullToAbsent
-          ? const Value.absent()
-          : Value(selfieLocalPath),
-      mobileVerificationId: mobileVerificationId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(mobileVerificationId),
-      isVerified: Value(isVerified),
-      latitude: latitude == null && nullToAbsent
-          ? const Value.absent()
-          : Value(latitude),
-      longitude: longitude == null && nullToAbsent
-          ? const Value.absent()
-          : Value(longitude),
-      location: location == null && nullToAbsent
-          ? const Value.absent()
-          : Value(location),
-      createdAt: Value(createdAt),
-    );
-  }
-
-  factory Profile.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Profile(
-      id: serializer.fromJson<String>(json['id']),
-      name: serializer.fromJson<String>(json['name']),
-      contact: serializer.fromJson<String>(json['contact']),
-      aadhaar: serializer.fromJson<String>(json['aadhaar']),
-      selfieLocalPath: serializer.fromJson<String?>(json['selfieLocalPath']),
-      mobileVerificationId: serializer.fromJson<String?>(
-        json['mobileVerificationId'],
-      ),
-      isVerified: serializer.fromJson<bool>(json['isVerified']),
-      latitude: serializer.fromJson<double?>(json['latitude']),
-      longitude: serializer.fromJson<double?>(json['longitude']),
-      location: serializer.fromJson<String?>(json['location']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'name': serializer.toJson<String>(name),
-      'contact': serializer.toJson<String>(contact),
-      'aadhaar': serializer.toJson<String>(aadhaar),
-      'selfieLocalPath': serializer.toJson<String?>(selfieLocalPath),
-      'mobileVerificationId': serializer.toJson<String?>(mobileVerificationId),
-      'isVerified': serializer.toJson<bool>(isVerified),
-      'latitude': serializer.toJson<double?>(latitude),
-      'longitude': serializer.toJson<double?>(longitude),
-      'location': serializer.toJson<String?>(location),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-    };
-  }
-
-  Profile copyWith({
-    String? id,
-    String? name,
-    String? contact,
-    String? aadhaar,
-    Value<String?> selfieLocalPath = const Value.absent(),
-    Value<String?> mobileVerificationId = const Value.absent(),
-    bool? isVerified,
-    Value<double?> latitude = const Value.absent(),
-    Value<double?> longitude = const Value.absent(),
-    Value<String?> location = const Value.absent(),
-    DateTime? createdAt,
-  }) => Profile(
-    id: id ?? this.id,
-    name: name ?? this.name,
-    contact: contact ?? this.contact,
-    aadhaar: aadhaar ?? this.aadhaar,
-    selfieLocalPath: selfieLocalPath.present
-        ? selfieLocalPath.value
-        : this.selfieLocalPath,
-    mobileVerificationId: mobileVerificationId.present
-        ? mobileVerificationId.value
-        : this.mobileVerificationId,
-    isVerified: isVerified ?? this.isVerified,
-    latitude: latitude.present ? latitude.value : this.latitude,
-    longitude: longitude.present ? longitude.value : this.longitude,
-    location: location.present ? location.value : this.location,
-    createdAt: createdAt ?? this.createdAt,
-  );
-  Profile copyWithCompanion(ProfilesCompanion data) {
-    return Profile(
-      id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
-      contact: data.contact.present ? data.contact.value : this.contact,
-      aadhaar: data.aadhaar.present ? data.aadhaar.value : this.aadhaar,
-      selfieLocalPath: data.selfieLocalPath.present
-          ? data.selfieLocalPath.value
-          : this.selfieLocalPath,
-      mobileVerificationId: data.mobileVerificationId.present
-          ? data.mobileVerificationId.value
-          : this.mobileVerificationId,
-      isVerified: data.isVerified.present
-          ? data.isVerified.value
-          : this.isVerified,
-      latitude: data.latitude.present ? data.latitude.value : this.latitude,
-      longitude: data.longitude.present ? data.longitude.value : this.longitude,
-      location: data.location.present ? data.location.value : this.location,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Profile(')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('contact: $contact, ')
-          ..write('aadhaar: $aadhaar, ')
-          ..write('selfieLocalPath: $selfieLocalPath, ')
-          ..write('mobileVerificationId: $mobileVerificationId, ')
-          ..write('isVerified: $isVerified, ')
-          ..write('latitude: $latitude, ')
-          ..write('longitude: $longitude, ')
-          ..write('location: $location, ')
-          ..write('createdAt: $createdAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    name,
-    contact,
-    aadhaar,
-    selfieLocalPath,
-    mobileVerificationId,
-    isVerified,
-    latitude,
-    longitude,
-    location,
-    createdAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Profile &&
-          other.id == this.id &&
-          other.name == this.name &&
-          other.contact == this.contact &&
-          other.aadhaar == this.aadhaar &&
-          other.selfieLocalPath == this.selfieLocalPath &&
-          other.mobileVerificationId == this.mobileVerificationId &&
-          other.isVerified == this.isVerified &&
-          other.latitude == this.latitude &&
-          other.longitude == this.longitude &&
-          other.location == this.location &&
-          other.createdAt == this.createdAt);
-}
-
-class ProfilesCompanion extends UpdateCompanion<Profile> {
-  final Value<String> id;
-  final Value<String> name;
-  final Value<String> contact;
-  final Value<String> aadhaar;
-  final Value<String?> selfieLocalPath;
-  final Value<String?> mobileVerificationId;
-  final Value<bool> isVerified;
-  final Value<double?> latitude;
-  final Value<double?> longitude;
-  final Value<String?> location;
-  final Value<DateTime> createdAt;
-  final Value<int> rowid;
-  const ProfilesCompanion({
-    this.id = const Value.absent(),
-    this.name = const Value.absent(),
-    this.contact = const Value.absent(),
-    this.aadhaar = const Value.absent(),
-    this.selfieLocalPath = const Value.absent(),
-    this.mobileVerificationId = const Value.absent(),
-    this.isVerified = const Value.absent(),
-    this.latitude = const Value.absent(),
-    this.longitude = const Value.absent(),
-    this.location = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  ProfilesCompanion.insert({
-    required String id,
-    required String name,
-    required String contact,
-    required String aadhaar,
-    this.selfieLocalPath = const Value.absent(),
-    this.mobileVerificationId = const Value.absent(),
-    this.isVerified = const Value.absent(),
-    this.latitude = const Value.absent(),
-    this.longitude = const Value.absent(),
-    this.location = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       name = Value(name),
-       contact = Value(contact),
-       aadhaar = Value(aadhaar);
-  static Insertable<Profile> custom({
-    Expression<String>? id,
-    Expression<String>? name,
-    Expression<String>? contact,
-    Expression<String>? aadhaar,
-    Expression<String>? selfieLocalPath,
-    Expression<String>? mobileVerificationId,
-    Expression<bool>? isVerified,
-    Expression<double>? latitude,
-    Expression<double>? longitude,
-    Expression<String>? location,
-    Expression<DateTime>? createdAt,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (name != null) 'name': name,
-      if (contact != null) 'contact': contact,
-      if (aadhaar != null) 'aadhaar': aadhaar,
-      if (selfieLocalPath != null) 'selfie_local_path': selfieLocalPath,
-      if (mobileVerificationId != null)
-        'mobile_verification_id': mobileVerificationId,
-      if (isVerified != null) 'is_verified': isVerified,
-      if (latitude != null) 'latitude': latitude,
-      if (longitude != null) 'longitude': longitude,
-      if (location != null) 'location': location,
-      if (createdAt != null) 'created_at': createdAt,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  ProfilesCompanion copyWith({
-    Value<String>? id,
-    Value<String>? name,
-    Value<String>? contact,
-    Value<String>? aadhaar,
-    Value<String?>? selfieLocalPath,
-    Value<String?>? mobileVerificationId,
-    Value<bool>? isVerified,
-    Value<double?>? latitude,
-    Value<double?>? longitude,
-    Value<String?>? location,
-    Value<DateTime>? createdAt,
-    Value<int>? rowid,
-  }) {
-    return ProfilesCompanion(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      contact: contact ?? this.contact,
-      aadhaar: aadhaar ?? this.aadhaar,
-      selfieLocalPath: selfieLocalPath ?? this.selfieLocalPath,
-      mobileVerificationId: mobileVerificationId ?? this.mobileVerificationId,
-      isVerified: isVerified ?? this.isVerified,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      location: location ?? this.location,
-      createdAt: createdAt ?? this.createdAt,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (contact.present) {
-      map['contact'] = Variable<String>(contact.value);
-    }
-    if (aadhaar.present) {
-      map['aadhaar'] = Variable<String>(aadhaar.value);
-    }
-    if (selfieLocalPath.present) {
-      map['selfie_local_path'] = Variable<String>(selfieLocalPath.value);
-    }
-    if (mobileVerificationId.present) {
-      map['mobile_verification_id'] = Variable<String>(
-        mobileVerificationId.value,
-      );
-    }
-    if (isVerified.present) {
-      map['is_verified'] = Variable<bool>(isVerified.value);
-    }
-    if (latitude.present) {
-      map['latitude'] = Variable<double>(latitude.value);
-    }
-    if (longitude.present) {
-      map['longitude'] = Variable<double>(longitude.value);
-    }
-    if (location.present) {
-      map['location'] = Variable<String>(location.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ProfilesCompanion(')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('contact: $contact, ')
-          ..write('aadhaar: $aadhaar, ')
-          ..write('selfieLocalPath: $selfieLocalPath, ')
-          ..write('mobileVerificationId: $mobileVerificationId, ')
-          ..write('isVerified: $isVerified, ')
-          ..write('latitude: $latitude, ')
-          ..write('longitude: $longitude, ')
-          ..write('location: $location, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $ExamsTable extends Exams with TableInfo<$ExamsTable, Exam> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ExamsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _codeMeta = const VerificationMeta('code');
-  @override
-  late final GeneratedColumn<String> code = GeneratedColumn<String>(
-    'code',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _centerNameMeta = const VerificationMeta(
-    'centerName',
-  );
-  @override
-  late final GeneratedColumn<String> centerName = GeneratedColumn<String>(
-    'center_name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _centerCodeMeta = const VerificationMeta(
-    'centerCode',
-  );
-  @override
-  late final GeneratedColumn<String> centerCode = GeneratedColumn<String>(
-    'center_code',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _jsonDataMeta = const VerificationMeta(
-    'jsonData',
-  );
-  @override
-  late final GeneratedColumn<String> jsonData = GeneratedColumn<String>(
-    'json_data',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _downloadedAtMeta = const VerificationMeta(
-    'downloadedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> downloadedAt = GeneratedColumn<DateTime>(
-    'downloaded_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    code,
-    name,
-    centerName,
-    centerCode,
-    jsonData,
-    downloadedAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'exams';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<Exam> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('code')) {
-      context.handle(
-        _codeMeta,
-        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_codeMeta);
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    if (data.containsKey('center_name')) {
-      context.handle(
-        _centerNameMeta,
-        centerName.isAcceptableOrUnknown(data['center_name']!, _centerNameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_centerNameMeta);
-    }
-    if (data.containsKey('center_code')) {
-      context.handle(
-        _centerCodeMeta,
-        centerCode.isAcceptableOrUnknown(data['center_code']!, _centerCodeMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_centerCodeMeta);
-    }
-    if (data.containsKey('json_data')) {
-      context.handle(
-        _jsonDataMeta,
-        jsonData.isAcceptableOrUnknown(data['json_data']!, _jsonDataMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_jsonDataMeta);
-    }
-    if (data.containsKey('downloaded_at')) {
-      context.handle(
-        _downloadedAtMeta,
-        downloadedAt.isAcceptableOrUnknown(
-          data['downloaded_at']!,
-          _downloadedAtMeta,
-        ),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Exam map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Exam(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
-      code: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}code'],
-      )!,
-      name: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}name'],
-      )!,
-      centerName: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}center_name'],
-      )!,
-      centerCode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}center_code'],
-      )!,
-      jsonData: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}json_data'],
-      )!,
-      downloadedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}downloaded_at'],
-      )!,
-    );
-  }
-
-  @override
-  $ExamsTable createAlias(String alias) {
-    return $ExamsTable(attachedDatabase, alias);
-  }
-}
-
-class Exam extends DataClass implements Insertable<Exam> {
-  final String id;
-  final String code;
-  final String name;
-  final String centerName;
-  final String centerCode;
-  final String jsonData;
-  final DateTime downloadedAt;
-  const Exam({
-    required this.id,
-    required this.code,
-    required this.name,
-    required this.centerName,
-    required this.centerCode,
-    required this.jsonData,
-    required this.downloadedAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['code'] = Variable<String>(code);
-    map['name'] = Variable<String>(name);
-    map['center_name'] = Variable<String>(centerName);
-    map['center_code'] = Variable<String>(centerCode);
-    map['json_data'] = Variable<String>(jsonData);
-    map['downloaded_at'] = Variable<DateTime>(downloadedAt);
-    return map;
-  }
-
-  ExamsCompanion toCompanion(bool nullToAbsent) {
-    return ExamsCompanion(
-      id: Value(id),
-      code: Value(code),
-      name: Value(name),
-      centerName: Value(centerName),
-      centerCode: Value(centerCode),
-      jsonData: Value(jsonData),
-      downloadedAt: Value(downloadedAt),
-    );
-  }
-
-  factory Exam.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Exam(
-      id: serializer.fromJson<String>(json['id']),
-      code: serializer.fromJson<String>(json['code']),
-      name: serializer.fromJson<String>(json['name']),
-      centerName: serializer.fromJson<String>(json['centerName']),
-      centerCode: serializer.fromJson<String>(json['centerCode']),
-      jsonData: serializer.fromJson<String>(json['jsonData']),
-      downloadedAt: serializer.fromJson<DateTime>(json['downloadedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'code': serializer.toJson<String>(code),
-      'name': serializer.toJson<String>(name),
-      'centerName': serializer.toJson<String>(centerName),
-      'centerCode': serializer.toJson<String>(centerCode),
-      'jsonData': serializer.toJson<String>(jsonData),
-      'downloadedAt': serializer.toJson<DateTime>(downloadedAt),
-    };
-  }
-
-  Exam copyWith({
-    String? id,
-    String? code,
-    String? name,
-    String? centerName,
-    String? centerCode,
-    String? jsonData,
-    DateTime? downloadedAt,
-  }) => Exam(
-    id: id ?? this.id,
-    code: code ?? this.code,
-    name: name ?? this.name,
-    centerName: centerName ?? this.centerName,
-    centerCode: centerCode ?? this.centerCode,
-    jsonData: jsonData ?? this.jsonData,
-    downloadedAt: downloadedAt ?? this.downloadedAt,
-  );
-  Exam copyWithCompanion(ExamsCompanion data) {
-    return Exam(
-      id: data.id.present ? data.id.value : this.id,
-      code: data.code.present ? data.code.value : this.code,
-      name: data.name.present ? data.name.value : this.name,
-      centerName: data.centerName.present
-          ? data.centerName.value
-          : this.centerName,
-      centerCode: data.centerCode.present
-          ? data.centerCode.value
-          : this.centerCode,
-      jsonData: data.jsonData.present ? data.jsonData.value : this.jsonData,
-      downloadedAt: data.downloadedAt.present
-          ? data.downloadedAt.value
-          : this.downloadedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Exam(')
-          ..write('id: $id, ')
-          ..write('code: $code, ')
-          ..write('name: $name, ')
-          ..write('centerName: $centerName, ')
-          ..write('centerCode: $centerCode, ')
-          ..write('jsonData: $jsonData, ')
-          ..write('downloadedAt: $downloadedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    code,
-    name,
-    centerName,
-    centerCode,
-    jsonData,
-    downloadedAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Exam &&
-          other.id == this.id &&
-          other.code == this.code &&
-          other.name == this.name &&
-          other.centerName == this.centerName &&
-          other.centerCode == this.centerCode &&
-          other.jsonData == this.jsonData &&
-          other.downloadedAt == this.downloadedAt);
-}
-
-class ExamsCompanion extends UpdateCompanion<Exam> {
-  final Value<String> id;
-  final Value<String> code;
-  final Value<String> name;
-  final Value<String> centerName;
-  final Value<String> centerCode;
-  final Value<String> jsonData;
-  final Value<DateTime> downloadedAt;
-  final Value<int> rowid;
-  const ExamsCompanion({
-    this.id = const Value.absent(),
-    this.code = const Value.absent(),
-    this.name = const Value.absent(),
-    this.centerName = const Value.absent(),
-    this.centerCode = const Value.absent(),
-    this.jsonData = const Value.absent(),
-    this.downloadedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  ExamsCompanion.insert({
-    required String id,
-    required String code,
-    required String name,
-    required String centerName,
-    required String centerCode,
-    required String jsonData,
-    this.downloadedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       code = Value(code),
-       name = Value(name),
-       centerName = Value(centerName),
-       centerCode = Value(centerCode),
-       jsonData = Value(jsonData);
-  static Insertable<Exam> custom({
-    Expression<String>? id,
-    Expression<String>? code,
-    Expression<String>? name,
-    Expression<String>? centerName,
-    Expression<String>? centerCode,
-    Expression<String>? jsonData,
-    Expression<DateTime>? downloadedAt,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (code != null) 'code': code,
-      if (name != null) 'name': name,
-      if (centerName != null) 'center_name': centerName,
-      if (centerCode != null) 'center_code': centerCode,
-      if (jsonData != null) 'json_data': jsonData,
-      if (downloadedAt != null) 'downloaded_at': downloadedAt,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  ExamsCompanion copyWith({
-    Value<String>? id,
-    Value<String>? code,
-    Value<String>? name,
-    Value<String>? centerName,
-    Value<String>? centerCode,
-    Value<String>? jsonData,
-    Value<DateTime>? downloadedAt,
-    Value<int>? rowid,
-  }) {
-    return ExamsCompanion(
-      id: id ?? this.id,
-      code: code ?? this.code,
-      name: name ?? this.name,
-      centerName: centerName ?? this.centerName,
-      centerCode: centerCode ?? this.centerCode,
-      jsonData: jsonData ?? this.jsonData,
-      downloadedAt: downloadedAt ?? this.downloadedAt,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
-    if (code.present) {
-      map['code'] = Variable<String>(code.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (centerName.present) {
-      map['center_name'] = Variable<String>(centerName.value);
-    }
-    if (centerCode.present) {
-      map['center_code'] = Variable<String>(centerCode.value);
-    }
-    if (jsonData.present) {
-      map['json_data'] = Variable<String>(jsonData.value);
-    }
-    if (downloadedAt.present) {
-      map['downloaded_at'] = Variable<DateTime>(downloadedAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ExamsCompanion(')
-          ..write('id: $id, ')
-          ..write('code: $code, ')
-          ..write('name: $name, ')
-          ..write('centerName: $centerName, ')
-          ..write('centerCode: $centerCode, ')
-          ..write('jsonData: $jsonData, ')
-          ..write('downloadedAt: $downloadedAt, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $ShiftsTable extends Shifts with TableInfo<$ShiftsTable, Shift> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ShiftsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _examIdMeta = const VerificationMeta('examId');
-  @override
-  late final GeneratedColumn<String> examId = GeneratedColumn<String>(
-    'exam_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _dateMeta = const VerificationMeta('date');
-  @override
-  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
-    'date',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _isSelectedMeta = const VerificationMeta(
-    'isSelected',
-  );
-  @override
-  late final GeneratedColumn<bool> isSelected = GeneratedColumn<bool>(
-    'is_selected',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_selected" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
-  @override
-  List<GeneratedColumn> get $columns => [id, examId, name, date, isSelected];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'shifts';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<Shift> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('exam_id')) {
-      context.handle(
-        _examIdMeta,
-        examId.isAcceptableOrUnknown(data['exam_id']!, _examIdMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_examIdMeta);
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    if (data.containsKey('date')) {
-      context.handle(
-        _dateMeta,
-        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_dateMeta);
-    }
-    if (data.containsKey('is_selected')) {
-      context.handle(
-        _isSelectedMeta,
-        isSelected.isAcceptableOrUnknown(data['is_selected']!, _isSelectedMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Shift map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Shift(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
-      examId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}exam_id'],
-      )!,
-      name: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}name'],
-      )!,
-      date: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}date'],
-      )!,
-      isSelected: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_selected'],
-      )!,
-    );
-  }
-
-  @override
-  $ShiftsTable createAlias(String alias) {
-    return $ShiftsTable(attachedDatabase, alias);
-  }
-}
-
-class Shift extends DataClass implements Insertable<Shift> {
-  final String id;
-  final String examId;
-  final String name;
-  final DateTime date;
-  final bool isSelected;
-  const Shift({
-    required this.id,
-    required this.examId,
-    required this.name,
-    required this.date,
-    required this.isSelected,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['exam_id'] = Variable<String>(examId);
-    map['name'] = Variable<String>(name);
-    map['date'] = Variable<DateTime>(date);
-    map['is_selected'] = Variable<bool>(isSelected);
-    return map;
-  }
-
-  ShiftsCompanion toCompanion(bool nullToAbsent) {
-    return ShiftsCompanion(
-      id: Value(id),
-      examId: Value(examId),
-      name: Value(name),
-      date: Value(date),
-      isSelected: Value(isSelected),
-    );
-  }
-
-  factory Shift.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Shift(
-      id: serializer.fromJson<String>(json['id']),
-      examId: serializer.fromJson<String>(json['examId']),
-      name: serializer.fromJson<String>(json['name']),
-      date: serializer.fromJson<DateTime>(json['date']),
-      isSelected: serializer.fromJson<bool>(json['isSelected']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'examId': serializer.toJson<String>(examId),
-      'name': serializer.toJson<String>(name),
-      'date': serializer.toJson<DateTime>(date),
-      'isSelected': serializer.toJson<bool>(isSelected),
-    };
-  }
-
-  Shift copyWith({
-    String? id,
-    String? examId,
-    String? name,
-    DateTime? date,
-    bool? isSelected,
-  }) => Shift(
-    id: id ?? this.id,
-    examId: examId ?? this.examId,
-    name: name ?? this.name,
-    date: date ?? this.date,
-    isSelected: isSelected ?? this.isSelected,
-  );
-  Shift copyWithCompanion(ShiftsCompanion data) {
-    return Shift(
-      id: data.id.present ? data.id.value : this.id,
-      examId: data.examId.present ? data.examId.value : this.examId,
-      name: data.name.present ? data.name.value : this.name,
-      date: data.date.present ? data.date.value : this.date,
-      isSelected: data.isSelected.present
-          ? data.isSelected.value
-          : this.isSelected,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Shift(')
-          ..write('id: $id, ')
-          ..write('examId: $examId, ')
-          ..write('name: $name, ')
-          ..write('date: $date, ')
-          ..write('isSelected: $isSelected')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, examId, name, date, isSelected);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Shift &&
-          other.id == this.id &&
-          other.examId == this.examId &&
-          other.name == this.name &&
-          other.date == this.date &&
-          other.isSelected == this.isSelected);
-}
-
-class ShiftsCompanion extends UpdateCompanion<Shift> {
-  final Value<String> id;
-  final Value<String> examId;
-  final Value<String> name;
-  final Value<DateTime> date;
-  final Value<bool> isSelected;
-  final Value<int> rowid;
-  const ShiftsCompanion({
-    this.id = const Value.absent(),
-    this.examId = const Value.absent(),
-    this.name = const Value.absent(),
-    this.date = const Value.absent(),
-    this.isSelected = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  ShiftsCompanion.insert({
-    required String id,
-    required String examId,
-    required String name,
-    required DateTime date,
-    this.isSelected = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       examId = Value(examId),
-       name = Value(name),
-       date = Value(date);
-  static Insertable<Shift> custom({
-    Expression<String>? id,
-    Expression<String>? examId,
-    Expression<String>? name,
-    Expression<DateTime>? date,
-    Expression<bool>? isSelected,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (examId != null) 'exam_id': examId,
-      if (name != null) 'name': name,
-      if (date != null) 'date': date,
-      if (isSelected != null) 'is_selected': isSelected,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  ShiftsCompanion copyWith({
-    Value<String>? id,
-    Value<String>? examId,
-    Value<String>? name,
-    Value<DateTime>? date,
-    Value<bool>? isSelected,
-    Value<int>? rowid,
-  }) {
-    return ShiftsCompanion(
-      id: id ?? this.id,
-      examId: examId ?? this.examId,
-      name: name ?? this.name,
-      date: date ?? this.date,
-      isSelected: isSelected ?? this.isSelected,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
-    if (examId.present) {
-      map['exam_id'] = Variable<String>(examId.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (date.present) {
-      map['date'] = Variable<DateTime>(date.value);
-    }
-    if (isSelected.present) {
-      map['is_selected'] = Variable<bool>(isSelected.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ShiftsCompanion(')
-          ..write('id: $id, ')
-          ..write('examId: $examId, ')
-          ..write('name: $name, ')
-          ..write('date: $date, ')
-          ..write('isSelected: $isSelected, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $TasksTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _shiftIdMeta = const VerificationMeta(
-    'shiftId',
-  );
-  @override
-  late final GeneratedColumn<String> shiftId = GeneratedColumn<String>(
-    'shift_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _instructionsMeta = const VerificationMeta(
-    'instructions',
-  );
-  @override
-  late final GeneratedColumn<String> instructions = GeneratedColumn<String>(
-    'instructions',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
-    'sortOrder',
-  );
-  @override
-  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
-    'sort_order',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _statusMeta = const VerificationMeta('status');
-  @override
-  late final GeneratedColumn<String> status = GeneratedColumn<String>(
-    'status',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant('pending'),
-  );
-  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
-    'syncStatus',
-  );
-  @override
-  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
-    'sync_status',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant('unsynced'),
-  );
-  static const VerificationMeta _downloadedAtMeta = const VerificationMeta(
-    'downloadedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> downloadedAt = GeneratedColumn<DateTime>(
-    'downloaded_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    shiftId,
-    name,
-    instructions,
-    sortOrder,
-    status,
-    syncStatus,
-    downloadedAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'tasks';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<Task> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2309,32 +758,1042 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('instructions')) {
+    if (data.containsKey('contact')) {
       context.handle(
-        _instructionsMeta,
-        instructions.isAcceptableOrUnknown(
-          data['instructions']!,
-          _instructionsMeta,
+        _contactMeta,
+        contact.isAcceptableOrUnknown(data['contact']!, _contactMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contactMeta);
+    }
+    if (data.containsKey('age')) {
+      context.handle(
+        _ageMeta,
+        age.isAcceptableOrUnknown(data['age']!, _ageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ageMeta);
+    }
+    if (data.containsKey('aadhaar')) {
+      context.handle(
+        _aadhaarMeta,
+        aadhaar.isAcceptableOrUnknown(data['aadhaar']!, _aadhaarMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_aadhaarMeta);
+    }
+    if (data.containsKey('selfie_local_path')) {
+      context.handle(
+        _selfieLocalPathMeta,
+        selfieLocalPath.isAcceptableOrUnknown(
+          data['selfie_local_path']!,
+          _selfieLocalPathMeta,
         ),
       );
     }
-    if (data.containsKey('sort_order')) {
+    if (data.containsKey('liveness_status')) {
       context.handle(
-        _sortOrderMeta,
-        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+        _livenessStatusMeta,
+        livenessStatus.isAcceptableOrUnknown(
+          data['liveness_status']!,
+          _livenessStatusMeta,
+        ),
       );
     }
-    if (data.containsKey('status')) {
+    if (data.containsKey('liveness_score')) {
       context.handle(
-        _statusMeta,
-        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+        _livenessScoreMeta,
+        livenessScore.isAcceptableOrUnknown(
+          data['liveness_score']!,
+          _livenessScoreMeta,
+        ),
       );
     }
-    if (data.containsKey('sync_status')) {
+    if (data.containsKey('liveness_attempted_at')) {
       context.handle(
-        _syncStatusMeta,
-        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+        _livenessAttemptedAtMeta,
+        livenessAttemptedAt.isAcceptableOrUnknown(
+          data['liveness_attempted_at']!,
+          _livenessAttemptedAtMeta,
+        ),
       );
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    }
+    if (data.containsKey('location')) {
+      context.handle(
+        _locationMeta,
+        location.isAcceptableOrUnknown(data['location']!, _locationMeta),
+      );
+    }
+    if (data.containsKey('mobile_verification_id')) {
+      context.handle(
+        _mobileVerificationIdMeta,
+        mobileVerificationId.isAcceptableOrUnknown(
+          data['mobile_verification_id']!,
+          _mobileVerificationIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('backend_profile_id')) {
+      context.handle(
+        _backendProfileIdMeta,
+        backendProfileId.isAcceptableOrUnknown(
+          data['backend_profile_id']!,
+          _backendProfileIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Profile map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Profile(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      shiftId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}shift_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      contact: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact'],
+      )!,
+      age: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}age'],
+      )!,
+      aadhaar: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}aadhaar'],
+      )!,
+      selfieLocalPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selfie_local_path'],
+      ),
+      livenessStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}liveness_status'],
+      )!,
+      livenessScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}liveness_score'],
+      ),
+      livenessAttemptedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}liveness_attempted_at'],
+      ),
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      ),
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      ),
+      location: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}location'],
+      ),
+      mobileVerificationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mobile_verification_id'],
+      ),
+      backendProfileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}backend_profile_id'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ProfilesTable createAlias(String alias) {
+    return $ProfilesTable(attachedDatabase, alias);
+  }
+}
+
+class Profile extends DataClass implements Insertable<Profile> {
+  final String id;
+  final String shiftId;
+  final String name;
+  final String contact;
+  final int age;
+  final String aadhaar;
+  final String? selfieLocalPath;
+  final String livenessStatus;
+  final double? livenessScore;
+  final DateTime? livenessAttemptedAt;
+  final double? latitude;
+  final double? longitude;
+  final String? location;
+  final String? mobileVerificationId;
+  final String? backendProfileId;
+  final DateTime createdAt;
+  const Profile({
+    required this.id,
+    required this.shiftId,
+    required this.name,
+    required this.contact,
+    required this.age,
+    required this.aadhaar,
+    this.selfieLocalPath,
+    required this.livenessStatus,
+    this.livenessScore,
+    this.livenessAttemptedAt,
+    this.latitude,
+    this.longitude,
+    this.location,
+    this.mobileVerificationId,
+    this.backendProfileId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['shift_id'] = Variable<String>(shiftId);
+    map['name'] = Variable<String>(name);
+    map['contact'] = Variable<String>(contact);
+    map['age'] = Variable<int>(age);
+    map['aadhaar'] = Variable<String>(aadhaar);
+    if (!nullToAbsent || selfieLocalPath != null) {
+      map['selfie_local_path'] = Variable<String>(selfieLocalPath);
+    }
+    map['liveness_status'] = Variable<String>(livenessStatus);
+    if (!nullToAbsent || livenessScore != null) {
+      map['liveness_score'] = Variable<double>(livenessScore);
+    }
+    if (!nullToAbsent || livenessAttemptedAt != null) {
+      map['liveness_attempted_at'] = Variable<DateTime>(livenessAttemptedAt);
+    }
+    if (!nullToAbsent || latitude != null) {
+      map['latitude'] = Variable<double>(latitude);
+    }
+    if (!nullToAbsent || longitude != null) {
+      map['longitude'] = Variable<double>(longitude);
+    }
+    if (!nullToAbsent || location != null) {
+      map['location'] = Variable<String>(location);
+    }
+    if (!nullToAbsent || mobileVerificationId != null) {
+      map['mobile_verification_id'] = Variable<String>(mobileVerificationId);
+    }
+    if (!nullToAbsent || backendProfileId != null) {
+      map['backend_profile_id'] = Variable<String>(backendProfileId);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ProfilesCompanion toCompanion(bool nullToAbsent) {
+    return ProfilesCompanion(
+      id: Value(id),
+      shiftId: Value(shiftId),
+      name: Value(name),
+      contact: Value(contact),
+      age: Value(age),
+      aadhaar: Value(aadhaar),
+      selfieLocalPath: selfieLocalPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selfieLocalPath),
+      livenessStatus: Value(livenessStatus),
+      livenessScore: livenessScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(livenessScore),
+      livenessAttemptedAt: livenessAttemptedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(livenessAttemptedAt),
+      latitude: latitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(latitude),
+      longitude: longitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(longitude),
+      location: location == null && nullToAbsent
+          ? const Value.absent()
+          : Value(location),
+      mobileVerificationId: mobileVerificationId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mobileVerificationId),
+      backendProfileId: backendProfileId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backendProfileId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Profile.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Profile(
+      id: serializer.fromJson<String>(json['id']),
+      shiftId: serializer.fromJson<String>(json['shiftId']),
+      name: serializer.fromJson<String>(json['name']),
+      contact: serializer.fromJson<String>(json['contact']),
+      age: serializer.fromJson<int>(json['age']),
+      aadhaar: serializer.fromJson<String>(json['aadhaar']),
+      selfieLocalPath: serializer.fromJson<String?>(json['selfieLocalPath']),
+      livenessStatus: serializer.fromJson<String>(json['livenessStatus']),
+      livenessScore: serializer.fromJson<double?>(json['livenessScore']),
+      livenessAttemptedAt: serializer.fromJson<DateTime?>(
+        json['livenessAttemptedAt'],
+      ),
+      latitude: serializer.fromJson<double?>(json['latitude']),
+      longitude: serializer.fromJson<double?>(json['longitude']),
+      location: serializer.fromJson<String?>(json['location']),
+      mobileVerificationId: serializer.fromJson<String?>(
+        json['mobileVerificationId'],
+      ),
+      backendProfileId: serializer.fromJson<String?>(json['backendProfileId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'shiftId': serializer.toJson<String>(shiftId),
+      'name': serializer.toJson<String>(name),
+      'contact': serializer.toJson<String>(contact),
+      'age': serializer.toJson<int>(age),
+      'aadhaar': serializer.toJson<String>(aadhaar),
+      'selfieLocalPath': serializer.toJson<String?>(selfieLocalPath),
+      'livenessStatus': serializer.toJson<String>(livenessStatus),
+      'livenessScore': serializer.toJson<double?>(livenessScore),
+      'livenessAttemptedAt': serializer.toJson<DateTime?>(livenessAttemptedAt),
+      'latitude': serializer.toJson<double?>(latitude),
+      'longitude': serializer.toJson<double?>(longitude),
+      'location': serializer.toJson<String?>(location),
+      'mobileVerificationId': serializer.toJson<String?>(mobileVerificationId),
+      'backendProfileId': serializer.toJson<String?>(backendProfileId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Profile copyWith({
+    String? id,
+    String? shiftId,
+    String? name,
+    String? contact,
+    int? age,
+    String? aadhaar,
+    Value<String?> selfieLocalPath = const Value.absent(),
+    String? livenessStatus,
+    Value<double?> livenessScore = const Value.absent(),
+    Value<DateTime?> livenessAttemptedAt = const Value.absent(),
+    Value<double?> latitude = const Value.absent(),
+    Value<double?> longitude = const Value.absent(),
+    Value<String?> location = const Value.absent(),
+    Value<String?> mobileVerificationId = const Value.absent(),
+    Value<String?> backendProfileId = const Value.absent(),
+    DateTime? createdAt,
+  }) => Profile(
+    id: id ?? this.id,
+    shiftId: shiftId ?? this.shiftId,
+    name: name ?? this.name,
+    contact: contact ?? this.contact,
+    age: age ?? this.age,
+    aadhaar: aadhaar ?? this.aadhaar,
+    selfieLocalPath: selfieLocalPath.present
+        ? selfieLocalPath.value
+        : this.selfieLocalPath,
+    livenessStatus: livenessStatus ?? this.livenessStatus,
+    livenessScore: livenessScore.present
+        ? livenessScore.value
+        : this.livenessScore,
+    livenessAttemptedAt: livenessAttemptedAt.present
+        ? livenessAttemptedAt.value
+        : this.livenessAttemptedAt,
+    latitude: latitude.present ? latitude.value : this.latitude,
+    longitude: longitude.present ? longitude.value : this.longitude,
+    location: location.present ? location.value : this.location,
+    mobileVerificationId: mobileVerificationId.present
+        ? mobileVerificationId.value
+        : this.mobileVerificationId,
+    backendProfileId: backendProfileId.present
+        ? backendProfileId.value
+        : this.backendProfileId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Profile copyWithCompanion(ProfilesCompanion data) {
+    return Profile(
+      id: data.id.present ? data.id.value : this.id,
+      shiftId: data.shiftId.present ? data.shiftId.value : this.shiftId,
+      name: data.name.present ? data.name.value : this.name,
+      contact: data.contact.present ? data.contact.value : this.contact,
+      age: data.age.present ? data.age.value : this.age,
+      aadhaar: data.aadhaar.present ? data.aadhaar.value : this.aadhaar,
+      selfieLocalPath: data.selfieLocalPath.present
+          ? data.selfieLocalPath.value
+          : this.selfieLocalPath,
+      livenessStatus: data.livenessStatus.present
+          ? data.livenessStatus.value
+          : this.livenessStatus,
+      livenessScore: data.livenessScore.present
+          ? data.livenessScore.value
+          : this.livenessScore,
+      livenessAttemptedAt: data.livenessAttemptedAt.present
+          ? data.livenessAttemptedAt.value
+          : this.livenessAttemptedAt,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+      location: data.location.present ? data.location.value : this.location,
+      mobileVerificationId: data.mobileVerificationId.present
+          ? data.mobileVerificationId.value
+          : this.mobileVerificationId,
+      backendProfileId: data.backendProfileId.present
+          ? data.backendProfileId.value
+          : this.backendProfileId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Profile(')
+          ..write('id: $id, ')
+          ..write('shiftId: $shiftId, ')
+          ..write('name: $name, ')
+          ..write('contact: $contact, ')
+          ..write('age: $age, ')
+          ..write('aadhaar: $aadhaar, ')
+          ..write('selfieLocalPath: $selfieLocalPath, ')
+          ..write('livenessStatus: $livenessStatus, ')
+          ..write('livenessScore: $livenessScore, ')
+          ..write('livenessAttemptedAt: $livenessAttemptedAt, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('location: $location, ')
+          ..write('mobileVerificationId: $mobileVerificationId, ')
+          ..write('backendProfileId: $backendProfileId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    shiftId,
+    name,
+    contact,
+    age,
+    aadhaar,
+    selfieLocalPath,
+    livenessStatus,
+    livenessScore,
+    livenessAttemptedAt,
+    latitude,
+    longitude,
+    location,
+    mobileVerificationId,
+    backendProfileId,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Profile &&
+          other.id == this.id &&
+          other.shiftId == this.shiftId &&
+          other.name == this.name &&
+          other.contact == this.contact &&
+          other.age == this.age &&
+          other.aadhaar == this.aadhaar &&
+          other.selfieLocalPath == this.selfieLocalPath &&
+          other.livenessStatus == this.livenessStatus &&
+          other.livenessScore == this.livenessScore &&
+          other.livenessAttemptedAt == this.livenessAttemptedAt &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude &&
+          other.location == this.location &&
+          other.mobileVerificationId == this.mobileVerificationId &&
+          other.backendProfileId == this.backendProfileId &&
+          other.createdAt == this.createdAt);
+}
+
+class ProfilesCompanion extends UpdateCompanion<Profile> {
+  final Value<String> id;
+  final Value<String> shiftId;
+  final Value<String> name;
+  final Value<String> contact;
+  final Value<int> age;
+  final Value<String> aadhaar;
+  final Value<String?> selfieLocalPath;
+  final Value<String> livenessStatus;
+  final Value<double?> livenessScore;
+  final Value<DateTime?> livenessAttemptedAt;
+  final Value<double?> latitude;
+  final Value<double?> longitude;
+  final Value<String?> location;
+  final Value<String?> mobileVerificationId;
+  final Value<String?> backendProfileId;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ProfilesCompanion({
+    this.id = const Value.absent(),
+    this.shiftId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.contact = const Value.absent(),
+    this.age = const Value.absent(),
+    this.aadhaar = const Value.absent(),
+    this.selfieLocalPath = const Value.absent(),
+    this.livenessStatus = const Value.absent(),
+    this.livenessScore = const Value.absent(),
+    this.livenessAttemptedAt = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.location = const Value.absent(),
+    this.mobileVerificationId = const Value.absent(),
+    this.backendProfileId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ProfilesCompanion.insert({
+    required String id,
+    required String shiftId,
+    required String name,
+    required String contact,
+    required int age,
+    required String aadhaar,
+    this.selfieLocalPath = const Value.absent(),
+    this.livenessStatus = const Value.absent(),
+    this.livenessScore = const Value.absent(),
+    this.livenessAttemptedAt = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.location = const Value.absent(),
+    this.mobileVerificationId = const Value.absent(),
+    this.backendProfileId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       shiftId = Value(shiftId),
+       name = Value(name),
+       contact = Value(contact),
+       age = Value(age),
+       aadhaar = Value(aadhaar);
+  static Insertable<Profile> custom({
+    Expression<String>? id,
+    Expression<String>? shiftId,
+    Expression<String>? name,
+    Expression<String>? contact,
+    Expression<int>? age,
+    Expression<String>? aadhaar,
+    Expression<String>? selfieLocalPath,
+    Expression<String>? livenessStatus,
+    Expression<double>? livenessScore,
+    Expression<DateTime>? livenessAttemptedAt,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+    Expression<String>? location,
+    Expression<String>? mobileVerificationId,
+    Expression<String>? backendProfileId,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (shiftId != null) 'shift_id': shiftId,
+      if (name != null) 'name': name,
+      if (contact != null) 'contact': contact,
+      if (age != null) 'age': age,
+      if (aadhaar != null) 'aadhaar': aadhaar,
+      if (selfieLocalPath != null) 'selfie_local_path': selfieLocalPath,
+      if (livenessStatus != null) 'liveness_status': livenessStatus,
+      if (livenessScore != null) 'liveness_score': livenessScore,
+      if (livenessAttemptedAt != null)
+        'liveness_attempted_at': livenessAttemptedAt,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (location != null) 'location': location,
+      if (mobileVerificationId != null)
+        'mobile_verification_id': mobileVerificationId,
+      if (backendProfileId != null) 'backend_profile_id': backendProfileId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ProfilesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? shiftId,
+    Value<String>? name,
+    Value<String>? contact,
+    Value<int>? age,
+    Value<String>? aadhaar,
+    Value<String?>? selfieLocalPath,
+    Value<String>? livenessStatus,
+    Value<double?>? livenessScore,
+    Value<DateTime?>? livenessAttemptedAt,
+    Value<double?>? latitude,
+    Value<double?>? longitude,
+    Value<String?>? location,
+    Value<String?>? mobileVerificationId,
+    Value<String?>? backendProfileId,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ProfilesCompanion(
+      id: id ?? this.id,
+      shiftId: shiftId ?? this.shiftId,
+      name: name ?? this.name,
+      contact: contact ?? this.contact,
+      age: age ?? this.age,
+      aadhaar: aadhaar ?? this.aadhaar,
+      selfieLocalPath: selfieLocalPath ?? this.selfieLocalPath,
+      livenessStatus: livenessStatus ?? this.livenessStatus,
+      livenessScore: livenessScore ?? this.livenessScore,
+      livenessAttemptedAt: livenessAttemptedAt ?? this.livenessAttemptedAt,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      location: location ?? this.location,
+      mobileVerificationId: mobileVerificationId ?? this.mobileVerificationId,
+      backendProfileId: backendProfileId ?? this.backendProfileId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (shiftId.present) {
+      map['shift_id'] = Variable<String>(shiftId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (contact.present) {
+      map['contact'] = Variable<String>(contact.value);
+    }
+    if (age.present) {
+      map['age'] = Variable<int>(age.value);
+    }
+    if (aadhaar.present) {
+      map['aadhaar'] = Variable<String>(aadhaar.value);
+    }
+    if (selfieLocalPath.present) {
+      map['selfie_local_path'] = Variable<String>(selfieLocalPath.value);
+    }
+    if (livenessStatus.present) {
+      map['liveness_status'] = Variable<String>(livenessStatus.value);
+    }
+    if (livenessScore.present) {
+      map['liveness_score'] = Variable<double>(livenessScore.value);
+    }
+    if (livenessAttemptedAt.present) {
+      map['liveness_attempted_at'] = Variable<DateTime>(
+        livenessAttemptedAt.value,
+      );
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    if (location.present) {
+      map['location'] = Variable<String>(location.value);
+    }
+    if (mobileVerificationId.present) {
+      map['mobile_verification_id'] = Variable<String>(
+        mobileVerificationId.value,
+      );
+    }
+    if (backendProfileId.present) {
+      map['backend_profile_id'] = Variable<String>(backendProfileId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProfilesCompanion(')
+          ..write('id: $id, ')
+          ..write('shiftId: $shiftId, ')
+          ..write('name: $name, ')
+          ..write('contact: $contact, ')
+          ..write('age: $age, ')
+          ..write('aadhaar: $aadhaar, ')
+          ..write('selfieLocalPath: $selfieLocalPath, ')
+          ..write('livenessStatus: $livenessStatus, ')
+          ..write('livenessScore: $livenessScore, ')
+          ..write('livenessAttemptedAt: $livenessAttemptedAt, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('location: $location, ')
+          ..write('mobileVerificationId: $mobileVerificationId, ')
+          ..write('backendProfileId: $backendProfileId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TasksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _clientCodeMeta = const VerificationMeta(
+    'clientCode',
+  );
+  @override
+  late final GeneratedColumn<String> clientCode = GeneratedColumn<String>(
+    'client_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _examIdMeta = const VerificationMeta('examId');
+  @override
+  late final GeneratedColumn<String> examId = GeneratedColumn<String>(
+    'exam_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _centerIdMeta = const VerificationMeta(
+    'centerId',
+  );
+  @override
+  late final GeneratedColumn<String> centerId = GeneratedColumn<String>(
+    'center_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _shiftIdMeta = const VerificationMeta(
+    'shiftId',
+  );
+  @override
+  late final GeneratedColumn<String> shiftId = GeneratedColumn<String>(
+    'shift_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _serviceMeta = const VerificationMeta(
+    'service',
+  );
+  @override
+  late final GeneratedColumn<String> service = GeneratedColumn<String>(
+    'service',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _seqNumberMeta = const VerificationMeta(
+    'seqNumber',
+  );
+  @override
+  late final GeneratedColumn<int> seqNumber = GeneratedColumn<int>(
+    'seq_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _requiredMeta = const VerificationMeta(
+    'required',
+  );
+  @override
+  late final GeneratedColumn<bool> required = GeneratedColumn<bool>(
+    'required',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("required" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
+  @override
+  late final GeneratedColumn<String> taskId = GeneratedColumn<String>(
+    'task_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _taskLabelMeta = const VerificationMeta(
+    'taskLabel',
+  );
+  @override
+  late final GeneratedColumn<String> taskLabel = GeneratedColumn<String>(
+    'task_label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _taskDescMeta = const VerificationMeta(
+    'taskDesc',
+  );
+  @override
+  late final GeneratedColumn<String> taskDesc = GeneratedColumn<String>(
+    'task_desc',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _taskTypeMeta = const VerificationMeta(
+    'taskType',
+  );
+  @override
+  late final GeneratedColumn<String> taskType = GeneratedColumn<String>(
+    'task_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('IMAGE'),
+  );
+  static const VerificationMeta _taskStatusMeta = const VerificationMeta(
+    'taskStatus',
+  );
+  @override
+  late final GeneratedColumn<String> taskStatus = GeneratedColumn<String>(
+    'task_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('PENDING'),
+  );
+  static const VerificationMeta _centerCodeMeta = const VerificationMeta(
+    'centerCode',
+  );
+  @override
+  late final GeneratedColumn<String> centerCode = GeneratedColumn<String>(
+    'center_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _centerNameMeta = const VerificationMeta(
+    'centerName',
+  );
+  @override
+  late final GeneratedColumn<String> centerName = GeneratedColumn<String>(
+    'center_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _downloadedAtMeta = const VerificationMeta(
+    'downloadedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> downloadedAt = GeneratedColumn<DateTime>(
+    'downloaded_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    clientCode,
+    examId,
+    centerId,
+    shiftId,
+    service,
+    seqNumber,
+    required,
+    taskId,
+    taskLabel,
+    taskDesc,
+    taskType,
+    taskStatus,
+    centerCode,
+    centerName,
+    downloadedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tasks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Task> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('client_code')) {
+      context.handle(
+        _clientCodeMeta,
+        clientCode.isAcceptableOrUnknown(data['client_code']!, _clientCodeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clientCodeMeta);
+    }
+    if (data.containsKey('exam_id')) {
+      context.handle(
+        _examIdMeta,
+        examId.isAcceptableOrUnknown(data['exam_id']!, _examIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_examIdMeta);
+    }
+    if (data.containsKey('center_id')) {
+      context.handle(
+        _centerIdMeta,
+        centerId.isAcceptableOrUnknown(data['center_id']!, _centerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_centerIdMeta);
+    }
+    if (data.containsKey('shift_id')) {
+      context.handle(
+        _shiftIdMeta,
+        shiftId.isAcceptableOrUnknown(data['shift_id']!, _shiftIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_shiftIdMeta);
+    }
+    if (data.containsKey('service')) {
+      context.handle(
+        _serviceMeta,
+        service.isAcceptableOrUnknown(data['service']!, _serviceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_serviceMeta);
+    }
+    if (data.containsKey('seq_number')) {
+      context.handle(
+        _seqNumberMeta,
+        seqNumber.isAcceptableOrUnknown(data['seq_number']!, _seqNumberMeta),
+      );
+    }
+    if (data.containsKey('required')) {
+      context.handle(
+        _requiredMeta,
+        required.isAcceptableOrUnknown(data['required']!, _requiredMeta),
+      );
+    }
+    if (data.containsKey('task_id')) {
+      context.handle(
+        _taskIdMeta,
+        taskId.isAcceptableOrUnknown(data['task_id']!, _taskIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_taskIdMeta);
+    }
+    if (data.containsKey('task_label')) {
+      context.handle(
+        _taskLabelMeta,
+        taskLabel.isAcceptableOrUnknown(data['task_label']!, _taskLabelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_taskLabelMeta);
+    }
+    if (data.containsKey('task_desc')) {
+      context.handle(
+        _taskDescMeta,
+        taskDesc.isAcceptableOrUnknown(data['task_desc']!, _taskDescMeta),
+      );
+    }
+    if (data.containsKey('task_type')) {
+      context.handle(
+        _taskTypeMeta,
+        taskType.isAcceptableOrUnknown(data['task_type']!, _taskTypeMeta),
+      );
+    }
+    if (data.containsKey('task_status')) {
+      context.handle(
+        _taskStatusMeta,
+        taskStatus.isAcceptableOrUnknown(data['task_status']!, _taskStatusMeta),
+      );
+    }
+    if (data.containsKey('center_code')) {
+      context.handle(
+        _centerCodeMeta,
+        centerCode.isAcceptableOrUnknown(data['center_code']!, _centerCodeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_centerCodeMeta);
+    }
+    if (data.containsKey('center_name')) {
+      context.handle(
+        _centerNameMeta,
+        centerName.isAcceptableOrUnknown(data['center_name']!, _centerNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_centerNameMeta);
     }
     if (data.containsKey('downloaded_at')) {
       context.handle(
@@ -2358,29 +1817,61 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
+      clientCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}client_code'],
+      )!,
+      examId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}exam_id'],
+      )!,
+      centerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}center_id'],
+      )!,
       shiftId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}shift_id'],
       )!,
-      name: attachedDatabase.typeMapping.read(
+      service: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}name'],
+        data['${effectivePrefix}service'],
       )!,
-      instructions: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}instructions'],
-      ),
-      sortOrder: attachedDatabase.typeMapping.read(
+      seqNumber: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}sort_order'],
+        data['${effectivePrefix}seq_number'],
       )!,
-      status: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}status'],
+      required: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}required'],
       )!,
-      syncStatus: attachedDatabase.typeMapping.read(
+      taskId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}sync_status'],
+        data['${effectivePrefix}task_id'],
+      )!,
+      taskLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}task_label'],
+      )!,
+      taskDesc: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}task_desc'],
+      ),
+      taskType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}task_type'],
+      )!,
+      taskStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}task_status'],
+      )!,
+      centerCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}center_code'],
+      )!,
+      centerName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}center_name'],
       )!,
       downloadedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -2397,35 +1888,59 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
 
 class Task extends DataClass implements Insertable<Task> {
   final String id;
+  final String clientCode;
+  final String examId;
+  final String centerId;
   final String shiftId;
-  final String name;
-  final String? instructions;
-  final int sortOrder;
-  final String status;
-  final String syncStatus;
+  final String service;
+  final int seqNumber;
+  final bool required;
+  final String taskId;
+  final String taskLabel;
+  final String? taskDesc;
+  final String taskType;
+  final String taskStatus;
+  final String centerCode;
+  final String centerName;
   final DateTime downloadedAt;
   const Task({
     required this.id,
+    required this.clientCode,
+    required this.examId,
+    required this.centerId,
     required this.shiftId,
-    required this.name,
-    this.instructions,
-    required this.sortOrder,
-    required this.status,
-    required this.syncStatus,
+    required this.service,
+    required this.seqNumber,
+    required this.required,
+    required this.taskId,
+    required this.taskLabel,
+    this.taskDesc,
+    required this.taskType,
+    required this.taskStatus,
+    required this.centerCode,
+    required this.centerName,
     required this.downloadedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
+    map['client_code'] = Variable<String>(clientCode);
+    map['exam_id'] = Variable<String>(examId);
+    map['center_id'] = Variable<String>(centerId);
     map['shift_id'] = Variable<String>(shiftId);
-    map['name'] = Variable<String>(name);
-    if (!nullToAbsent || instructions != null) {
-      map['instructions'] = Variable<String>(instructions);
+    map['service'] = Variable<String>(service);
+    map['seq_number'] = Variable<int>(seqNumber);
+    map['required'] = Variable<bool>(required);
+    map['task_id'] = Variable<String>(taskId);
+    map['task_label'] = Variable<String>(taskLabel);
+    if (!nullToAbsent || taskDesc != null) {
+      map['task_desc'] = Variable<String>(taskDesc);
     }
-    map['sort_order'] = Variable<int>(sortOrder);
-    map['status'] = Variable<String>(status);
-    map['sync_status'] = Variable<String>(syncStatus);
+    map['task_type'] = Variable<String>(taskType);
+    map['task_status'] = Variable<String>(taskStatus);
+    map['center_code'] = Variable<String>(centerCode);
+    map['center_name'] = Variable<String>(centerName);
     map['downloaded_at'] = Variable<DateTime>(downloadedAt);
     return map;
   }
@@ -2433,14 +1948,22 @@ class Task extends DataClass implements Insertable<Task> {
   TasksCompanion toCompanion(bool nullToAbsent) {
     return TasksCompanion(
       id: Value(id),
+      clientCode: Value(clientCode),
+      examId: Value(examId),
+      centerId: Value(centerId),
       shiftId: Value(shiftId),
-      name: Value(name),
-      instructions: instructions == null && nullToAbsent
+      service: Value(service),
+      seqNumber: Value(seqNumber),
+      required: Value(required),
+      taskId: Value(taskId),
+      taskLabel: Value(taskLabel),
+      taskDesc: taskDesc == null && nullToAbsent
           ? const Value.absent()
-          : Value(instructions),
-      sortOrder: Value(sortOrder),
-      status: Value(status),
-      syncStatus: Value(syncStatus),
+          : Value(taskDesc),
+      taskType: Value(taskType),
+      taskStatus: Value(taskStatus),
+      centerCode: Value(centerCode),
+      centerName: Value(centerName),
       downloadedAt: Value(downloadedAt),
     );
   }
@@ -2452,12 +1975,20 @@ class Task extends DataClass implements Insertable<Task> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Task(
       id: serializer.fromJson<String>(json['id']),
+      clientCode: serializer.fromJson<String>(json['clientCode']),
+      examId: serializer.fromJson<String>(json['examId']),
+      centerId: serializer.fromJson<String>(json['centerId']),
       shiftId: serializer.fromJson<String>(json['shiftId']),
-      name: serializer.fromJson<String>(json['name']),
-      instructions: serializer.fromJson<String?>(json['instructions']),
-      sortOrder: serializer.fromJson<int>(json['sortOrder']),
-      status: serializer.fromJson<String>(json['status']),
-      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      service: serializer.fromJson<String>(json['service']),
+      seqNumber: serializer.fromJson<int>(json['seqNumber']),
+      required: serializer.fromJson<bool>(json['required']),
+      taskId: serializer.fromJson<String>(json['taskId']),
+      taskLabel: serializer.fromJson<String>(json['taskLabel']),
+      taskDesc: serializer.fromJson<String?>(json['taskDesc']),
+      taskType: serializer.fromJson<String>(json['taskType']),
+      taskStatus: serializer.fromJson<String>(json['taskStatus']),
+      centerCode: serializer.fromJson<String>(json['centerCode']),
+      centerName: serializer.fromJson<String>(json['centerName']),
       downloadedAt: serializer.fromJson<DateTime>(json['downloadedAt']),
     );
   }
@@ -2466,48 +1997,84 @@ class Task extends DataClass implements Insertable<Task> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
+      'clientCode': serializer.toJson<String>(clientCode),
+      'examId': serializer.toJson<String>(examId),
+      'centerId': serializer.toJson<String>(centerId),
       'shiftId': serializer.toJson<String>(shiftId),
-      'name': serializer.toJson<String>(name),
-      'instructions': serializer.toJson<String?>(instructions),
-      'sortOrder': serializer.toJson<int>(sortOrder),
-      'status': serializer.toJson<String>(status),
-      'syncStatus': serializer.toJson<String>(syncStatus),
+      'service': serializer.toJson<String>(service),
+      'seqNumber': serializer.toJson<int>(seqNumber),
+      'required': serializer.toJson<bool>(required),
+      'taskId': serializer.toJson<String>(taskId),
+      'taskLabel': serializer.toJson<String>(taskLabel),
+      'taskDesc': serializer.toJson<String?>(taskDesc),
+      'taskType': serializer.toJson<String>(taskType),
+      'taskStatus': serializer.toJson<String>(taskStatus),
+      'centerCode': serializer.toJson<String>(centerCode),
+      'centerName': serializer.toJson<String>(centerName),
       'downloadedAt': serializer.toJson<DateTime>(downloadedAt),
     };
   }
 
   Task copyWith({
     String? id,
+    String? clientCode,
+    String? examId,
+    String? centerId,
     String? shiftId,
-    String? name,
-    Value<String?> instructions = const Value.absent(),
-    int? sortOrder,
-    String? status,
-    String? syncStatus,
+    String? service,
+    int? seqNumber,
+    bool? required,
+    String? taskId,
+    String? taskLabel,
+    Value<String?> taskDesc = const Value.absent(),
+    String? taskType,
+    String? taskStatus,
+    String? centerCode,
+    String? centerName,
     DateTime? downloadedAt,
   }) => Task(
     id: id ?? this.id,
+    clientCode: clientCode ?? this.clientCode,
+    examId: examId ?? this.examId,
+    centerId: centerId ?? this.centerId,
     shiftId: shiftId ?? this.shiftId,
-    name: name ?? this.name,
-    instructions: instructions.present ? instructions.value : this.instructions,
-    sortOrder: sortOrder ?? this.sortOrder,
-    status: status ?? this.status,
-    syncStatus: syncStatus ?? this.syncStatus,
+    service: service ?? this.service,
+    seqNumber: seqNumber ?? this.seqNumber,
+    required: required ?? this.required,
+    taskId: taskId ?? this.taskId,
+    taskLabel: taskLabel ?? this.taskLabel,
+    taskDesc: taskDesc.present ? taskDesc.value : this.taskDesc,
+    taskType: taskType ?? this.taskType,
+    taskStatus: taskStatus ?? this.taskStatus,
+    centerCode: centerCode ?? this.centerCode,
+    centerName: centerName ?? this.centerName,
     downloadedAt: downloadedAt ?? this.downloadedAt,
   );
   Task copyWithCompanion(TasksCompanion data) {
     return Task(
       id: data.id.present ? data.id.value : this.id,
+      clientCode: data.clientCode.present
+          ? data.clientCode.value
+          : this.clientCode,
+      examId: data.examId.present ? data.examId.value : this.examId,
+      centerId: data.centerId.present ? data.centerId.value : this.centerId,
       shiftId: data.shiftId.present ? data.shiftId.value : this.shiftId,
-      name: data.name.present ? data.name.value : this.name,
-      instructions: data.instructions.present
-          ? data.instructions.value
-          : this.instructions,
-      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
-      status: data.status.present ? data.status.value : this.status,
-      syncStatus: data.syncStatus.present
-          ? data.syncStatus.value
-          : this.syncStatus,
+      service: data.service.present ? data.service.value : this.service,
+      seqNumber: data.seqNumber.present ? data.seqNumber.value : this.seqNumber,
+      required: data.required.present ? data.required.value : this.required,
+      taskId: data.taskId.present ? data.taskId.value : this.taskId,
+      taskLabel: data.taskLabel.present ? data.taskLabel.value : this.taskLabel,
+      taskDesc: data.taskDesc.present ? data.taskDesc.value : this.taskDesc,
+      taskType: data.taskType.present ? data.taskType.value : this.taskType,
+      taskStatus: data.taskStatus.present
+          ? data.taskStatus.value
+          : this.taskStatus,
+      centerCode: data.centerCode.present
+          ? data.centerCode.value
+          : this.centerCode,
+      centerName: data.centerName.present
+          ? data.centerName.value
+          : this.centerName,
       downloadedAt: data.downloadedAt.present
           ? data.downloadedAt.value
           : this.downloadedAt,
@@ -2518,12 +2085,20 @@ class Task extends DataClass implements Insertable<Task> {
   String toString() {
     return (StringBuffer('Task(')
           ..write('id: $id, ')
+          ..write('clientCode: $clientCode, ')
+          ..write('examId: $examId, ')
+          ..write('centerId: $centerId, ')
           ..write('shiftId: $shiftId, ')
-          ..write('name: $name, ')
-          ..write('instructions: $instructions, ')
-          ..write('sortOrder: $sortOrder, ')
-          ..write('status: $status, ')
-          ..write('syncStatus: $syncStatus, ')
+          ..write('service: $service, ')
+          ..write('seqNumber: $seqNumber, ')
+          ..write('required: $required, ')
+          ..write('taskId: $taskId, ')
+          ..write('taskLabel: $taskLabel, ')
+          ..write('taskDesc: $taskDesc, ')
+          ..write('taskType: $taskType, ')
+          ..write('taskStatus: $taskStatus, ')
+          ..write('centerCode: $centerCode, ')
+          ..write('centerName: $centerName, ')
           ..write('downloadedAt: $downloadedAt')
           ..write(')'))
         .toString();
@@ -2532,12 +2107,20 @@ class Task extends DataClass implements Insertable<Task> {
   @override
   int get hashCode => Object.hash(
     id,
+    clientCode,
+    examId,
+    centerId,
     shiftId,
-    name,
-    instructions,
-    sortOrder,
-    status,
-    syncStatus,
+    service,
+    seqNumber,
+    required,
+    taskId,
+    taskLabel,
+    taskDesc,
+    taskType,
+    taskStatus,
+    centerCode,
+    centerName,
     downloadedAt,
   );
   @override
@@ -2545,68 +2128,123 @@ class Task extends DataClass implements Insertable<Task> {
       identical(this, other) ||
       (other is Task &&
           other.id == this.id &&
+          other.clientCode == this.clientCode &&
+          other.examId == this.examId &&
+          other.centerId == this.centerId &&
           other.shiftId == this.shiftId &&
-          other.name == this.name &&
-          other.instructions == this.instructions &&
-          other.sortOrder == this.sortOrder &&
-          other.status == this.status &&
-          other.syncStatus == this.syncStatus &&
+          other.service == this.service &&
+          other.seqNumber == this.seqNumber &&
+          other.required == this.required &&
+          other.taskId == this.taskId &&
+          other.taskLabel == this.taskLabel &&
+          other.taskDesc == this.taskDesc &&
+          other.taskType == this.taskType &&
+          other.taskStatus == this.taskStatus &&
+          other.centerCode == this.centerCode &&
+          other.centerName == this.centerName &&
           other.downloadedAt == this.downloadedAt);
 }
 
 class TasksCompanion extends UpdateCompanion<Task> {
   final Value<String> id;
+  final Value<String> clientCode;
+  final Value<String> examId;
+  final Value<String> centerId;
   final Value<String> shiftId;
-  final Value<String> name;
-  final Value<String?> instructions;
-  final Value<int> sortOrder;
-  final Value<String> status;
-  final Value<String> syncStatus;
+  final Value<String> service;
+  final Value<int> seqNumber;
+  final Value<bool> required;
+  final Value<String> taskId;
+  final Value<String> taskLabel;
+  final Value<String?> taskDesc;
+  final Value<String> taskType;
+  final Value<String> taskStatus;
+  final Value<String> centerCode;
+  final Value<String> centerName;
   final Value<DateTime> downloadedAt;
   final Value<int> rowid;
   const TasksCompanion({
     this.id = const Value.absent(),
+    this.clientCode = const Value.absent(),
+    this.examId = const Value.absent(),
+    this.centerId = const Value.absent(),
     this.shiftId = const Value.absent(),
-    this.name = const Value.absent(),
-    this.instructions = const Value.absent(),
-    this.sortOrder = const Value.absent(),
-    this.status = const Value.absent(),
-    this.syncStatus = const Value.absent(),
+    this.service = const Value.absent(),
+    this.seqNumber = const Value.absent(),
+    this.required = const Value.absent(),
+    this.taskId = const Value.absent(),
+    this.taskLabel = const Value.absent(),
+    this.taskDesc = const Value.absent(),
+    this.taskType = const Value.absent(),
+    this.taskStatus = const Value.absent(),
+    this.centerCode = const Value.absent(),
+    this.centerName = const Value.absent(),
     this.downloadedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TasksCompanion.insert({
     required String id,
+    required String clientCode,
+    required String examId,
+    required String centerId,
     required String shiftId,
-    required String name,
-    this.instructions = const Value.absent(),
-    this.sortOrder = const Value.absent(),
-    this.status = const Value.absent(),
-    this.syncStatus = const Value.absent(),
+    required String service,
+    this.seqNumber = const Value.absent(),
+    this.required = const Value.absent(),
+    required String taskId,
+    required String taskLabel,
+    this.taskDesc = const Value.absent(),
+    this.taskType = const Value.absent(),
+    this.taskStatus = const Value.absent(),
+    required String centerCode,
+    required String centerName,
     this.downloadedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
+       clientCode = Value(clientCode),
+       examId = Value(examId),
+       centerId = Value(centerId),
        shiftId = Value(shiftId),
-       name = Value(name);
+       service = Value(service),
+       taskId = Value(taskId),
+       taskLabel = Value(taskLabel),
+       centerCode = Value(centerCode),
+       centerName = Value(centerName);
   static Insertable<Task> custom({
     Expression<String>? id,
+    Expression<String>? clientCode,
+    Expression<String>? examId,
+    Expression<String>? centerId,
     Expression<String>? shiftId,
-    Expression<String>? name,
-    Expression<String>? instructions,
-    Expression<int>? sortOrder,
-    Expression<String>? status,
-    Expression<String>? syncStatus,
+    Expression<String>? service,
+    Expression<int>? seqNumber,
+    Expression<bool>? required,
+    Expression<String>? taskId,
+    Expression<String>? taskLabel,
+    Expression<String>? taskDesc,
+    Expression<String>? taskType,
+    Expression<String>? taskStatus,
+    Expression<String>? centerCode,
+    Expression<String>? centerName,
     Expression<DateTime>? downloadedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (clientCode != null) 'client_code': clientCode,
+      if (examId != null) 'exam_id': examId,
+      if (centerId != null) 'center_id': centerId,
       if (shiftId != null) 'shift_id': shiftId,
-      if (name != null) 'name': name,
-      if (instructions != null) 'instructions': instructions,
-      if (sortOrder != null) 'sort_order': sortOrder,
-      if (status != null) 'status': status,
-      if (syncStatus != null) 'sync_status': syncStatus,
+      if (service != null) 'service': service,
+      if (seqNumber != null) 'seq_number': seqNumber,
+      if (required != null) 'required': required,
+      if (taskId != null) 'task_id': taskId,
+      if (taskLabel != null) 'task_label': taskLabel,
+      if (taskDesc != null) 'task_desc': taskDesc,
+      if (taskType != null) 'task_type': taskType,
+      if (taskStatus != null) 'task_status': taskStatus,
+      if (centerCode != null) 'center_code': centerCode,
+      if (centerName != null) 'center_name': centerName,
       if (downloadedAt != null) 'downloaded_at': downloadedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2614,23 +2252,39 @@ class TasksCompanion extends UpdateCompanion<Task> {
 
   TasksCompanion copyWith({
     Value<String>? id,
+    Value<String>? clientCode,
+    Value<String>? examId,
+    Value<String>? centerId,
     Value<String>? shiftId,
-    Value<String>? name,
-    Value<String?>? instructions,
-    Value<int>? sortOrder,
-    Value<String>? status,
-    Value<String>? syncStatus,
+    Value<String>? service,
+    Value<int>? seqNumber,
+    Value<bool>? required,
+    Value<String>? taskId,
+    Value<String>? taskLabel,
+    Value<String?>? taskDesc,
+    Value<String>? taskType,
+    Value<String>? taskStatus,
+    Value<String>? centerCode,
+    Value<String>? centerName,
     Value<DateTime>? downloadedAt,
     Value<int>? rowid,
   }) {
     return TasksCompanion(
       id: id ?? this.id,
+      clientCode: clientCode ?? this.clientCode,
+      examId: examId ?? this.examId,
+      centerId: centerId ?? this.centerId,
       shiftId: shiftId ?? this.shiftId,
-      name: name ?? this.name,
-      instructions: instructions ?? this.instructions,
-      sortOrder: sortOrder ?? this.sortOrder,
-      status: status ?? this.status,
-      syncStatus: syncStatus ?? this.syncStatus,
+      service: service ?? this.service,
+      seqNumber: seqNumber ?? this.seqNumber,
+      required: required ?? this.required,
+      taskId: taskId ?? this.taskId,
+      taskLabel: taskLabel ?? this.taskLabel,
+      taskDesc: taskDesc ?? this.taskDesc,
+      taskType: taskType ?? this.taskType,
+      taskStatus: taskStatus ?? this.taskStatus,
+      centerCode: centerCode ?? this.centerCode,
+      centerName: centerName ?? this.centerName,
       downloadedAt: downloadedAt ?? this.downloadedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -2642,23 +2296,47 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
+    if (clientCode.present) {
+      map['client_code'] = Variable<String>(clientCode.value);
+    }
+    if (examId.present) {
+      map['exam_id'] = Variable<String>(examId.value);
+    }
+    if (centerId.present) {
+      map['center_id'] = Variable<String>(centerId.value);
+    }
     if (shiftId.present) {
       map['shift_id'] = Variable<String>(shiftId.value);
     }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
+    if (service.present) {
+      map['service'] = Variable<String>(service.value);
     }
-    if (instructions.present) {
-      map['instructions'] = Variable<String>(instructions.value);
+    if (seqNumber.present) {
+      map['seq_number'] = Variable<int>(seqNumber.value);
     }
-    if (sortOrder.present) {
-      map['sort_order'] = Variable<int>(sortOrder.value);
+    if (required.present) {
+      map['required'] = Variable<bool>(required.value);
     }
-    if (status.present) {
-      map['status'] = Variable<String>(status.value);
+    if (taskId.present) {
+      map['task_id'] = Variable<String>(taskId.value);
     }
-    if (syncStatus.present) {
-      map['sync_status'] = Variable<String>(syncStatus.value);
+    if (taskLabel.present) {
+      map['task_label'] = Variable<String>(taskLabel.value);
+    }
+    if (taskDesc.present) {
+      map['task_desc'] = Variable<String>(taskDesc.value);
+    }
+    if (taskType.present) {
+      map['task_type'] = Variable<String>(taskType.value);
+    }
+    if (taskStatus.present) {
+      map['task_status'] = Variable<String>(taskStatus.value);
+    }
+    if (centerCode.present) {
+      map['center_code'] = Variable<String>(centerCode.value);
+    }
+    if (centerName.present) {
+      map['center_name'] = Variable<String>(centerName.value);
     }
     if (downloadedAt.present) {
       map['downloaded_at'] = Variable<DateTime>(downloadedAt.value);
@@ -2673,12 +2351,20 @@ class TasksCompanion extends UpdateCompanion<Task> {
   String toString() {
     return (StringBuffer('TasksCompanion(')
           ..write('id: $id, ')
+          ..write('clientCode: $clientCode, ')
+          ..write('examId: $examId, ')
+          ..write('centerId: $centerId, ')
           ..write('shiftId: $shiftId, ')
-          ..write('name: $name, ')
-          ..write('instructions: $instructions, ')
-          ..write('sortOrder: $sortOrder, ')
-          ..write('status: $status, ')
-          ..write('syncStatus: $syncStatus, ')
+          ..write('service: $service, ')
+          ..write('seqNumber: $seqNumber, ')
+          ..write('required: $required, ')
+          ..write('taskId: $taskId, ')
+          ..write('taskLabel: $taskLabel, ')
+          ..write('taskDesc: $taskDesc, ')
+          ..write('taskType: $taskType, ')
+          ..write('taskStatus: $taskStatus, ')
+          ..write('centerCode: $centerCode, ')
+          ..write('centerName: $centerName, ')
           ..write('downloadedAt: $downloadedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -3253,8 +2939,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $SessionsTable sessions = $SessionsTable(this);
   late final $ProfilesTable profiles = $ProfilesTable(this);
-  late final $ExamsTable exams = $ExamsTable(this);
-  late final $ShiftsTable shifts = $ShiftsTable(this);
   late final $TasksTable tasks = $TasksTable(this);
   late final $TaskImagesTable taskImages = $TaskImagesTable(this);
   @override
@@ -3264,8 +2948,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     sessions,
     profiles,
-    exams,
-    shifts,
     tasks,
     taskImages,
   ];
@@ -3273,31 +2955,25 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$SessionsTableCreateCompanionBuilder =
     SessionsCompanion Function({
-      required String accessToken,
-      required String userId,
-      required String username,
-      Value<String?> examId,
-      Value<String?> centerId,
-      Value<String?> examCode,
-      Value<String?> centerCode,
-      Value<String?> centerName,
-      Value<String?> examName,
-      Value<String?> userDataJson,
+      required String id,
+      Value<String?> service,
+      Value<String?> userJson,
+      Value<String?> examJson,
+      Value<String?> centerJson,
+      Value<String> onboardingStep,
+      Value<String?> selectedShiftId,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
 typedef $$SessionsTableUpdateCompanionBuilder =
     SessionsCompanion Function({
-      Value<String> accessToken,
-      Value<String> userId,
-      Value<String> username,
-      Value<String?> examId,
-      Value<String?> centerId,
-      Value<String?> examCode,
-      Value<String?> centerCode,
-      Value<String?> centerName,
-      Value<String?> examName,
-      Value<String?> userDataJson,
+      Value<String> id,
+      Value<String?> service,
+      Value<String?> userJson,
+      Value<String?> examJson,
+      Value<String?> centerJson,
+      Value<String> onboardingStep,
+      Value<String?> selectedShiftId,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -3311,53 +2987,38 @@ class $$SessionsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get accessToken => $composableBuilder(
-    column: $table.accessToken,
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get userId => $composableBuilder(
-    column: $table.userId,
+  ColumnFilters<String> get service => $composableBuilder(
+    column: $table.service,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get username => $composableBuilder(
-    column: $table.username,
+  ColumnFilters<String> get userJson => $composableBuilder(
+    column: $table.userJson,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get examId => $composableBuilder(
-    column: $table.examId,
+  ColumnFilters<String> get examJson => $composableBuilder(
+    column: $table.examJson,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get centerId => $composableBuilder(
-    column: $table.centerId,
+  ColumnFilters<String> get centerJson => $composableBuilder(
+    column: $table.centerJson,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get examCode => $composableBuilder(
-    column: $table.examCode,
+  ColumnFilters<String> get onboardingStep => $composableBuilder(
+    column: $table.onboardingStep,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get centerCode => $composableBuilder(
-    column: $table.centerCode,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get centerName => $composableBuilder(
-    column: $table.centerName,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get examName => $composableBuilder(
-    column: $table.examName,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get userDataJson => $composableBuilder(
-    column: $table.userDataJson,
+  ColumnFilters<String> get selectedShiftId => $composableBuilder(
+    column: $table.selectedShiftId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3376,53 +3037,38 @@ class $$SessionsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get accessToken => $composableBuilder(
-    column: $table.accessToken,
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get userId => $composableBuilder(
-    column: $table.userId,
+  ColumnOrderings<String> get service => $composableBuilder(
+    column: $table.service,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get username => $composableBuilder(
-    column: $table.username,
+  ColumnOrderings<String> get userJson => $composableBuilder(
+    column: $table.userJson,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get examId => $composableBuilder(
-    column: $table.examId,
+  ColumnOrderings<String> get examJson => $composableBuilder(
+    column: $table.examJson,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get centerId => $composableBuilder(
-    column: $table.centerId,
+  ColumnOrderings<String> get centerJson => $composableBuilder(
+    column: $table.centerJson,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get examCode => $composableBuilder(
-    column: $table.examCode,
+  ColumnOrderings<String> get onboardingStep => $composableBuilder(
+    column: $table.onboardingStep,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get centerCode => $composableBuilder(
-    column: $table.centerCode,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get centerName => $composableBuilder(
-    column: $table.centerName,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get examName => $composableBuilder(
-    column: $table.examName,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get userDataJson => $composableBuilder(
-    column: $table.userDataJson,
+  ColumnOrderings<String> get selectedShiftId => $composableBuilder(
+    column: $table.selectedShiftId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3441,41 +3087,30 @@ class $$SessionsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get accessToken => $composableBuilder(
-    column: $table.accessToken,
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get service =>
+      $composableBuilder(column: $table.service, builder: (column) => column);
+
+  GeneratedColumn<String> get userJson =>
+      $composableBuilder(column: $table.userJson, builder: (column) => column);
+
+  GeneratedColumn<String> get examJson =>
+      $composableBuilder(column: $table.examJson, builder: (column) => column);
+
+  GeneratedColumn<String> get centerJson => $composableBuilder(
+    column: $table.centerJson,
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get userId =>
-      $composableBuilder(column: $table.userId, builder: (column) => column);
-
-  GeneratedColumn<String> get username =>
-      $composableBuilder(column: $table.username, builder: (column) => column);
-
-  GeneratedColumn<String> get examId =>
-      $composableBuilder(column: $table.examId, builder: (column) => column);
-
-  GeneratedColumn<String> get centerId =>
-      $composableBuilder(column: $table.centerId, builder: (column) => column);
-
-  GeneratedColumn<String> get examCode =>
-      $composableBuilder(column: $table.examCode, builder: (column) => column);
-
-  GeneratedColumn<String> get centerCode => $composableBuilder(
-    column: $table.centerCode,
+  GeneratedColumn<String> get onboardingStep => $composableBuilder(
+    column: $table.onboardingStep,
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get centerName => $composableBuilder(
-    column: $table.centerName,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get examName =>
-      $composableBuilder(column: $table.examName, builder: (column) => column);
-
-  GeneratedColumn<String> get userDataJson => $composableBuilder(
-    column: $table.userDataJson,
+  GeneratedColumn<String> get selectedShiftId => $composableBuilder(
+    column: $table.selectedShiftId,
     builder: (column) => column,
   );
 
@@ -3511,57 +3146,45 @@ class $$SessionsTableTableManager
               $$SessionsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<String> accessToken = const Value.absent(),
-                Value<String> userId = const Value.absent(),
-                Value<String> username = const Value.absent(),
-                Value<String?> examId = const Value.absent(),
-                Value<String?> centerId = const Value.absent(),
-                Value<String?> examCode = const Value.absent(),
-                Value<String?> centerCode = const Value.absent(),
-                Value<String?> centerName = const Value.absent(),
-                Value<String?> examName = const Value.absent(),
-                Value<String?> userDataJson = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String?> service = const Value.absent(),
+                Value<String?> userJson = const Value.absent(),
+                Value<String?> examJson = const Value.absent(),
+                Value<String?> centerJson = const Value.absent(),
+                Value<String> onboardingStep = const Value.absent(),
+                Value<String?> selectedShiftId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SessionsCompanion(
-                accessToken: accessToken,
-                userId: userId,
-                username: username,
-                examId: examId,
-                centerId: centerId,
-                examCode: examCode,
-                centerCode: centerCode,
-                centerName: centerName,
-                examName: examName,
-                userDataJson: userDataJson,
+                id: id,
+                service: service,
+                userJson: userJson,
+                examJson: examJson,
+                centerJson: centerJson,
+                onboardingStep: onboardingStep,
+                selectedShiftId: selectedShiftId,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                required String accessToken,
-                required String userId,
-                required String username,
-                Value<String?> examId = const Value.absent(),
-                Value<String?> centerId = const Value.absent(),
-                Value<String?> examCode = const Value.absent(),
-                Value<String?> centerCode = const Value.absent(),
-                Value<String?> centerName = const Value.absent(),
-                Value<String?> examName = const Value.absent(),
-                Value<String?> userDataJson = const Value.absent(),
+                required String id,
+                Value<String?> service = const Value.absent(),
+                Value<String?> userJson = const Value.absent(),
+                Value<String?> examJson = const Value.absent(),
+                Value<String?> centerJson = const Value.absent(),
+                Value<String> onboardingStep = const Value.absent(),
+                Value<String?> selectedShiftId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SessionsCompanion.insert(
-                accessToken: accessToken,
-                userId: userId,
-                username: username,
-                examId: examId,
-                centerId: centerId,
-                examCode: examCode,
-                centerCode: centerCode,
-                centerName: centerName,
-                examName: examName,
-                userDataJson: userDataJson,
+                id: id,
+                service: service,
+                userJson: userJson,
+                examJson: examJson,
+                centerJson: centerJson,
+                onboardingStep: onboardingStep,
+                selectedShiftId: selectedShiftId,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
@@ -3590,30 +3213,40 @@ typedef $$SessionsTableProcessedTableManager =
 typedef $$ProfilesTableCreateCompanionBuilder =
     ProfilesCompanion Function({
       required String id,
+      required String shiftId,
       required String name,
       required String contact,
+      required int age,
       required String aadhaar,
       Value<String?> selfieLocalPath,
-      Value<String?> mobileVerificationId,
-      Value<bool> isVerified,
+      Value<String> livenessStatus,
+      Value<double?> livenessScore,
+      Value<DateTime?> livenessAttemptedAt,
       Value<double?> latitude,
       Value<double?> longitude,
       Value<String?> location,
+      Value<String?> mobileVerificationId,
+      Value<String?> backendProfileId,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
 typedef $$ProfilesTableUpdateCompanionBuilder =
     ProfilesCompanion Function({
       Value<String> id,
+      Value<String> shiftId,
       Value<String> name,
       Value<String> contact,
+      Value<int> age,
       Value<String> aadhaar,
       Value<String?> selfieLocalPath,
-      Value<String?> mobileVerificationId,
-      Value<bool> isVerified,
+      Value<String> livenessStatus,
+      Value<double?> livenessScore,
+      Value<DateTime?> livenessAttemptedAt,
       Value<double?> latitude,
       Value<double?> longitude,
       Value<String?> location,
+      Value<String?> mobileVerificationId,
+      Value<String?> backendProfileId,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -3632,6 +3265,11 @@ class $$ProfilesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get shiftId => $composableBuilder(
+    column: $table.shiftId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get name => $composableBuilder(
     column: $table.name,
     builder: (column) => ColumnFilters(column),
@@ -3639,6 +3277,11 @@ class $$ProfilesTableFilterComposer
 
   ColumnFilters<String> get contact => $composableBuilder(
     column: $table.contact,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get age => $composableBuilder(
+    column: $table.age,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3652,13 +3295,18 @@ class $$ProfilesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get mobileVerificationId => $composableBuilder(
-    column: $table.mobileVerificationId,
+  ColumnFilters<String> get livenessStatus => $composableBuilder(
+    column: $table.livenessStatus,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get isVerified => $composableBuilder(
-    column: $table.isVerified,
+  ColumnFilters<double> get livenessScore => $composableBuilder(
+    column: $table.livenessScore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get livenessAttemptedAt => $composableBuilder(
+    column: $table.livenessAttemptedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3674,6 +3322,16 @@ class $$ProfilesTableFilterComposer
 
   ColumnFilters<String> get location => $composableBuilder(
     column: $table.location,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mobileVerificationId => $composableBuilder(
+    column: $table.mobileVerificationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get backendProfileId => $composableBuilder(
+    column: $table.backendProfileId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3697,6 +3355,11 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get shiftId => $composableBuilder(
+    column: $table.shiftId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get name => $composableBuilder(
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
@@ -3704,6 +3367,11 @@ class $$ProfilesTableOrderingComposer
 
   ColumnOrderings<String> get contact => $composableBuilder(
     column: $table.contact,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get age => $composableBuilder(
+    column: $table.age,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3717,13 +3385,18 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get mobileVerificationId => $composableBuilder(
-    column: $table.mobileVerificationId,
+  ColumnOrderings<String> get livenessStatus => $composableBuilder(
+    column: $table.livenessStatus,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get isVerified => $composableBuilder(
-    column: $table.isVerified,
+  ColumnOrderings<double> get livenessScore => $composableBuilder(
+    column: $table.livenessScore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get livenessAttemptedAt => $composableBuilder(
+    column: $table.livenessAttemptedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3739,6 +3412,16 @@ class $$ProfilesTableOrderingComposer
 
   ColumnOrderings<String> get location => $composableBuilder(
     column: $table.location,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mobileVerificationId => $composableBuilder(
+    column: $table.mobileVerificationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get backendProfileId => $composableBuilder(
+    column: $table.backendProfileId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3760,11 +3443,17 @@ class $$ProfilesTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
+  GeneratedColumn<String> get shiftId =>
+      $composableBuilder(column: $table.shiftId, builder: (column) => column);
+
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
   GeneratedColumn<String> get contact =>
       $composableBuilder(column: $table.contact, builder: (column) => column);
+
+  GeneratedColumn<int> get age =>
+      $composableBuilder(column: $table.age, builder: (column) => column);
 
   GeneratedColumn<String> get aadhaar =>
       $composableBuilder(column: $table.aadhaar, builder: (column) => column);
@@ -3774,13 +3463,18 @@ class $$ProfilesTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get mobileVerificationId => $composableBuilder(
-    column: $table.mobileVerificationId,
+  GeneratedColumn<String> get livenessStatus => $composableBuilder(
+    column: $table.livenessStatus,
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get isVerified => $composableBuilder(
-    column: $table.isVerified,
+  GeneratedColumn<double> get livenessScore => $composableBuilder(
+    column: $table.livenessScore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get livenessAttemptedAt => $composableBuilder(
+    column: $table.livenessAttemptedAt,
     builder: (column) => column,
   );
 
@@ -3792,6 +3486,16 @@ class $$ProfilesTableAnnotationComposer
 
   GeneratedColumn<String> get location =>
       $composableBuilder(column: $table.location, builder: (column) => column);
+
+  GeneratedColumn<String> get mobileVerificationId => $composableBuilder(
+    column: $table.mobileVerificationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get backendProfileId => $composableBuilder(
+    column: $table.backendProfileId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -3826,56 +3530,76 @@ class $$ProfilesTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
+                Value<String> shiftId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> contact = const Value.absent(),
+                Value<int> age = const Value.absent(),
                 Value<String> aadhaar = const Value.absent(),
                 Value<String?> selfieLocalPath = const Value.absent(),
-                Value<String?> mobileVerificationId = const Value.absent(),
-                Value<bool> isVerified = const Value.absent(),
+                Value<String> livenessStatus = const Value.absent(),
+                Value<double?> livenessScore = const Value.absent(),
+                Value<DateTime?> livenessAttemptedAt = const Value.absent(),
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
                 Value<String?> location = const Value.absent(),
+                Value<String?> mobileVerificationId = const Value.absent(),
+                Value<String?> backendProfileId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
+                shiftId: shiftId,
                 name: name,
                 contact: contact,
+                age: age,
                 aadhaar: aadhaar,
                 selfieLocalPath: selfieLocalPath,
-                mobileVerificationId: mobileVerificationId,
-                isVerified: isVerified,
+                livenessStatus: livenessStatus,
+                livenessScore: livenessScore,
+                livenessAttemptedAt: livenessAttemptedAt,
                 latitude: latitude,
                 longitude: longitude,
                 location: location,
+                mobileVerificationId: mobileVerificationId,
+                backendProfileId: backendProfileId,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String id,
+                required String shiftId,
                 required String name,
                 required String contact,
+                required int age,
                 required String aadhaar,
                 Value<String?> selfieLocalPath = const Value.absent(),
-                Value<String?> mobileVerificationId = const Value.absent(),
-                Value<bool> isVerified = const Value.absent(),
+                Value<String> livenessStatus = const Value.absent(),
+                Value<double?> livenessScore = const Value.absent(),
+                Value<DateTime?> livenessAttemptedAt = const Value.absent(),
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
                 Value<String?> location = const Value.absent(),
+                Value<String?> mobileVerificationId = const Value.absent(),
+                Value<String?> backendProfileId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
+                shiftId: shiftId,
                 name: name,
                 contact: contact,
+                age: age,
                 aadhaar: aadhaar,
                 selfieLocalPath: selfieLocalPath,
-                mobileVerificationId: mobileVerificationId,
-                isVerified: isVerified,
+                livenessStatus: livenessStatus,
+                livenessScore: livenessScore,
+                livenessAttemptedAt: livenessAttemptedAt,
                 latitude: latitude,
                 longitude: longitude,
                 location: location,
+                mobileVerificationId: mobileVerificationId,
+                backendProfileId: backendProfileId,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
@@ -3901,460 +3625,43 @@ typedef $$ProfilesTableProcessedTableManager =
       Profile,
       PrefetchHooks Function()
     >;
-typedef $$ExamsTableCreateCompanionBuilder =
-    ExamsCompanion Function({
-      required String id,
-      required String code,
-      required String name,
-      required String centerName,
-      required String centerCode,
-      required String jsonData,
-      Value<DateTime> downloadedAt,
-      Value<int> rowid,
-    });
-typedef $$ExamsTableUpdateCompanionBuilder =
-    ExamsCompanion Function({
-      Value<String> id,
-      Value<String> code,
-      Value<String> name,
-      Value<String> centerName,
-      Value<String> centerCode,
-      Value<String> jsonData,
-      Value<DateTime> downloadedAt,
-      Value<int> rowid,
-    });
-
-class $$ExamsTableFilterComposer extends Composer<_$AppDatabase, $ExamsTable> {
-  $$ExamsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get code => $composableBuilder(
-    column: $table.code,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get centerName => $composableBuilder(
-    column: $table.centerName,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get centerCode => $composableBuilder(
-    column: $table.centerCode,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get jsonData => $composableBuilder(
-    column: $table.jsonData,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get downloadedAt => $composableBuilder(
-    column: $table.downloadedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-}
-
-class $$ExamsTableOrderingComposer
-    extends Composer<_$AppDatabase, $ExamsTable> {
-  $$ExamsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get code => $composableBuilder(
-    column: $table.code,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get centerName => $composableBuilder(
-    column: $table.centerName,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get centerCode => $composableBuilder(
-    column: $table.centerCode,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get jsonData => $composableBuilder(
-    column: $table.jsonData,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get downloadedAt => $composableBuilder(
-    column: $table.downloadedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$ExamsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ExamsTable> {
-  $$ExamsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get code =>
-      $composableBuilder(column: $table.code, builder: (column) => column);
-
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<String> get centerName => $composableBuilder(
-    column: $table.centerName,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get centerCode => $composableBuilder(
-    column: $table.centerCode,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get jsonData =>
-      $composableBuilder(column: $table.jsonData, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get downloadedAt => $composableBuilder(
-    column: $table.downloadedAt,
-    builder: (column) => column,
-  );
-}
-
-class $$ExamsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $ExamsTable,
-          Exam,
-          $$ExamsTableFilterComposer,
-          $$ExamsTableOrderingComposer,
-          $$ExamsTableAnnotationComposer,
-          $$ExamsTableCreateCompanionBuilder,
-          $$ExamsTableUpdateCompanionBuilder,
-          (Exam, BaseReferences<_$AppDatabase, $ExamsTable, Exam>),
-          Exam,
-          PrefetchHooks Function()
-        > {
-  $$ExamsTableTableManager(_$AppDatabase db, $ExamsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$ExamsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ExamsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ExamsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> code = const Value.absent(),
-                Value<String> name = const Value.absent(),
-                Value<String> centerName = const Value.absent(),
-                Value<String> centerCode = const Value.absent(),
-                Value<String> jsonData = const Value.absent(),
-                Value<DateTime> downloadedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => ExamsCompanion(
-                id: id,
-                code: code,
-                name: name,
-                centerName: centerName,
-                centerCode: centerCode,
-                jsonData: jsonData,
-                downloadedAt: downloadedAt,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String code,
-                required String name,
-                required String centerName,
-                required String centerCode,
-                required String jsonData,
-                Value<DateTime> downloadedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => ExamsCompanion.insert(
-                id: id,
-                code: code,
-                name: name,
-                centerName: centerName,
-                centerCode: centerCode,
-                jsonData: jsonData,
-                downloadedAt: downloadedAt,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ),
-      );
-}
-
-typedef $$ExamsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $ExamsTable,
-      Exam,
-      $$ExamsTableFilterComposer,
-      $$ExamsTableOrderingComposer,
-      $$ExamsTableAnnotationComposer,
-      $$ExamsTableCreateCompanionBuilder,
-      $$ExamsTableUpdateCompanionBuilder,
-      (Exam, BaseReferences<_$AppDatabase, $ExamsTable, Exam>),
-      Exam,
-      PrefetchHooks Function()
-    >;
-typedef $$ShiftsTableCreateCompanionBuilder =
-    ShiftsCompanion Function({
-      required String id,
-      required String examId,
-      required String name,
-      required DateTime date,
-      Value<bool> isSelected,
-      Value<int> rowid,
-    });
-typedef $$ShiftsTableUpdateCompanionBuilder =
-    ShiftsCompanion Function({
-      Value<String> id,
-      Value<String> examId,
-      Value<String> name,
-      Value<DateTime> date,
-      Value<bool> isSelected,
-      Value<int> rowid,
-    });
-
-class $$ShiftsTableFilterComposer
-    extends Composer<_$AppDatabase, $ShiftsTable> {
-  $$ShiftsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get examId => $composableBuilder(
-    column: $table.examId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get date => $composableBuilder(
-    column: $table.date,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get isSelected => $composableBuilder(
-    column: $table.isSelected,
-    builder: (column) => ColumnFilters(column),
-  );
-}
-
-class $$ShiftsTableOrderingComposer
-    extends Composer<_$AppDatabase, $ShiftsTable> {
-  $$ShiftsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get examId => $composableBuilder(
-    column: $table.examId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get date => $composableBuilder(
-    column: $table.date,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get isSelected => $composableBuilder(
-    column: $table.isSelected,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$ShiftsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ShiftsTable> {
-  $$ShiftsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get examId =>
-      $composableBuilder(column: $table.examId, builder: (column) => column);
-
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get date =>
-      $composableBuilder(column: $table.date, builder: (column) => column);
-
-  GeneratedColumn<bool> get isSelected => $composableBuilder(
-    column: $table.isSelected,
-    builder: (column) => column,
-  );
-}
-
-class $$ShiftsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $ShiftsTable,
-          Shift,
-          $$ShiftsTableFilterComposer,
-          $$ShiftsTableOrderingComposer,
-          $$ShiftsTableAnnotationComposer,
-          $$ShiftsTableCreateCompanionBuilder,
-          $$ShiftsTableUpdateCompanionBuilder,
-          (Shift, BaseReferences<_$AppDatabase, $ShiftsTable, Shift>),
-          Shift,
-          PrefetchHooks Function()
-        > {
-  $$ShiftsTableTableManager(_$AppDatabase db, $ShiftsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$ShiftsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ShiftsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ShiftsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> examId = const Value.absent(),
-                Value<String> name = const Value.absent(),
-                Value<DateTime> date = const Value.absent(),
-                Value<bool> isSelected = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => ShiftsCompanion(
-                id: id,
-                examId: examId,
-                name: name,
-                date: date,
-                isSelected: isSelected,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String examId,
-                required String name,
-                required DateTime date,
-                Value<bool> isSelected = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => ShiftsCompanion.insert(
-                id: id,
-                examId: examId,
-                name: name,
-                date: date,
-                isSelected: isSelected,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ),
-      );
-}
-
-typedef $$ShiftsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $ShiftsTable,
-      Shift,
-      $$ShiftsTableFilterComposer,
-      $$ShiftsTableOrderingComposer,
-      $$ShiftsTableAnnotationComposer,
-      $$ShiftsTableCreateCompanionBuilder,
-      $$ShiftsTableUpdateCompanionBuilder,
-      (Shift, BaseReferences<_$AppDatabase, $ShiftsTable, Shift>),
-      Shift,
-      PrefetchHooks Function()
-    >;
 typedef $$TasksTableCreateCompanionBuilder =
     TasksCompanion Function({
       required String id,
+      required String clientCode,
+      required String examId,
+      required String centerId,
       required String shiftId,
-      required String name,
-      Value<String?> instructions,
-      Value<int> sortOrder,
-      Value<String> status,
-      Value<String> syncStatus,
+      required String service,
+      Value<int> seqNumber,
+      Value<bool> required,
+      required String taskId,
+      required String taskLabel,
+      Value<String?> taskDesc,
+      Value<String> taskType,
+      Value<String> taskStatus,
+      required String centerCode,
+      required String centerName,
       Value<DateTime> downloadedAt,
       Value<int> rowid,
     });
 typedef $$TasksTableUpdateCompanionBuilder =
     TasksCompanion Function({
       Value<String> id,
+      Value<String> clientCode,
+      Value<String> examId,
+      Value<String> centerId,
       Value<String> shiftId,
-      Value<String> name,
-      Value<String?> instructions,
-      Value<int> sortOrder,
-      Value<String> status,
-      Value<String> syncStatus,
+      Value<String> service,
+      Value<int> seqNumber,
+      Value<bool> required,
+      Value<String> taskId,
+      Value<String> taskLabel,
+      Value<String?> taskDesc,
+      Value<String> taskType,
+      Value<String> taskStatus,
+      Value<String> centerCode,
+      Value<String> centerName,
       Value<DateTime> downloadedAt,
       Value<int> rowid,
     });
@@ -4372,33 +3679,73 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get clientCode => $composableBuilder(
+    column: $table.clientCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get examId => $composableBuilder(
+    column: $table.examId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get centerId => $composableBuilder(
+    column: $table.centerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get shiftId => $composableBuilder(
     column: $table.shiftId,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
+  ColumnFilters<String> get service => $composableBuilder(
+    column: $table.service,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get instructions => $composableBuilder(
-    column: $table.instructions,
+  ColumnFilters<int> get seqNumber => $composableBuilder(
+    column: $table.seqNumber,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get sortOrder => $composableBuilder(
-    column: $table.sortOrder,
+  ColumnFilters<bool> get required => $composableBuilder(
+    column: $table.required,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get status => $composableBuilder(
-    column: $table.status,
+  ColumnFilters<String> get taskId => $composableBuilder(
+    column: $table.taskId,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get syncStatus => $composableBuilder(
-    column: $table.syncStatus,
+  ColumnFilters<String> get taskLabel => $composableBuilder(
+    column: $table.taskLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get taskDesc => $composableBuilder(
+    column: $table.taskDesc,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get taskType => $composableBuilder(
+    column: $table.taskType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get taskStatus => $composableBuilder(
+    column: $table.taskStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get centerCode => $composableBuilder(
+    column: $table.centerCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get centerName => $composableBuilder(
+    column: $table.centerName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4422,33 +3769,73 @@ class $$TasksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get clientCode => $composableBuilder(
+    column: $table.clientCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get examId => $composableBuilder(
+    column: $table.examId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get centerId => $composableBuilder(
+    column: $table.centerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get shiftId => $composableBuilder(
     column: $table.shiftId,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
+  ColumnOrderings<String> get service => $composableBuilder(
+    column: $table.service,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get instructions => $composableBuilder(
-    column: $table.instructions,
+  ColumnOrderings<int> get seqNumber => $composableBuilder(
+    column: $table.seqNumber,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get sortOrder => $composableBuilder(
-    column: $table.sortOrder,
+  ColumnOrderings<bool> get required => $composableBuilder(
+    column: $table.required,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get status => $composableBuilder(
-    column: $table.status,
+  ColumnOrderings<String> get taskId => $composableBuilder(
+    column: $table.taskId,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get syncStatus => $composableBuilder(
-    column: $table.syncStatus,
+  ColumnOrderings<String> get taskLabel => $composableBuilder(
+    column: $table.taskLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get taskDesc => $composableBuilder(
+    column: $table.taskDesc,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get taskType => $composableBuilder(
+    column: $table.taskType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get taskStatus => $composableBuilder(
+    column: $table.taskStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get centerCode => $composableBuilder(
+    column: $table.centerCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get centerName => $composableBuilder(
+    column: $table.centerName,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4470,25 +3857,53 @@ class $$TasksTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get shiftId =>
-      $composableBuilder(column: $table.shiftId, builder: (column) => column);
-
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<String> get instructions => $composableBuilder(
-    column: $table.instructions,
+  GeneratedColumn<String> get clientCode => $composableBuilder(
+    column: $table.clientCode,
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get sortOrder =>
-      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+  GeneratedColumn<String> get examId =>
+      $composableBuilder(column: $table.examId, builder: (column) => column);
 
-  GeneratedColumn<String> get status =>
-      $composableBuilder(column: $table.status, builder: (column) => column);
+  GeneratedColumn<String> get centerId =>
+      $composableBuilder(column: $table.centerId, builder: (column) => column);
 
-  GeneratedColumn<String> get syncStatus => $composableBuilder(
-    column: $table.syncStatus,
+  GeneratedColumn<String> get shiftId =>
+      $composableBuilder(column: $table.shiftId, builder: (column) => column);
+
+  GeneratedColumn<String> get service =>
+      $composableBuilder(column: $table.service, builder: (column) => column);
+
+  GeneratedColumn<int> get seqNumber =>
+      $composableBuilder(column: $table.seqNumber, builder: (column) => column);
+
+  GeneratedColumn<bool> get required =>
+      $composableBuilder(column: $table.required, builder: (column) => column);
+
+  GeneratedColumn<String> get taskId =>
+      $composableBuilder(column: $table.taskId, builder: (column) => column);
+
+  GeneratedColumn<String> get taskLabel =>
+      $composableBuilder(column: $table.taskLabel, builder: (column) => column);
+
+  GeneratedColumn<String> get taskDesc =>
+      $composableBuilder(column: $table.taskDesc, builder: (column) => column);
+
+  GeneratedColumn<String> get taskType =>
+      $composableBuilder(column: $table.taskType, builder: (column) => column);
+
+  GeneratedColumn<String> get taskStatus => $composableBuilder(
+    column: $table.taskStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get centerCode => $composableBuilder(
+    column: $table.centerCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get centerName => $composableBuilder(
+    column: $table.centerName,
     builder: (column) => column,
   );
 
@@ -4527,44 +3942,76 @@ class $$TasksTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
+                Value<String> clientCode = const Value.absent(),
+                Value<String> examId = const Value.absent(),
+                Value<String> centerId = const Value.absent(),
                 Value<String> shiftId = const Value.absent(),
-                Value<String> name = const Value.absent(),
-                Value<String?> instructions = const Value.absent(),
-                Value<int> sortOrder = const Value.absent(),
-                Value<String> status = const Value.absent(),
-                Value<String> syncStatus = const Value.absent(),
+                Value<String> service = const Value.absent(),
+                Value<int> seqNumber = const Value.absent(),
+                Value<bool> required = const Value.absent(),
+                Value<String> taskId = const Value.absent(),
+                Value<String> taskLabel = const Value.absent(),
+                Value<String?> taskDesc = const Value.absent(),
+                Value<String> taskType = const Value.absent(),
+                Value<String> taskStatus = const Value.absent(),
+                Value<String> centerCode = const Value.absent(),
+                Value<String> centerName = const Value.absent(),
                 Value<DateTime> downloadedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TasksCompanion(
                 id: id,
+                clientCode: clientCode,
+                examId: examId,
+                centerId: centerId,
                 shiftId: shiftId,
-                name: name,
-                instructions: instructions,
-                sortOrder: sortOrder,
-                status: status,
-                syncStatus: syncStatus,
+                service: service,
+                seqNumber: seqNumber,
+                required: required,
+                taskId: taskId,
+                taskLabel: taskLabel,
+                taskDesc: taskDesc,
+                taskType: taskType,
+                taskStatus: taskStatus,
+                centerCode: centerCode,
+                centerName: centerName,
                 downloadedAt: downloadedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String id,
+                required String clientCode,
+                required String examId,
+                required String centerId,
                 required String shiftId,
-                required String name,
-                Value<String?> instructions = const Value.absent(),
-                Value<int> sortOrder = const Value.absent(),
-                Value<String> status = const Value.absent(),
-                Value<String> syncStatus = const Value.absent(),
+                required String service,
+                Value<int> seqNumber = const Value.absent(),
+                Value<bool> required = const Value.absent(),
+                required String taskId,
+                required String taskLabel,
+                Value<String?> taskDesc = const Value.absent(),
+                Value<String> taskType = const Value.absent(),
+                Value<String> taskStatus = const Value.absent(),
+                required String centerCode,
+                required String centerName,
                 Value<DateTime> downloadedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TasksCompanion.insert(
                 id: id,
+                clientCode: clientCode,
+                examId: examId,
+                centerId: centerId,
                 shiftId: shiftId,
-                name: name,
-                instructions: instructions,
-                sortOrder: sortOrder,
-                status: status,
-                syncStatus: syncStatus,
+                service: service,
+                seqNumber: seqNumber,
+                required: required,
+                taskId: taskId,
+                taskLabel: taskLabel,
+                taskDesc: taskDesc,
+                taskType: taskType,
+                taskStatus: taskStatus,
+                centerCode: centerCode,
+                centerName: centerName,
                 downloadedAt: downloadedAt,
                 rowid: rowid,
               ),
@@ -4875,10 +4322,6 @@ class $AppDatabaseManager {
       $$SessionsTableTableManager(_db, _db.sessions);
   $$ProfilesTableTableManager get profiles =>
       $$ProfilesTableTableManager(_db, _db.profiles);
-  $$ExamsTableTableManager get exams =>
-      $$ExamsTableTableManager(_db, _db.exams);
-  $$ShiftsTableTableManager get shifts =>
-      $$ShiftsTableTableManager(_db, _db.shifts);
   $$TasksTableTableManager get tasks =>
       $$TasksTableTableManager(_db, _db.tasks);
   $$TaskImagesTableTableManager get taskImages =>

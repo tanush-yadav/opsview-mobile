@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access for liveness verification and selfie capture</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs location access to verify you are at the exam center</string>
 </dict>
 </plist>

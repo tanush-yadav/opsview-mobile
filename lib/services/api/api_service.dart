@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/api_constants.dart';
+import '../../core/exceptions/app_exception.dart';
 import '../../models/api_response.dart';
 import 'dio_client.dart';
 
@@ -12,9 +13,9 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 });
 
 class ApiService {
-  final Dio _dio;
 
   ApiService(this._dio);
+  final Dio _dio;
 
   // Auth
   Future<ApiResponse> login({
@@ -22,39 +23,59 @@ class ApiService {
     required String username,
     required String password,
   }) async {
-    final response = await _dio.post(
-      ApiConstants.login,
-      data: {
-        'examCode': examCode,
-        'username': username.toLowerCase(),
-        'password': password,
-      },
-    );
-    return ApiResponse.fromJson(response.data);
+    try {
+      final response = await _dio.post(
+        ApiConstants.login,
+        data: {
+          'examCode': examCode,
+          'username': username.toLowerCase(),
+          'password': password,
+        },
+      );
+      return ApiResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      final error = e.error;
+      throw error is AppException ? error : AppException('Something went wrong');
+    }
   }
 
   // Mobile Verification
   Future<ApiResponse> initiateMobileVerification(String contact) async {
-    final response = await _dio.post(
-      ApiConstants.mobileVerification,
-      data: {'contact': contact},
-    );
-    return ApiResponse.fromJson(response.data);
+    try {
+      final response = await _dio.post(
+        ApiConstants.mobileVerification,
+        data: {'contact': contact},
+      );
+      return ApiResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      final error = e.error;
+      throw error is AppException ? error : AppException('Something went wrong');
+    }
   }
 
   Future<ApiResponse> verifyOtp(String verificationId, String otp) async {
-    final response = await _dio.post(
-      ApiConstants.verifyOtp(verificationId),
-      data: {'otp': otp},
-    );
-    return ApiResponse.fromJson(response.data);
+    try {
+      final response = await _dio.post(
+        ApiConstants.verifyOtp(verificationId),
+        data: {'otp': otp},
+      );
+      return ApiResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      final error = e.error;
+      throw error is AppException ? error : AppException('Something went wrong');
+    }
   }
 
   Future<ApiResponse> resendOtp(String verificationId) async {
-    final response = await _dio.post(
-      ApiConstants.resendOtp(verificationId),
-    );
-    return ApiResponse.fromJson(response.data);
+    try {
+      final response = await _dio.post(
+        ApiConstants.resendOtp(verificationId),
+      );
+      return ApiResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      final error = e.error;
+      throw error is AppException ? error : AppException('Something went wrong');
+    }
   }
 
   // Profile
@@ -84,11 +105,8 @@ class ApiService {
     return ApiResponse.fromJson(response.data);
   }
 
-  Future<ApiResponse> getOperatorTasks(String shiftId) async {
-    final response = await _dio.get(
-      ApiConstants.operatorTasks,
-      queryParameters: {'shiftId': shiftId},
-    );
+  Future<ApiResponse> getOperatorTasks() async {
+    final response = await _dio.get(ApiConstants.operatorTasks);
     return ApiResponse.fromJson(response.data);
   }
 

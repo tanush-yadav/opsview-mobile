@@ -1,165 +1,181 @@
 import '../app_strings.dart';
 
 class EnStrings implements AppStrings {
-  // App
-  @override
-  String get appName => 'OpsView';
-
-  // Common
-  @override
-  String get ok => 'OK';
-  @override
-  String get cancel => 'Cancel';
-  @override
-  String get confirm => 'Confirm';
-  @override
-  String get exit => 'Exit';
-  @override
-  String get next => 'Next';
-  @override
-  String get back => 'Back';
-  @override
-  String get skip => 'Skip';
-  @override
-  String get submit => 'Submit';
-  @override
-  String get retry => 'Retry';
-  @override
-  String get loading => 'Loading...';
-  @override
-  String get error => 'Error';
-  @override
-  String get success => 'Success';
-  @override
-  String get warning => 'Warning';
-
-  // Splash
-  @override
-  String get splashLoading => 'Initializing...';
-
   // Login
   @override
-  String get loginTitle => 'Operator Login';
+  String get welcomeBack => 'Welcome Back';
   @override
-  String get examCode => 'Exam Code';
+  String get enterExamCredentials => 'Enter your exam credentials';
   @override
-  String get username => 'Username';
+  String get examCode => 'EXAM CODE';
   @override
-  String get password => 'Password';
+  String get examCodeHint => 'EX-8920';
   @override
-  String get login => 'Login';
+  String get username => 'USERNAME';
   @override
-  String get loginFailed => 'Login Failed';
+  String get usernameHint => 'vikram.singh';
   @override
-  String get invalidCredentials => 'Invalid credentials. Please try again.';
+  String get password => 'PASSWORD';
+  @override
+  String get secureLogin => 'Secure Login';
+  @override
+  String get loginFailed => 'Login failed';
+  @override
+  String get loginSuccess => 'Login successful';
+  @override
+  String get fillAllFields => 'Please fill in all fields';
 
   // Confirmation
   @override
   String get confirmationTitle => 'Confirm Details';
   @override
-  String get examDetails => 'Exam Details';
+  String get verifyAssignment => 'Please verify your assignment';
   @override
-  String get centerName => 'Center Name';
+  String get examCodeLabel => 'EXAM CODE';
   @override
-  String get examName => 'Exam Name';
+  String get examNameLabel => 'EXAM NAME';
   @override
-  String get confirmAndProceed => 'Confirm & Proceed';
+  String get centerCodeLabel => 'CENTER CODE';
   @override
-  String get exitApp => 'Exit App';
-
-  // Profile
+  String get centerNameLabel => 'CENTER NAME';
   @override
-  String get profileCreation => 'Profile Creation';
+  String get wrongCenter => 'Wrong Center';
   @override
-  String get name => 'Name';
-  @override
-  String get mobileNumber => 'Mobile Number';
-  @override
-  String get aadhaar => 'Aadhaar Number';
-  @override
-  String get selfieCapture => 'Selfie Capture';
-  @override
-  String get captureSelfie => 'Capture Selfie';
-  @override
-  String get retake => 'Retake';
-  @override
-  String get otpVerification => 'OTP Verification';
-  @override
-  String get enterOtp => 'Enter OTP';
-  @override
-  String get resendOtp => 'Resend OTP';
-  @override
-  String get verifyOtp => 'Verify OTP';
-  @override
-  String get training => 'Training';
-  @override
-  String get watchTraining => 'Watch Training Video';
-  @override
-  String get skipTraining => 'Skip Training';
+  String get yesConfirm => 'Yes, Confirm';
 
   // Shift Selection
   @override
   String get selectShift => 'Select Shift';
   @override
-  String get mockDay => 'Mock Day';
+  String get chooseAssignment => 'Choose your assignment for the day';
   @override
   String get examDay => 'Exam Day';
   @override
-  String get downloadingData => 'Downloading data...';
+  String get mockDay => 'Mock Day';
+  @override
+  String get morningShift => 'Morning Shift';
+  @override
+  String get afternoonShift => 'Afternoon Shift';
+  @override
+  String get confirmShift => 'Confirm Shift';
+
+  // Profile
+  @override
+  String get operatorProfile => 'Operator Profile';
+  @override
+  String get fillDetailsManually => 'Please fill your details manually';
+  @override
+  String get fullName => 'FULL NAME';
+  @override
+  String get age => 'AGE';
+  @override
+  String get mobileNumber => 'MOBILE NUMBER';
+  @override
+  String get aadhaarNumber => 'AADHAAR NUMBER';
+  @override
+  String get verify => 'Verify';
+  @override
+  String get continueToSelfie => 'Continue to Selfie';
+  @override
+  String get details => 'DETAILS';
+  @override
+  String get selfie => 'SELFIE';
+  @override
+  String get captureSelfie => 'Capture Selfie';
+  @override
+  String get selfieInstructions => 'Position your face in the frame and take a clear photo';
+  @override
+  String get retake => 'Retake';
+  @override
+  String get submit => 'Submit';
+
+  // OTP
+  @override
+  String get enterOtpSentToMobile => 'Enter OTP sent to mobile';
+  @override
+  String get changeNumber => 'Change Number';
+  @override
+  String get submitOtp => 'Submit OTP';
+  @override
+  String get resendOtp => 'Resend OTP';
+  @override
+  String get verified => 'Verified';
+
+  // Location & Selfie
+  @override
+  String get verifyLocationAndSelfie => 'Verify Location & Selfie';
+  @override
+  String get ensureInsideExamCentre => 'Ensure you are inside the exam centre';
+  @override
+  String get locationDetected => 'Location Detected';
+  @override
+  String get distanceFromCentre => 'DISTANCE FROM CENTRE';
+  @override
+  String get capturePhoto => 'Capture Photo';
+  @override
+  String get locationNotDetected => 'Location Not Detected';
+  @override
+  String get detectingLocation => 'Detecting location...';
+  @override
+  String get faceVerification => 'Face Verification';
+
+  // Training
+  @override
+  String get trainingRequired => 'Training Required';
+  @override
+  String get completeBeforeShiftStart => 'Complete before shift start';
+  @override
+  String get duration => 'Duration';
+  @override
+  String get priority => 'Priority';
+  @override
+  String get mandatory => 'Mandatory';
+  @override
+  String get completed => 'Completed';
 
   // Home
   @override
-  String get tasks => 'Tasks';
+  String get notSubmitted => 'Not Submitted';
   @override
-  String get pending => 'Pending';
+  String get submitted => 'Submitted';
   @override
-  String get completed => 'Completed';
+  String get allTasksCompleted => 'All tasks completed';
+  @override
+  String get noSubmittedTasks => 'No submitted tasks';
   @override
   String get synced => 'Synced';
   @override
   String get unsynced => 'Unsynced';
-  @override
-  String get syncWarning => 'Some data is not synced yet';
-  @override
-  String get capture => 'Capture';
-
-  // Task Capture
-  @override
-  String get captureEvidence => 'Capture Evidence';
-  @override
-  String get addMessage => 'Add Message';
-  @override
-  String get messagePlaceholder => 'Enter optional message...';
-  @override
-  String get save => 'Save';
-  @override
-  String get previousCaptures => 'Previous Captures';
-
-  // Settings
-  @override
-  String get settings => 'Settings';
-  @override
-  String get profile => 'Profile';
-  @override
-  String get syncNow => 'Sync Now';
-  @override
-  String get syncStatus => 'Sync Status';
-  @override
-  String get logout => 'Logout';
-  @override
-  String get logoutConfirmation => 'Are you sure you want to logout?';
-  @override
-  String get unsyncedDataWarning => 'You have unsynced data. Logging out will delete this data.';
 
   // Errors
   @override
-  String get networkError => 'Network error. Please check your connection.';
+  String get somethingWentWrong => 'Something went wrong';
+
+  // Settings
   @override
-  String get serverError => 'Server error. Please try again later.';
+  String get profile => 'Profile';
   @override
-  String get unknownError => 'An unknown error occurred.';
+  String get operatorAssignmentDetails => 'Operator Assignment Details';
   @override
-  String get locationPermissionDenied => 'Location permission denied.';
+  String get operatorIdentity => 'Operator Identity';
   @override
-  String get cameraPermissionDenied => 'Camera permission denied.';
+  String get currentAssignment => 'Current Assignment';
+  @override
+  String get assignedService => 'Assigned Service';
+  @override
+  String get training => 'Training';
+  @override
+  String get trainingModule => 'Training Module';
+  @override
+  String get viewBriefingVideo => 'View Briefing Video';
+  @override
+  String get onDuty => 'On Duty';
+  @override
+  String get syncRequired => 'Sync Required';
+  @override
+  String get syncBeforeLogout => 'Please sync your data before logging out';
+  @override
+  String get syncData => 'Sync Data';
+  @override
+  String get logout => 'Log Out';
 }

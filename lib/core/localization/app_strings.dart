@@ -8,105 +8,109 @@ final appStringsProvider = Provider<AppStrings>((ref) {
 });
 
 abstract class AppStrings {
-  // App
-  String get appName;
-
-  // Common
-  String get ok;
-  String get cancel;
-  String get confirm;
-  String get exit;
-  String get next;
-  String get back;
-  String get skip;
-  String get submit;
-  String get retry;
-  String get loading;
-  String get error;
-  String get success;
-  String get warning;
-
-  // Splash
-  String get splashLoading;
-
-  // Login
-  String get loginTitle;
-  String get examCode;
-  String get username;
-  String get password;
-  String get login;
-  String get loginFailed;
-  String get invalidCredentials;
-
-  // Confirmation
-  String get confirmationTitle;
-  String get examDetails;
-  String get centerName;
-  String get examName;
-  String get confirmAndProceed;
-  String get exitApp;
-
-  // Profile
-  String get profileCreation;
-  String get name;
-  String get mobileNumber;
-  String get aadhaar;
-  String get selfieCapture;
-  String get captureSelfie;
-  String get retake;
-  String get otpVerification;
-  String get enterOtp;
-  String get resendOtp;
-  String get verifyOtp;
-  String get training;
-  String get watchTraining;
-  String get skipTraining;
-
-  // Shift Selection
-  String get selectShift;
-  String get mockDay;
-  String get examDay;
-  String get downloadingData;
-
-  // Home
-  String get tasks;
-  String get pending;
-  String get completed;
-  String get synced;
-  String get unsynced;
-  String get syncWarning;
-  String get capture;
-
-  // Task Capture
-  String get captureEvidence;
-  String get addMessage;
-  String get messagePlaceholder;
-  String get save;
-  String get previousCaptures;
-
-  // Settings
-  String get settings;
-  String get profile;
-  String get syncNow;
-  String get syncStatus;
-  String get logout;
-  String get logoutConfirmation;
-  String get unsyncedDataWarning;
-
-  // Errors
-  String get networkError;
-  String get serverError;
-  String get unknownError;
-  String get locationPermissionDenied;
-  String get cameraPermissionDenied;
 
   factory AppStrings.of(AppLanguage language) {
     switch (language) {
       case AppLanguage.english:
         return EnStrings();
-      // TODO: Add other languages here
-      // case AppLanguage.hindi:
-      //   return HiStrings();
     }
   }
+  // Login
+  String get welcomeBack;
+  String get enterExamCredentials;
+  String get examCode;
+  String get examCodeHint;
+  String get username;
+  String get usernameHint;
+  String get password;
+  String get secureLogin;
+  String get loginFailed;
+  String get loginSuccess;
+  String get fillAllFields;
+
+  // Confirmation
+  String get confirmationTitle;
+  String get verifyAssignment;
+  String get examCodeLabel;
+  String get examNameLabel;
+  String get centerCodeLabel;
+  String get centerNameLabel;
+  String get wrongCenter;
+  String get yesConfirm;
+
+  // Shift Selection
+  String get selectShift;
+  String get chooseAssignment;
+  String get examDay;
+  String get mockDay;
+  String get morningShift;
+  String get afternoonShift;
+  String get confirmShift;
+
+  // Profile
+  String get operatorProfile;
+  String get fillDetailsManually;
+  String get fullName;
+  String get age;
+  String get mobileNumber;
+  String get aadhaarNumber;
+  String get verify;
+  String get continueToSelfie;
+  String get details;
+  String get selfie;
+  String get captureSelfie;
+  String get selfieInstructions;
+  String get retake;
+  String get submit;
+
+  // OTP
+  String get enterOtpSentToMobile;
+  String get changeNumber;
+  String get submitOtp;
+  String get resendOtp;
+  String get verified;
+
+  // Location & Selfie
+  String get verifyLocationAndSelfie;
+  String get ensureInsideExamCentre;
+  String get locationDetected;
+  String get distanceFromCentre;
+  String get capturePhoto;
+  String get locationNotDetected;
+  String get detectingLocation;
+  String get faceVerification;
+
+  // Training
+  String get trainingRequired;
+  String get completeBeforeShiftStart;
+  String get duration;
+  String get priority;
+  String get mandatory;
+  String get completed;
+
+  // Home
+  String get notSubmitted;
+  String get submitted;
+  String get allTasksCompleted;
+  String get noSubmittedTasks;
+  String get synced;
+  String get unsynced;
+
+  // Errors
+  String get somethingWentWrong;
+
+  // Settings
+  String get profile;
+  String get operatorAssignmentDetails;
+  String get operatorIdentity;
+  String get currentAssignment;
+  String get assignedService;
+  String get training;
+  String get trainingModule;
+  String get viewBriefingVideo;
+  String get onDuty;
+  String get syncRequired;
+  String get syncBeforeLogout;
+  String get syncData;
+  String get logout;
 }

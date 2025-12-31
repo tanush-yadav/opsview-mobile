@@ -2,13 +2,16 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../core/constants/api_constants.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/providers/app_state_provider.dart';
+import '../database/app_database.dart';
 
 class AuthInterceptor extends Interceptor {
+  AuthInterceptor(this._ref);
+
   final Ref _ref;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-
-  AuthInterceptor(this._ref);
 
   @override
   void onRequest(
@@ -16,7 +19,7 @@ class AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     // Skip auth header for login endpoint
-    if (options.path.contains('op-login')) {
+    if (options.path.contains(ApiConstants.login)) {
       return handler.next(options);
     }
 
@@ -29,10 +32,13 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      // Token expired - could trigger logout here
-      // _ref.read(authProvider.notifier).logout();
+      // Token expired - clear session and logout
+      final db = _ref.read(appDatabaseProvider);
+      await db.delete(db.sessions).go();
+      await _storage.delete(key: AppConstants.accessTokenKey);
+      _ref.read(appStateProvider.notifier).clear();
     }
     handler.next(err);
   }

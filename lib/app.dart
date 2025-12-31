@@ -10,7 +10,7 @@ class OpsViewApp extends StatelessWidget {
     return ShadcnApp.router(
       title: 'OpsView',
       theme: ThemeData(
-        colorScheme: LegacyColorSchemes.darkZinc(),
+        colorScheme: LegacyColorSchemes.lightBlue(),
         radius: 0.5,
       ),
       routerConfig: appRouter,

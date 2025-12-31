@@ -2,12 +2,20 @@ import 'package:drift/drift.dart';
 
 class Tasks extends Table {
   TextColumn get id => text()();
+  TextColumn get clientCode => text()();
+  TextColumn get examId => text()();
+  TextColumn get centerId => text()();
   TextColumn get shiftId => text()();
-  TextColumn get name => text()();
-  TextColumn get instructions => text().nullable()();
-  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
-  TextColumn get status => text().withDefault(const Constant('pending'))();
-  TextColumn get syncStatus => text().withDefault(const Constant('unsynced'))();
+  TextColumn get service => text()();
+  IntColumn get seqNumber => integer().withDefault(const Constant(0))();
+  BoolColumn get required => boolean().withDefault(const Constant(true))();
+  TextColumn get taskId => text()();
+  TextColumn get taskLabel => text()();
+  TextColumn get taskDesc => text().nullable()();
+  TextColumn get taskType => text().withDefault(const Constant('IMAGE'))();
+  TextColumn get taskStatus => text().withDefault(const Constant('PENDING'))();
+  TextColumn get centerCode => text()();
+  TextColumn get centerName => text()();
   DateTimeColumn get downloadedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override

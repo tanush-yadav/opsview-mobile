@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/api_constants.dart';
 import 'auth_interceptor.dart';
+import 'error_interceptor.dart';
 
 final dioClientProvider = Provider<Dio>((ref) {
   final dio = Dio(
@@ -24,6 +25,7 @@ final dioClientProvider = Provider<Dio>((ref) {
       responseBody: true,
       error: true,
     ),
+    ErrorInterceptor(),
   ]);
 
   return dio;

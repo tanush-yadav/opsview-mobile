@@ -2,10 +2,8 @@ abstract class AppConstants {
   static const String appName = 'OpsView';
   static const String appVersion = '1.0.0';
 
-  // Storage Keys
+  // Storage Keys (secure storage - sensitive data only)
   static const String accessTokenKey = 'access_token';
-  static const String userDataKey = 'user_data';
-  static const String sessionKey = 'session_data';
 
   // Image Settings
   static const int imageQuality = 70;
@@ -16,4 +14,31 @@ abstract class AppConstants {
   // Sync Settings
   static const int syncRetryAttempts = 3;
   static const int syncBatchSize = 5;
+
+  // Shift Types
+  static const String shiftTypeExamDay = 'ExamDay';
+  static const String shiftTypeMockDay = 'MockDay';
+
+  // Support
+  static const String supportPhoneNumber = '+911234567890';
+}
+
+/// Onboarding steps for user flow tracking
+enum OnboardingStep {
+  confirmation('confirmation'),
+  shiftSelection('shiftSelection'),
+  profile('profile'),
+  training('training'),
+  completed('completed');
+
+  const OnboardingStep(this.value);
+
+  final String value;
+
+  static OnboardingStep fromString(String? value) {
+    return OnboardingStep.values.firstWhere(
+      (step) => step.value == value,
+      orElse: () => OnboardingStep.confirmation,
+    );
+  }
 }

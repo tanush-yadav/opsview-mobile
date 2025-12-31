@@ -1,8 +1,4 @@
 class ApiResponse {
-  final String status;
-  final String code;
-  final dynamic data;
-  final NotifyInfo? notify;
 
   ApiResponse({
     required this.status,
@@ -10,8 +6,6 @@ class ApiResponse {
     this.data,
     this.notify,
   });
-
-  bool get isSuccess => status == 'SUCCESS';
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
     return ApiResponse(
@@ -21,13 +15,15 @@ class ApiResponse {
       notify: json['notify'] != null ? NotifyInfo.fromJson(json['notify']) : null,
     );
   }
+  final String status;
+  final String code;
+  final dynamic data;
+  final NotifyInfo? notify;
+
+  bool get isSuccess => status == 'SUCCESS';
 }
 
 class NotifyInfo {
-  final String message;
-  final String type;
-  final int timeout;
-  final String tag;
 
   NotifyInfo({
     required this.message,
@@ -44,4 +40,8 @@ class NotifyInfo {
       tag: json['tag'] ?? '',
     );
   }
+  final String message;
+  final String type;
+  final int timeout;
+  final String tag;
 }

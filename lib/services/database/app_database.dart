@@ -8,8 +8,6 @@ import 'package:path/path.dart' as p;
 
 import 'tables/sessions.dart';
 import 'tables/profiles.dart';
-import 'tables/exams.dart';
-import 'tables/shifts.dart';
 import 'tables/tasks.dart';
 import 'tables/task_images.dart';
 
@@ -18,8 +16,6 @@ part 'app_database.g.dart';
 @DriftDatabase(tables: [
   Sessions,
   Profiles,
-  Exams,
-  Shifts,
   Tasks,
   TaskImages,
 ])
