@@ -203,12 +203,10 @@ class ConfirmationScreen extends ConsumerWidget {
   }
 
   Future<void> _handleConfirm(BuildContext context, WidgetRef ref) async {
-    final strings = ref.read(appStringsProvider);
 
     await ref.read(confirmationViewModelProvider.notifier).confirmCenter();
 
     if (context.mounted) {
-      SnackBarUtils.success(context, strings.yesConfirm);
       context.go(AppRoutes.shiftSelection);
     }
   }

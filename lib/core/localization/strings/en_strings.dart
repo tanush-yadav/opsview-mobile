@@ -17,7 +17,7 @@ class EnStrings implements AppStrings {
   @override
   String get password => 'PASSWORD';
   @override
-  String get secureLogin => 'Secure Login';
+  String get secureLogin => 'Login';
   @override
   String get loginFailed => 'Login failed';
   @override
@@ -83,7 +83,8 @@ class EnStrings implements AppStrings {
   @override
   String get captureSelfie => 'Capture Selfie';
   @override
-  String get selfieInstructions => 'Position your face in the frame and take a clear photo';
+  String get selfieInstructions =>
+      'Position your face in the frame and take a clear photo';
   @override
   String get retake => 'Retake';
   @override
@@ -142,10 +143,6 @@ class EnStrings implements AppStrings {
   String get allTasksCompleted => 'All tasks completed';
   @override
   String get noSubmittedTasks => 'No submitted tasks';
-  @override
-  String get synced => 'Synced';
-  @override
-  String get unsynced => 'Unsynced';
 
   // Errors
   @override
@@ -178,4 +175,45 @@ class EnStrings implements AppStrings {
   String get syncData => 'Sync Data';
   @override
   String get logout => 'Log Out';
+  @override
+  String get syncSuccess => 'Sync process completed';
+  @override
+  String get syncFailed => 'Sync failed. Please try again.';
+
+  // Task Capture
+  @override
+  String get taskDetails => 'Task Details';
+  @override
+  String get instructions => 'INSTRUCTIONS';
+  @override
+  String get reportedIssues => 'REPORTED ISSUES';
+  @override
+  String get photoEvidence => 'PHOTO EVIDENCE';
+  @override
+  String get observations => 'OBSERVATIONS';
+  @override
+  String get observationsHint =>
+      'Add any notes about the server room condition...';
+  @override
+  String get verificationChecklist => 'VERIFICATION CHECKLIST';
+  @override
+  String get takePhoto => 'Take Photo';
+  @override
+  String get addAnother => 'Add Another';
+  @override
+  String get tapToCaptureEvidence => 'Tap to capture evidence';
+  @override
+  String get yes => 'Yes';
+  @override
+  String get no => 'No';
+  @override
+  String completeTask(int count) => 'Complete Task ($count)';
+  @override
+  String get selectPhotoSource => 'Select Photo Source';
+  @override
+  String get camera => 'Camera';
+  @override
+  String get gallery => 'Gallery';
+  @override
+  String get cancel => 'Cancel';
 }

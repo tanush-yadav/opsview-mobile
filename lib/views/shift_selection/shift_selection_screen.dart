@@ -312,7 +312,6 @@ class ShiftSelectionScreen extends ConsumerWidget {
       await ref.read(shiftSelectionViewModelProvider.notifier).confirmShift();
 
       if (context.mounted) {
-        SnackBarUtils.success(context, strings.confirmShift);
         context.go(AppRoutes.profile);
       }
     }

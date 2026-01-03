@@ -13,10 +13,13 @@ class SnackBarUtils {
     showToast(
       context: context,
       builder: (context, overlay) {
-        return SurfaceCard(
-          child: Basic(
-            leading: Icon(_getIcon(type), color: _getColor(type), size: 20),
-            title: Text(message),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 80),
+          child: SurfaceCard(
+            child: Basic(
+              leading: Icon(_getIcon(type), color: _getColor(type), size: 20),
+              title: Text(message),
+            ),
           ),
         );
       },

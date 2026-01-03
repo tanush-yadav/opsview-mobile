@@ -11,13 +11,11 @@ import '../core/localization/app_strings.dart';
 import '../core/providers/app_state_provider.dart';
 import '../services/api/api_service.dart';
 import '../services/database/app_database.dart';
+import '../core/enums/location_status.dart';
 
 enum ProfileStep { details, selfie }
 
-enum LocationStatus { idle, detecting, detected, error }
-
 class ProfileState {
-
   const ProfileState({
     this.currentStep = ProfileStep.details,
     this.fullName = '',
@@ -172,8 +170,9 @@ class ProfileViewModel extends Notifier<ProfileState> {
     state = state.copyWith(isOtpLoading: true);
     try {
       final apiService = ref.read(apiServiceProvider);
-      final response =
-          await apiService.initiateMobileVerification(state.mobileNumber);
+      final response = await apiService.initiateMobileVerification(
+        state.mobileNumber,
+      );
 
       final strings = ref.read(appStringsProvider);
       if (response.isSuccess && response.data != null) {
@@ -191,7 +190,10 @@ class ProfileViewModel extends Notifier<ProfileState> {
       }
     } catch (e) {
       final strings = ref.read(appStringsProvider);
-      state = state.copyWith(isOtpLoading: false, error: strings.somethingWentWrong);
+      state = state.copyWith(
+        isOtpLoading: false,
+        error: strings.somethingWentWrong,
+      );
     }
   }
 
@@ -208,8 +210,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
     try {
       final apiService = ref.read(apiServiceProvider);
       final otp = state.otpDigits.join();
-      final response =
-          await apiService.verifyOtp(_pendingVerificationId!, otp);
+      final response = await apiService.verifyOtp(_pendingVerificationId!, otp);
 
       final strings = ref.read(appStringsProvider);
       if (response.isSuccess) {
@@ -229,7 +230,10 @@ class ProfileViewModel extends Notifier<ProfileState> {
       state = state.copyWith(isOtpLoading: false, error: e.message);
     } catch (e) {
       final strings = ref.read(appStringsProvider);
-      state = state.copyWith(isOtpLoading: false, error: strings.somethingWentWrong);
+      state = state.copyWith(
+        isOtpLoading: false,
+        error: strings.somethingWentWrong,
+      );
     }
   }
 
@@ -240,19 +244,22 @@ class ProfileViewModel extends Notifier<ProfileState> {
     try {
       final apiService = ref.read(apiServiceProvider);
       await apiService.resendOtp(_pendingVerificationId!);
-      state = state.copyWith(
-        otpDigits: ['', '', '', ''],
-        isOtpLoading: false,
-      );
+      state = state.copyWith(otpDigits: ['', '', '', ''], isOtpLoading: false);
     } catch (e) {
       final strings = ref.read(appStringsProvider);
-      state = state.copyWith(isOtpLoading: false, error: strings.somethingWentWrong);
+      state = state.copyWith(
+        isOtpLoading: false,
+        error: strings.somethingWentWrong,
+      );
     }
   }
 
   void cancelOtpVerification() {
     _pendingVerificationId = null;
-    state = state.copyWith(showOtpInput: false, otpDigits: ['', '', '', '', '', '']);
+    state = state.copyWith(
+      showOtpInput: false,
+      otpDigits: ['', '', '', '', '', ''],
+    );
   }
 
   void goToSelfie() {
@@ -336,7 +343,8 @@ class ProfileViewModel extends Notifier<ProfileState> {
     final dLat = _toRadians(lat2 - lat1);
     final dLon = _toRadians(lon2 - lon1);
 
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_toRadians(lat1)) *
             math.cos(_toRadians(lat2)) *
             math.sin(dLon / 2) *
@@ -352,10 +360,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
   }
 
   void setSelfieImage(String path, {double? livenessScore}) {
-    state = state.copyWith(
-      selfieImagePath: path,
-      livenessScore: livenessScore,
-    );
+    state = state.copyWith(selfieImagePath: path, livenessScore: livenessScore);
   }
 
   void clearSelfie() {
@@ -379,7 +384,9 @@ class ProfileViewModel extends Notifier<ProfileState> {
       final now = DateTime.now();
 
       // Save profile to local database
-      await db.into(db.profiles).insert(
+      await db
+          .into(db.profiles)
+          .insert(
             ProfilesCompanion.insert(
               id: profileId,
               shiftId: shiftId,
@@ -400,15 +407,16 @@ class ProfileViewModel extends Notifier<ProfileState> {
 
       // Update onboarding step to training
       await (db.update(db.sessions)..where((t) => const Constant(true))).write(
-        SessionsCompanion(
-          onboardingStep: Value(OnboardingStep.training.value),
-        ),
+        SessionsCompanion(onboardingStep: Value(OnboardingStep.training.value)),
       );
 
       // Update app state
       ref
           .read(appStateProvider.notifier)
           .updateOnboardingStep(OnboardingStep.training.value);
+
+      // Reload app state to fetch the new profile
+      await ref.read(appStateProvider.notifier).loadFromDatabase();
 
       state = state.copyWith(isLoading: false);
     } catch (e) {

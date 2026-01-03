@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../core/constants/app_constants.dart';
 import '../core/providers/app_state_provider.dart';
+import '../models/task/task_enums.dart';
 import '../services/database/app_database.dart';
 
 enum HomeTab { notSubmitted, submitted }
@@ -99,6 +100,24 @@ class HomeViewModel extends Notifier<HomeState> {
     state = state.copyWith(currentTab: tab);
   }
 
+  SyncStatus getSyncStatus(String taskId) {
+    final appState = ref.read(appStateProvider);
+    final submission = appState.taskSubmissions
+        .where((s) => s.taskId == taskId)
+        .firstOrNull;
+
+    if (submission == null) return SyncStatus.unsynced;
+
+    try {
+      return SyncStatus.values.firstWhere(
+        (e) => e.toDbValue == submission.status,
+        orElse: () => SyncStatus.unsynced,
+      );
+    } catch (_) {
+      return SyncStatus.unsynced;
+    }
+  }
+
   Future<void> callSupport() async {
     final uri = Uri.parse('tel:${AppConstants.supportPhoneNumber}');
     if (await canLaunchUrl(uri)) {
@@ -107,5 +126,6 @@ class HomeViewModel extends Notifier<HomeState> {
   }
 }
 
-final homeViewModelProvider =
-    NotifierProvider<HomeViewModel, HomeState>(HomeViewModel.new);
+final homeViewModelProvider = NotifierProvider<HomeViewModel, HomeState>(
+  HomeViewModel.new,
+);

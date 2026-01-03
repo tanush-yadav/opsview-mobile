@@ -8,7 +8,6 @@ final appStringsProvider = Provider<AppStrings>((ref) {
 });
 
 abstract class AppStrings {
-
   factory AppStrings.of(AppLanguage language) {
     switch (language) {
       case AppLanguage.english:
@@ -93,8 +92,6 @@ abstract class AppStrings {
   String get submitted;
   String get allTasksCompleted;
   String get noSubmittedTasks;
-  String get synced;
-  String get unsynced;
 
   // Errors
   String get somethingWentWrong;
@@ -113,4 +110,25 @@ abstract class AppStrings {
   String get syncBeforeLogout;
   String get syncData;
   String get logout;
+  String get syncSuccess;
+  String get syncFailed;
+
+  // Task Capture
+  String get taskDetails;
+  String get instructions;
+  String get reportedIssues;
+  String get photoEvidence;
+  String get observations;
+  String get observationsHint;
+  String get verificationChecklist;
+  String get takePhoto;
+  String get addAnother;
+  String get tapToCaptureEvidence;
+  String get yes;
+  String get no;
+  String completeTask(int count);
+  String get selectPhotoSource;
+  String get camera;
+  String get gallery;
+  String get cancel;
 }

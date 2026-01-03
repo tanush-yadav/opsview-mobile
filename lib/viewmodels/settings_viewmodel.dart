@@ -7,6 +7,9 @@ import '../models/auth/center.dart' as model;
 import '../models/auth/exam.dart' as model;
 import '../models/auth/user.dart' as model;
 import '../services/database/app_database.dart';
+import '../services/sync/profile_sync_service.dart';
+import '../services/sync/task_sync_service.dart';
+import '../models/task/task_enums.dart';
 
 class SettingsState {
   const SettingsState({
@@ -65,7 +68,9 @@ class SettingsViewModel extends Notifier<SettingsState> {
     final appState = ref.watch(appStateProvider);
 
     // Check for pending sync (tasks that are not submitted)
-    final hasPendingSync = appState.tasks.any((t) => t.taskStatus == 'PENDING');
+    final hasPendingSync = appState.tasks.any(
+      (t) => t.taskStatus == TaskStatus.pending.toDbValue,
+    );
 
     return SettingsState(
       user: appState.user,
@@ -77,11 +82,34 @@ class SettingsViewModel extends Notifier<SettingsState> {
     );
   }
 
-  Future<void> syncData() async {
+  Future<bool> syncData() async {
     state = state.copyWith(isSyncing: true);
-    // TODO: Implement actual sync logic
-    await Future.delayed(const Duration(seconds: 2));
-    state = state.copyWith(isSyncing: false, hasPendingSync: false);
+
+    try {
+      final profileSync = ref.read(profileSyncServiceProvider);
+      final taskSync = ref.read(taskSyncServiceProvider);
+
+      // Sync Profile
+      await profileSync.syncAllProfiles();
+
+      // Sync Tasks
+      await taskSync.syncAllTasks();
+
+      // Refresh App State to reflect changes (e.g. sync status)
+      await ref.read(appStateProvider.notifier).loadFromDatabase();
+
+      // Re-evaluate pending sync status
+      final appState = ref.read(appStateProvider);
+      final hasPendingSync = appState.tasks.any(
+        (t) => t.taskStatus == TaskStatus.pending.toDbValue,
+      );
+
+      state = state.copyWith(isSyncing: false, hasPendingSync: hasPendingSync);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isSyncing: false);
+      return false;
+    }
   }
 
   Future<void> logout() async {
@@ -95,7 +123,7 @@ class SettingsViewModel extends Notifier<SettingsState> {
     await db.delete(db.sessions).go();
     await db.delete(db.profiles).go();
     await db.delete(db.tasks).go();
-    await db.delete(db.taskImages).go();
+    await db.delete(db.taskSubmissions).go();
 
     // Clear app state
     ref.read(appStateProvider.notifier).clear();
@@ -104,7 +132,9 @@ class SettingsViewModel extends Notifier<SettingsState> {
   Future<void> openTrainingVideo() async {
     final appState = ref.read(appStateProvider);
     final shiftId = appState.selectedShiftId;
-    final shift = appState.exam?.shifts.where((s) => s.id == shiftId).firstOrNull;
+    final shift = appState.exam?.shifts
+        .where((s) => s.id == shiftId)
+        .firstOrNull;
 
     if (shift != null && shift.services.isNotEmpty) {
       final trainingLink = shift.services.first.trainingLink;

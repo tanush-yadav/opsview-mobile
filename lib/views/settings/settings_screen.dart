@@ -9,6 +9,7 @@ import '../../core/localization/app_strings.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/utils/snackbar_utils.dart';
 import '../../viewmodels/settings_viewmodel.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -37,32 +38,46 @@ class SettingsScreen extends ConsumerWidget {
                           // Back button
                           GestureDetector(
                             onTap: () => context.pop(),
-                            child: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                           const SizedBox(height: 16),
                           // Title
                           Text(strings.profile, style: AppTextStyles.h1),
                           const SizedBox(height: 4),
-                          Text(strings.operatorAssignmentDetails, style: AppTextStyles.muted),
+                          Text(
+                            strings.operatorAssignmentDetails,
+                            style: AppTextStyles.muted,
+                          ),
                           const SizedBox(height: 24),
                           // Operator Identity Section
-                          _buildSectionHeader(Icons.person_outline, strings.operatorIdentity),
+                          _buildSectionHeader(
+                            Icons.person_outline,
+                            strings.operatorIdentity,
+                          ),
                           const SizedBox(height: 12),
                           _buildIdentityCard(state, strings),
                           const SizedBox(height: 24),
                           // Current Assignment Section
-                          _buildSectionHeader(Icons.check_circle_outline, strings.currentAssignment),
+                          _buildSectionHeader(
+                            Icons.check_circle_outline,
+                            strings.currentAssignment,
+                          ),
                           const SizedBox(height: 12),
                           _buildAssignmentCard(
                             icon: Icons.description_outlined,
                             title: state.exam?.name ?? '',
-                            subtitle: '${strings.examCodeLabel}: #${state.exam?.code ?? ''}',
+                            subtitle:
+                                '${strings.examCodeLabel}: #${state.exam?.code ?? ''}',
                           ),
                           const SizedBox(height: 8),
                           _buildAssignmentCard(
                             icon: Icons.location_on_outlined,
                             title: state.center?.name ?? '',
-                            subtitle: '${state.center?.city ?? ''} • ${state.center?.code ?? ''}',
+                            subtitle:
+                                '${state.center?.city ?? ''} • ${state.center?.code ?? ''}',
                           ),
                           const SizedBox(height: 8),
                           _buildAssignmentCard(
@@ -72,7 +87,10 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 24),
                           // Training Section
-                          _buildSectionHeader(Icons.play_circle_outline, strings.training),
+                          _buildSectionHeader(
+                            Icons.play_circle_outline,
+                            strings.training,
+                          ),
                           const SizedBox(height: 12),
                           GestureDetector(
                             onTap: viewModel.openTrainingVideo,
@@ -137,7 +155,11 @@ class SettingsScreen extends ConsumerWidget {
                       fit: BoxFit.cover,
                     ),
                   )
-                : const Icon(Icons.person, size: 48, color: AppColors.textMuted),
+                : const Icon(
+                    Icons.person,
+                    size: 48,
+                    color: AppColors.textMuted,
+                  ),
           ),
           const SizedBox(height: 16),
           // Name
@@ -155,7 +177,8 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               _buildInfoChip('ID: ${state.user?.id.substring(0, 8) ?? ''}'),
               const SizedBox(width: 8),
-              if (state.profile != null) _buildInfoChip('${strings.age}: ${state.profile!.age}'),
+              if (state.profile != null)
+                _buildInfoChip('${strings.age}: ${state.profile!.age}'),
               const SizedBox(width: 8),
               _buildStatusChip(strings.onDuty),
             ],
@@ -255,7 +278,11 @@ class SettingsScreen extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: AppColors.warning,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -263,11 +290,15 @@ class SettingsScreen extends ConsumerWidget {
                       children: [
                         Text(
                           strings.syncRequired,
-                          style: AppTextStyles.label.copyWith(color: AppColors.warning),
+                          style: AppTextStyles.label.copyWith(
+                            color: AppColors.warning,
+                          ),
                         ),
                         Text(
                           strings.syncBeforeLogout,
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.warning),
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.warning,
+                          ),
                         ),
                       ],
                     ),
@@ -280,10 +311,23 @@ class SettingsScreen extends ConsumerWidget {
             width: double.infinity,
             height: 48,
             child: material.OutlinedButton(
-              onPressed: state.isSyncing ? null : viewModel.syncData,
+              onPressed: state.isSyncing
+                  ? null
+                  : () async {
+                      final success = await viewModel.syncData();
+                      if (context.mounted) {
+                        if (success) {
+                          SnackBarUtils.success(context, strings.syncSuccess);
+                        } else {
+                          SnackBarUtils.error(context, strings.syncFailed);
+                        }
+                      }
+                    },
               style: material.OutlinedButton.styleFrom(
                 side: const BorderSide(color: AppColors.primary),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: state.isSyncing
                   ? const SizedBox(
@@ -298,7 +342,9 @@ class SettingsScreen extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Text(
                           strings.syncData,
-                          style: AppTextStyles.button.copyWith(color: AppColors.primary),
+                          style: AppTextStyles.button.copyWith(
+                            color: AppColors.primary,
+                          ),
                         ),
                       ],
                     ),
@@ -320,22 +366,30 @@ class SettingsScreen extends ConsumerWidget {
                     },
               style: material.OutlinedButton.styleFrom(
                 side: BorderSide(
-                  color: state.hasPendingSync ? AppColors.textMuted : AppColors.border,
+                  color: state.hasPendingSync
+                      ? AppColors.textMuted
+                      : AppColors.border,
                 ),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.logout,
-                    color: state.hasPendingSync ? AppColors.textMuted : AppColors.textSecondary,
+                    color: state.hasPendingSync
+                        ? AppColors.textMuted
+                        : AppColors.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     strings.logout,
                     style: AppTextStyles.button.copyWith(
-                      color: state.hasPendingSync ? AppColors.textMuted : AppColors.textSecondary,
+                      color: state.hasPendingSync
+                          ? AppColors.textMuted
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ],

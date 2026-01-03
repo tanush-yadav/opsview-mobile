@@ -8,22 +8,24 @@ import '../../models/auth/user.dart' as model;
 import '../../services/database/app_database.dart';
 
 class AppState {
-
   const AppState({
     this.user,
     this.exam,
     this.center,
     this.profile,
     this.tasks = const [],
+    this.taskSubmissions = const [],
     this.selectedShiftId,
     this.onboardingStep,
     this.isLoaded = false,
   });
+
   final model.User? user;
   final model.Exam? exam;
   final model.Center? center;
   final Profile? profile;
   final List<Task> tasks;
+  final List<TaskSubmission> taskSubmissions;
   final String? selectedShiftId;
   final String? onboardingStep;
   final bool isLoaded;
@@ -34,6 +36,7 @@ class AppState {
     model.Center? center,
     Profile? profile,
     List<Task>? tasks,
+    List<TaskSubmission>? taskSubmissions,
     String? selectedShiftId,
     String? onboardingStep,
     bool? isLoaded,
@@ -44,6 +47,7 @@ class AppState {
       center: center ?? this.center,
       profile: profile ?? this.profile,
       tasks: tasks ?? this.tasks,
+      taskSubmissions: taskSubmissions ?? this.taskSubmissions,
       selectedShiftId: selectedShiftId ?? this.selectedShiftId,
       onboardingStep: onboardingStep ?? this.onboardingStep,
       isLoaded: isLoaded ?? this.isLoaded,
@@ -92,10 +96,13 @@ class AppStateNotifier extends Notifier<AppState> {
       // Load tasks for selected shift
       List<Task> tasks = [];
       if (session.selectedShiftId != null) {
-        tasks = await (db.select(db.tasks)
-              ..where((t) => t.shiftId.equals(session.selectedShiftId!)))
-            .get();
+        tasks = await (db.select(
+          db.tasks,
+        )..where((t) => t.shiftId.equals(session.selectedShiftId!))).get();
       }
+
+      // Load task submissions
+      final taskSubmissions = await db.select(db.taskSubmissions).get();
 
       state = AppState(
         user: user,
@@ -103,6 +110,7 @@ class AppStateNotifier extends Notifier<AppState> {
         center: center,
         profile: profile,
         tasks: tasks,
+        taskSubmissions: taskSubmissions,
         selectedShiftId: session.selectedShiftId,
         onboardingStep: session.onboardingStep,
         isLoaded: true,
@@ -128,10 +136,15 @@ class AppStateNotifier extends Notifier<AppState> {
     state = state.copyWith(tasks: tasks);
   }
 
+  void updateTaskSubmissions(List<TaskSubmission> submissions) {
+    state = state.copyWith(taskSubmissions: submissions);
+  }
+
   void clear() {
     state = const AppState(isLoaded: true);
   }
 }
 
-final appStateProvider =
-    NotifierProvider<AppStateNotifier, AppState>(AppStateNotifier.new);
+final appStateProvider = NotifierProvider<AppStateNotifier, AppState>(
+  AppStateNotifier.new,
+);

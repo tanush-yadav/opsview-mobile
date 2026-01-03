@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -13,7 +14,6 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 });
 
 class ApiService {
-
   ApiService(this._dio);
   final Dio _dio;
 
@@ -35,7 +35,9 @@ class ApiService {
       return ApiResponse.fromJson(response.data);
     } on DioException catch (e) {
       final error = e.error;
-      throw error is AppException ? error : AppException('Something went wrong');
+      throw error is AppException
+          ? error
+          : AppException('Something went wrong');
     }
   }
 
@@ -49,7 +51,9 @@ class ApiService {
       return ApiResponse.fromJson(response.data);
     } on DioException catch (e) {
       final error = e.error;
-      throw error is AppException ? error : AppException('Something went wrong');
+      throw error is AppException
+          ? error
+          : AppException('Something went wrong');
     }
   }
 
@@ -62,19 +66,21 @@ class ApiService {
       return ApiResponse.fromJson(response.data);
     } on DioException catch (e) {
       final error = e.error;
-      throw error is AppException ? error : AppException('Something went wrong');
+      throw error is AppException
+          ? error
+          : AppException('Something went wrong');
     }
   }
 
   Future<ApiResponse> resendOtp(String verificationId) async {
     try {
-      final response = await _dio.post(
-        ApiConstants.resendOtp(verificationId),
-      );
+      final response = await _dio.post(ApiConstants.resendOtp(verificationId));
       return ApiResponse.fromJson(response.data);
     } on DioException catch (e) {
       final error = e.error;
-      throw error is AppException ? error : AppException('Something went wrong');
+      throw error is AppException
+          ? error
+          : AppException('Something went wrong');
     }
   }
 
@@ -114,18 +120,19 @@ class ApiService {
     required String taskId,
     required List<File> files,
     required Map<String, dynamic> payload,
+    Map<String, dynamic>? headers,
   }) async {
     final formData = FormData.fromMap({
       'files': await Future.wait(
         files.map((f) => MultipartFile.fromFile(f.path)),
       ),
-      'payload': payload,
+      'payload': jsonEncode(payload),
     });
 
     final response = await _dio.patch(
       ApiConstants.updateTask(taskId),
       data: formData,
-      options: Options(contentType: 'multipart/form-data'),
+      options: Options(contentType: 'multipart/form-data', headers: headers),
     );
     return ApiResponse.fromJson(response.data);
   }

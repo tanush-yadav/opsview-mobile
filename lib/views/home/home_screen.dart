@@ -9,6 +9,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../services/database/app_database.dart';
 import '../../viewmodels/home_viewmodel.dart';
+import '../../models/task/task_enums.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -40,7 +41,7 @@ class HomeScreen extends ConsumerWidget {
                         Expanded(
                           child: state.isLoading
                               ? const Center(child: CircularProgressIndicator())
-                              : _buildTaskList(context, state, strings),
+                              : _buildTaskList(context, ref, state, strings),
                         ),
                       ],
                     ),
@@ -64,14 +65,18 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, HomeState state, AppStrings strings) {
+  Widget _buildHeader(
+    BuildContext context,
+    HomeState state,
+    AppStrings strings,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       color: AppColors.backgroundWhite,
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => context.pop(),
+            onTap: () => context.replace(AppRoutes.shiftSelection),
             child: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           ),
           const SizedBox(width: 16),
@@ -80,13 +85,20 @@ class HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  state.shiftName.isNotEmpty ? state.shiftName : strings.morningShift,
+                  state.shiftName.isNotEmpty
+                      ? state.shiftName
+                      : strings.morningShift,
                   style: AppTextStyles.h3,
                 ),
-                if (state.shiftStartTime.isNotEmpty && state.shiftEndTime.isNotEmpty)
+                if (state.shiftStartTime.isNotEmpty &&
+                    state.shiftEndTime.isNotEmpty)
                   Row(
                     children: [
-                      const Icon(Icons.access_time, size: 14, color: AppColors.textMuted),
+                      const Icon(
+                        Icons.access_time,
+                        size: 14,
+                        color: AppColors.textMuted,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${state.shiftStartTime} - ${state.shiftEndTime}',
@@ -106,7 +118,10 @@ class HomeScreen extends ConsumerWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.border),
               ),
-              child: const Icon(Icons.person_outline, color: AppColors.textMuted),
+              child: const Icon(
+                Icons.person_outline,
+                color: AppColors.textMuted,
+              ),
             ),
           ),
         ],
@@ -114,7 +129,11 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTabBar(HomeState state, HomeViewModel viewModel, AppStrings strings) {
+  Widget _buildTabBar(
+    HomeState state,
+    HomeViewModel viewModel,
+    AppStrings strings,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -161,7 +180,13 @@ class HomeScreen extends ConsumerWidget {
           color: isSelected ? AppColors.backgroundWhite : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           boxShadow: isSelected
-              ? [const BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))]
+              ? [
+                  const BoxShadow(
+                    color: AppColors.shadow,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ]
               : null,
         ),
         child: Row(
@@ -199,7 +224,12 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTaskList(BuildContext context, HomeState state, AppStrings strings) {
+  Widget _buildTaskList(
+    BuildContext context,
+    WidgetRef ref,
+    HomeState state,
+    AppStrings strings,
+  ) {
     final tasks = state.currentTasks;
 
     if (tasks.isEmpty) {
@@ -229,13 +259,20 @@ class HomeScreen extends ConsumerWidget {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: tasks.length,
-      itemBuilder: (context, index) => _buildTaskCard(context, tasks[index], strings),
+      itemBuilder: (context, index) =>
+          _buildTaskCard(context, ref, tasks[index], strings),
     );
   }
 
-  Widget _buildTaskCard(BuildContext context, Task task, AppStrings strings) {
+  Widget _buildTaskCard(
+    BuildContext context,
+    WidgetRef ref,
+    Task task,
+    AppStrings strings,
+  ) {
     return GestureDetector(
-      onTap: () => context.push('${AppRoutes.taskCapture}?taskId=${task.id}'),
+      onTap: () =>
+          context.push('${AppRoutes.taskCapture}?taskId=${task.taskId}'),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -257,7 +294,11 @@ class HomeScreen extends ConsumerWidget {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.camera_alt_outlined, color: AppColors.primary, size: 24),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -266,7 +307,12 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          Expanded(child: Text(task.taskLabel, style: AppTextStyles.h4)),
+                          Expanded(
+                            child: Text(
+                              task.taskLabel,
+                              style: AppTextStyles.h4,
+                            ),
+                          ),
                           if (task.required)
                             Container(
                               width: 8,
@@ -296,7 +342,11 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textMuted),
+                const Icon(
+                  Icons.location_on_outlined,
+                  size: 14,
+                  color: AppColors.textMuted,
+                ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
@@ -313,7 +363,7 @@ class HomeScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSyncStatus(task, strings),
+                _buildSyncStatus(ref, task, strings),
                 const Icon(Icons.chevron_right, color: AppColors.textMuted),
               ],
             ),
@@ -323,10 +373,11 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSyncStatus(Task task, AppStrings strings) {
-    final isSubmitted = task.taskStatus == 'SUBMITTED';
-    final color = isSubmitted ? AppColors.synced : AppColors.unsynced;
-    final label = isSubmitted ? strings.synced : strings.unsynced;
+  Widget _buildSyncStatus(WidgetRef ref, Task task, AppStrings strings) {
+    final viewModel = ref.read(homeViewModelProvider.notifier);
+    final syncStatus = viewModel.getSyncStatus(task.taskId);
+
+    final color = syncStatus == SyncStatus.synced ? AppColors.synced : AppColors.unsynced;
 
     return Row(
       children: [
@@ -336,7 +387,7 @@ class HomeScreen extends ConsumerWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
-        Text(label, style: AppTextStyles.bodySmall.copyWith(color: color)),
+        Text(syncStatus.toUIValue, style: AppTextStyles.bodySmall.copyWith(color: color)),
       ],
     );
   }

@@ -21,22 +21,25 @@ class LivenessCheckPage extends ConsumerWidget {
           showBackButton: true,
         ),
         callbacks: LivenessCheckCallbacks(
-          onPhotoTaken: (imagePath, antiSpoofingPassed) {
+          onPhotoTaken: (imagePath, antiSpoofingPassed) async {
             viewModel.setSelfieImage(imagePath);
+            // Small delay to allow library to clean up internal state
+            await Future.delayed(const Duration(milliseconds: 500));
             if (context.mounted) {
               context.pop();
             }
           },
-          onCancel: () {
+          onCancel: () async {
+            await Future.delayed(const Duration(milliseconds: 300));
             if (context.mounted) {
               context.pop();
             }
           },
           onError: (error) {
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(error)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(error)));
               context.pop();
             }
           },

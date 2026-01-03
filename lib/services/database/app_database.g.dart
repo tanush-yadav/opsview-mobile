@@ -2372,12 +2372,12 @@ class TasksCompanion extends UpdateCompanion<Task> {
   }
 }
 
-class $TaskImagesTable extends TaskImages
-    with TableInfo<$TaskImagesTable, TaskImage> {
+class $TaskSubmissionsTable extends TaskSubmissions
+    with TableInfo<$TaskSubmissionsTable, TaskSubmission> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $TaskImagesTable(this.attachedDatabase, [this._alias]);
+  $TaskSubmissionsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
@@ -2396,27 +2396,48 @@ class $TaskImagesTable extends TaskImages
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _localPathMeta = const VerificationMeta(
-    'localPath',
+  static const VerificationMeta _observationsMeta = const VerificationMeta(
+    'observations',
   );
   @override
-  late final GeneratedColumn<String> localPath = GeneratedColumn<String>(
-    'local_path',
+  late final GeneratedColumn<String> observations = GeneratedColumn<String>(
+    'observations',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _verificationAnswersMeta =
+      const VerificationMeta('verificationAnswers');
+  @override
+  late final GeneratedColumn<String> verificationAnswers =
+      GeneratedColumn<String>(
+        'verification_answers',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _imagePathsMeta = const VerificationMeta(
+    'imagePaths',
+  );
+  @override
+  late final GeneratedColumn<String> imagePaths = GeneratedColumn<String>(
+    'image_paths',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _messageMeta = const VerificationMeta(
-    'message',
-  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
-  late final GeneratedColumn<String> message = GeneratedColumn<String>(
-    'message',
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
+    defaultValue: const Constant('UNSYNCED'),
   );
   static const VerificationMeta _latitudeMeta = const VerificationMeta(
     'latitude',
@@ -2440,29 +2461,17 @@ class $TaskImagesTable extends TaskImages
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _capturedAtMeta = const VerificationMeta(
-    'capturedAt',
+  static const VerificationMeta _submittedAtMeta = const VerificationMeta(
+    'submittedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> capturedAt = GeneratedColumn<DateTime>(
-    'captured_at',
+  late final GeneratedColumn<DateTime> submittedAt = GeneratedColumn<DateTime>(
+    'submitted_at',
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
-  );
-  static const VerificationMeta _syncStatusMeta = const VerificationMeta(
-    'syncStatus',
-  );
-  @override
-  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
-    'sync_status',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant('pending'),
   );
   static const VerificationMeta _syncedAtMeta = const VerificationMeta(
     'syncedAt',
@@ -2479,22 +2488,23 @@ class $TaskImagesTable extends TaskImages
   List<GeneratedColumn> get $columns => [
     id,
     taskId,
-    localPath,
-    message,
+    observations,
+    verificationAnswers,
+    imagePaths,
+    status,
     latitude,
     longitude,
-    capturedAt,
-    syncStatus,
+    submittedAt,
     syncedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'task_images';
+  static const String $name = 'task_submissions';
   @override
   VerificationContext validateIntegrity(
-    Insertable<TaskImage> instance, {
+    Insertable<TaskSubmission> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2512,18 +2522,38 @@ class $TaskImagesTable extends TaskImages
     } else if (isInserting) {
       context.missing(_taskIdMeta);
     }
-    if (data.containsKey('local_path')) {
+    if (data.containsKey('observations')) {
       context.handle(
-        _localPathMeta,
-        localPath.isAcceptableOrUnknown(data['local_path']!, _localPathMeta),
+        _observationsMeta,
+        observations.isAcceptableOrUnknown(
+          data['observations']!,
+          _observationsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('verification_answers')) {
+      context.handle(
+        _verificationAnswersMeta,
+        verificationAnswers.isAcceptableOrUnknown(
+          data['verification_answers']!,
+          _verificationAnswersMeta,
+        ),
       );
     } else if (isInserting) {
-      context.missing(_localPathMeta);
+      context.missing(_verificationAnswersMeta);
     }
-    if (data.containsKey('message')) {
+    if (data.containsKey('image_paths')) {
       context.handle(
-        _messageMeta,
-        message.isAcceptableOrUnknown(data['message']!, _messageMeta),
+        _imagePathsMeta,
+        imagePaths.isAcceptableOrUnknown(data['image_paths']!, _imagePathsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_imagePathsMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
       );
     }
     if (data.containsKey('latitude')) {
@@ -2538,16 +2568,13 @@ class $TaskImagesTable extends TaskImages
         longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
       );
     }
-    if (data.containsKey('captured_at')) {
+    if (data.containsKey('submitted_at')) {
       context.handle(
-        _capturedAtMeta,
-        capturedAt.isAcceptableOrUnknown(data['captured_at']!, _capturedAtMeta),
-      );
-    }
-    if (data.containsKey('sync_status')) {
-      context.handle(
-        _syncStatusMeta,
-        syncStatus.isAcceptableOrUnknown(data['sync_status']!, _syncStatusMeta),
+        _submittedAtMeta,
+        submittedAt.isAcceptableOrUnknown(
+          data['submitted_at']!,
+          _submittedAtMeta,
+        ),
       );
     }
     if (data.containsKey('synced_at')) {
@@ -2562,9 +2589,9 @@ class $TaskImagesTable extends TaskImages
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  TaskImage map(Map<String, dynamic> data, {String? tablePrefix}) {
+  TaskSubmission map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return TaskImage(
+    return TaskSubmission(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -2573,14 +2600,22 @@ class $TaskImagesTable extends TaskImages
         DriftSqlType.string,
         data['${effectivePrefix}task_id'],
       )!,
-      localPath: attachedDatabase.typeMapping.read(
+      observations: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}local_path'],
-      )!,
-      message: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}message'],
+        data['${effectivePrefix}observations'],
       ),
+      verificationAnswers: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}verification_answers'],
+      )!,
+      imagePaths: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_paths'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
       latitude: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}latitude'],
@@ -2589,13 +2624,9 @@ class $TaskImagesTable extends TaskImages
         DriftSqlType.double,
         data['${effectivePrefix}longitude'],
       ),
-      capturedAt: attachedDatabase.typeMapping.read(
+      submittedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
-        data['${effectivePrefix}captured_at'],
-      )!,
-      syncStatus: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}sync_status'],
+        data['${effectivePrefix}submitted_at'],
       )!,
       syncedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -2605,30 +2636,32 @@ class $TaskImagesTable extends TaskImages
   }
 
   @override
-  $TaskImagesTable createAlias(String alias) {
-    return $TaskImagesTable(attachedDatabase, alias);
+  $TaskSubmissionsTable createAlias(String alias) {
+    return $TaskSubmissionsTable(attachedDatabase, alias);
   }
 }
 
-class TaskImage extends DataClass implements Insertable<TaskImage> {
+class TaskSubmission extends DataClass implements Insertable<TaskSubmission> {
   final String id;
   final String taskId;
-  final String localPath;
-  final String? message;
+  final String? observations;
+  final String verificationAnswers;
+  final String imagePaths;
+  final String status;
   final double? latitude;
   final double? longitude;
-  final DateTime capturedAt;
-  final String syncStatus;
+  final DateTime submittedAt;
   final DateTime? syncedAt;
-  const TaskImage({
+  const TaskSubmission({
     required this.id,
     required this.taskId,
-    required this.localPath,
-    this.message,
+    this.observations,
+    required this.verificationAnswers,
+    required this.imagePaths,
+    required this.status,
     this.latitude,
     this.longitude,
-    required this.capturedAt,
-    required this.syncStatus,
+    required this.submittedAt,
     this.syncedAt,
   });
   @override
@@ -2636,60 +2669,65 @@ class TaskImage extends DataClass implements Insertable<TaskImage> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['task_id'] = Variable<String>(taskId);
-    map['local_path'] = Variable<String>(localPath);
-    if (!nullToAbsent || message != null) {
-      map['message'] = Variable<String>(message);
+    if (!nullToAbsent || observations != null) {
+      map['observations'] = Variable<String>(observations);
     }
+    map['verification_answers'] = Variable<String>(verificationAnswers);
+    map['image_paths'] = Variable<String>(imagePaths);
+    map['status'] = Variable<String>(status);
     if (!nullToAbsent || latitude != null) {
       map['latitude'] = Variable<double>(latitude);
     }
     if (!nullToAbsent || longitude != null) {
       map['longitude'] = Variable<double>(longitude);
     }
-    map['captured_at'] = Variable<DateTime>(capturedAt);
-    map['sync_status'] = Variable<String>(syncStatus);
+    map['submitted_at'] = Variable<DateTime>(submittedAt);
     if (!nullToAbsent || syncedAt != null) {
       map['synced_at'] = Variable<DateTime>(syncedAt);
     }
     return map;
   }
 
-  TaskImagesCompanion toCompanion(bool nullToAbsent) {
-    return TaskImagesCompanion(
+  TaskSubmissionsCompanion toCompanion(bool nullToAbsent) {
+    return TaskSubmissionsCompanion(
       id: Value(id),
       taskId: Value(taskId),
-      localPath: Value(localPath),
-      message: message == null && nullToAbsent
+      observations: observations == null && nullToAbsent
           ? const Value.absent()
-          : Value(message),
+          : Value(observations),
+      verificationAnswers: Value(verificationAnswers),
+      imagePaths: Value(imagePaths),
+      status: Value(status),
       latitude: latitude == null && nullToAbsent
           ? const Value.absent()
           : Value(latitude),
       longitude: longitude == null && nullToAbsent
           ? const Value.absent()
           : Value(longitude),
-      capturedAt: Value(capturedAt),
-      syncStatus: Value(syncStatus),
+      submittedAt: Value(submittedAt),
       syncedAt: syncedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(syncedAt),
     );
   }
 
-  factory TaskImage.fromJson(
+  factory TaskSubmission.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return TaskImage(
+    return TaskSubmission(
       id: serializer.fromJson<String>(json['id']),
       taskId: serializer.fromJson<String>(json['taskId']),
-      localPath: serializer.fromJson<String>(json['localPath']),
-      message: serializer.fromJson<String?>(json['message']),
+      observations: serializer.fromJson<String?>(json['observations']),
+      verificationAnswers: serializer.fromJson<String>(
+        json['verificationAnswers'],
+      ),
+      imagePaths: serializer.fromJson<String>(json['imagePaths']),
+      status: serializer.fromJson<String>(json['status']),
       latitude: serializer.fromJson<double?>(json['latitude']),
       longitude: serializer.fromJson<double?>(json['longitude']),
-      capturedAt: serializer.fromJson<DateTime>(json['capturedAt']),
-      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      submittedAt: serializer.fromJson<DateTime>(json['submittedAt']),
       syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
     );
   }
@@ -2699,66 +2737,75 @@ class TaskImage extends DataClass implements Insertable<TaskImage> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'taskId': serializer.toJson<String>(taskId),
-      'localPath': serializer.toJson<String>(localPath),
-      'message': serializer.toJson<String?>(message),
+      'observations': serializer.toJson<String?>(observations),
+      'verificationAnswers': serializer.toJson<String>(verificationAnswers),
+      'imagePaths': serializer.toJson<String>(imagePaths),
+      'status': serializer.toJson<String>(status),
       'latitude': serializer.toJson<double?>(latitude),
       'longitude': serializer.toJson<double?>(longitude),
-      'capturedAt': serializer.toJson<DateTime>(capturedAt),
-      'syncStatus': serializer.toJson<String>(syncStatus),
+      'submittedAt': serializer.toJson<DateTime>(submittedAt),
       'syncedAt': serializer.toJson<DateTime?>(syncedAt),
     };
   }
 
-  TaskImage copyWith({
+  TaskSubmission copyWith({
     String? id,
     String? taskId,
-    String? localPath,
-    Value<String?> message = const Value.absent(),
+    Value<String?> observations = const Value.absent(),
+    String? verificationAnswers,
+    String? imagePaths,
+    String? status,
     Value<double?> latitude = const Value.absent(),
     Value<double?> longitude = const Value.absent(),
-    DateTime? capturedAt,
-    String? syncStatus,
+    DateTime? submittedAt,
     Value<DateTime?> syncedAt = const Value.absent(),
-  }) => TaskImage(
+  }) => TaskSubmission(
     id: id ?? this.id,
     taskId: taskId ?? this.taskId,
-    localPath: localPath ?? this.localPath,
-    message: message.present ? message.value : this.message,
+    observations: observations.present ? observations.value : this.observations,
+    verificationAnswers: verificationAnswers ?? this.verificationAnswers,
+    imagePaths: imagePaths ?? this.imagePaths,
+    status: status ?? this.status,
     latitude: latitude.present ? latitude.value : this.latitude,
     longitude: longitude.present ? longitude.value : this.longitude,
-    capturedAt: capturedAt ?? this.capturedAt,
-    syncStatus: syncStatus ?? this.syncStatus,
+    submittedAt: submittedAt ?? this.submittedAt,
     syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
   );
-  TaskImage copyWithCompanion(TaskImagesCompanion data) {
-    return TaskImage(
+  TaskSubmission copyWithCompanion(TaskSubmissionsCompanion data) {
+    return TaskSubmission(
       id: data.id.present ? data.id.value : this.id,
       taskId: data.taskId.present ? data.taskId.value : this.taskId,
-      localPath: data.localPath.present ? data.localPath.value : this.localPath,
-      message: data.message.present ? data.message.value : this.message,
+      observations: data.observations.present
+          ? data.observations.value
+          : this.observations,
+      verificationAnswers: data.verificationAnswers.present
+          ? data.verificationAnswers.value
+          : this.verificationAnswers,
+      imagePaths: data.imagePaths.present
+          ? data.imagePaths.value
+          : this.imagePaths,
+      status: data.status.present ? data.status.value : this.status,
       latitude: data.latitude.present ? data.latitude.value : this.latitude,
       longitude: data.longitude.present ? data.longitude.value : this.longitude,
-      capturedAt: data.capturedAt.present
-          ? data.capturedAt.value
-          : this.capturedAt,
-      syncStatus: data.syncStatus.present
-          ? data.syncStatus.value
-          : this.syncStatus,
+      submittedAt: data.submittedAt.present
+          ? data.submittedAt.value
+          : this.submittedAt,
       syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('TaskImage(')
+    return (StringBuffer('TaskSubmission(')
           ..write('id: $id, ')
           ..write('taskId: $taskId, ')
-          ..write('localPath: $localPath, ')
-          ..write('message: $message, ')
+          ..write('observations: $observations, ')
+          ..write('verificationAnswers: $verificationAnswers, ')
+          ..write('imagePaths: $imagePaths, ')
+          ..write('status: $status, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
-          ..write('capturedAt: $capturedAt, ')
-          ..write('syncStatus: $syncStatus, ')
+          ..write('submittedAt: $submittedAt, ')
           ..write('syncedAt: $syncedAt')
           ..write(')'))
         .toString();
@@ -2768,113 +2815,124 @@ class TaskImage extends DataClass implements Insertable<TaskImage> {
   int get hashCode => Object.hash(
     id,
     taskId,
-    localPath,
-    message,
+    observations,
+    verificationAnswers,
+    imagePaths,
+    status,
     latitude,
     longitude,
-    capturedAt,
-    syncStatus,
+    submittedAt,
     syncedAt,
   );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is TaskImage &&
+      (other is TaskSubmission &&
           other.id == this.id &&
           other.taskId == this.taskId &&
-          other.localPath == this.localPath &&
-          other.message == this.message &&
+          other.observations == this.observations &&
+          other.verificationAnswers == this.verificationAnswers &&
+          other.imagePaths == this.imagePaths &&
+          other.status == this.status &&
           other.latitude == this.latitude &&
           other.longitude == this.longitude &&
-          other.capturedAt == this.capturedAt &&
-          other.syncStatus == this.syncStatus &&
+          other.submittedAt == this.submittedAt &&
           other.syncedAt == this.syncedAt);
 }
 
-class TaskImagesCompanion extends UpdateCompanion<TaskImage> {
+class TaskSubmissionsCompanion extends UpdateCompanion<TaskSubmission> {
   final Value<String> id;
   final Value<String> taskId;
-  final Value<String> localPath;
-  final Value<String?> message;
+  final Value<String?> observations;
+  final Value<String> verificationAnswers;
+  final Value<String> imagePaths;
+  final Value<String> status;
   final Value<double?> latitude;
   final Value<double?> longitude;
-  final Value<DateTime> capturedAt;
-  final Value<String> syncStatus;
+  final Value<DateTime> submittedAt;
   final Value<DateTime?> syncedAt;
   final Value<int> rowid;
-  const TaskImagesCompanion({
+  const TaskSubmissionsCompanion({
     this.id = const Value.absent(),
     this.taskId = const Value.absent(),
-    this.localPath = const Value.absent(),
-    this.message = const Value.absent(),
+    this.observations = const Value.absent(),
+    this.verificationAnswers = const Value.absent(),
+    this.imagePaths = const Value.absent(),
+    this.status = const Value.absent(),
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
-    this.capturedAt = const Value.absent(),
-    this.syncStatus = const Value.absent(),
+    this.submittedAt = const Value.absent(),
     this.syncedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  TaskImagesCompanion.insert({
+  TaskSubmissionsCompanion.insert({
     required String id,
     required String taskId,
-    required String localPath,
-    this.message = const Value.absent(),
+    this.observations = const Value.absent(),
+    required String verificationAnswers,
+    required String imagePaths,
+    this.status = const Value.absent(),
     this.latitude = const Value.absent(),
     this.longitude = const Value.absent(),
-    this.capturedAt = const Value.absent(),
-    this.syncStatus = const Value.absent(),
+    this.submittedAt = const Value.absent(),
     this.syncedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        taskId = Value(taskId),
-       localPath = Value(localPath);
-  static Insertable<TaskImage> custom({
+       verificationAnswers = Value(verificationAnswers),
+       imagePaths = Value(imagePaths);
+  static Insertable<TaskSubmission> custom({
     Expression<String>? id,
     Expression<String>? taskId,
-    Expression<String>? localPath,
-    Expression<String>? message,
+    Expression<String>? observations,
+    Expression<String>? verificationAnswers,
+    Expression<String>? imagePaths,
+    Expression<String>? status,
     Expression<double>? latitude,
     Expression<double>? longitude,
-    Expression<DateTime>? capturedAt,
-    Expression<String>? syncStatus,
+    Expression<DateTime>? submittedAt,
     Expression<DateTime>? syncedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (taskId != null) 'task_id': taskId,
-      if (localPath != null) 'local_path': localPath,
-      if (message != null) 'message': message,
+      if (observations != null) 'observations': observations,
+      if (verificationAnswers != null)
+        'verification_answers': verificationAnswers,
+      if (imagePaths != null) 'image_paths': imagePaths,
+      if (status != null) 'status': status,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
-      if (capturedAt != null) 'captured_at': capturedAt,
-      if (syncStatus != null) 'sync_status': syncStatus,
+      if (submittedAt != null) 'submitted_at': submittedAt,
       if (syncedAt != null) 'synced_at': syncedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
-  TaskImagesCompanion copyWith({
+  TaskSubmissionsCompanion copyWith({
     Value<String>? id,
     Value<String>? taskId,
-    Value<String>? localPath,
-    Value<String?>? message,
+    Value<String?>? observations,
+    Value<String>? verificationAnswers,
+    Value<String>? imagePaths,
+    Value<String>? status,
     Value<double?>? latitude,
     Value<double?>? longitude,
-    Value<DateTime>? capturedAt,
-    Value<String>? syncStatus,
+    Value<DateTime>? submittedAt,
     Value<DateTime?>? syncedAt,
     Value<int>? rowid,
   }) {
-    return TaskImagesCompanion(
+    return TaskSubmissionsCompanion(
       id: id ?? this.id,
       taskId: taskId ?? this.taskId,
-      localPath: localPath ?? this.localPath,
-      message: message ?? this.message,
+      observations: observations ?? this.observations,
+      verificationAnswers: verificationAnswers ?? this.verificationAnswers,
+      imagePaths: imagePaths ?? this.imagePaths,
+      status: status ?? this.status,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
-      capturedAt: capturedAt ?? this.capturedAt,
-      syncStatus: syncStatus ?? this.syncStatus,
+      submittedAt: submittedAt ?? this.submittedAt,
       syncedAt: syncedAt ?? this.syncedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -2889,11 +2947,17 @@ class TaskImagesCompanion extends UpdateCompanion<TaskImage> {
     if (taskId.present) {
       map['task_id'] = Variable<String>(taskId.value);
     }
-    if (localPath.present) {
-      map['local_path'] = Variable<String>(localPath.value);
+    if (observations.present) {
+      map['observations'] = Variable<String>(observations.value);
     }
-    if (message.present) {
-      map['message'] = Variable<String>(message.value);
+    if (verificationAnswers.present) {
+      map['verification_answers'] = Variable<String>(verificationAnswers.value);
+    }
+    if (imagePaths.present) {
+      map['image_paths'] = Variable<String>(imagePaths.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
     }
     if (latitude.present) {
       map['latitude'] = Variable<double>(latitude.value);
@@ -2901,11 +2965,8 @@ class TaskImagesCompanion extends UpdateCompanion<TaskImage> {
     if (longitude.present) {
       map['longitude'] = Variable<double>(longitude.value);
     }
-    if (capturedAt.present) {
-      map['captured_at'] = Variable<DateTime>(capturedAt.value);
-    }
-    if (syncStatus.present) {
-      map['sync_status'] = Variable<String>(syncStatus.value);
+    if (submittedAt.present) {
+      map['submitted_at'] = Variable<DateTime>(submittedAt.value);
     }
     if (syncedAt.present) {
       map['synced_at'] = Variable<DateTime>(syncedAt.value);
@@ -2918,15 +2979,16 @@ class TaskImagesCompanion extends UpdateCompanion<TaskImage> {
 
   @override
   String toString() {
-    return (StringBuffer('TaskImagesCompanion(')
+    return (StringBuffer('TaskSubmissionsCompanion(')
           ..write('id: $id, ')
           ..write('taskId: $taskId, ')
-          ..write('localPath: $localPath, ')
-          ..write('message: $message, ')
+          ..write('observations: $observations, ')
+          ..write('verificationAnswers: $verificationAnswers, ')
+          ..write('imagePaths: $imagePaths, ')
+          ..write('status: $status, ')
           ..write('latitude: $latitude, ')
           ..write('longitude: $longitude, ')
-          ..write('capturedAt: $capturedAt, ')
-          ..write('syncStatus: $syncStatus, ')
+          ..write('submittedAt: $submittedAt, ')
           ..write('syncedAt: $syncedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2940,7 +3002,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SessionsTable sessions = $SessionsTable(this);
   late final $ProfilesTable profiles = $ProfilesTable(this);
   late final $TasksTable tasks = $TasksTable(this);
-  late final $TaskImagesTable taskImages = $TaskImagesTable(this);
+  late final $TaskSubmissionsTable taskSubmissions = $TaskSubmissionsTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2949,7 +3013,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     sessions,
     profiles,
     tasks,
-    taskImages,
+    taskSubmissions,
   ];
 }
 
@@ -4037,36 +4101,38 @@ typedef $$TasksTableProcessedTableManager =
       Task,
       PrefetchHooks Function()
     >;
-typedef $$TaskImagesTableCreateCompanionBuilder =
-    TaskImagesCompanion Function({
+typedef $$TaskSubmissionsTableCreateCompanionBuilder =
+    TaskSubmissionsCompanion Function({
       required String id,
       required String taskId,
-      required String localPath,
-      Value<String?> message,
+      Value<String?> observations,
+      required String verificationAnswers,
+      required String imagePaths,
+      Value<String> status,
       Value<double?> latitude,
       Value<double?> longitude,
-      Value<DateTime> capturedAt,
-      Value<String> syncStatus,
+      Value<DateTime> submittedAt,
       Value<DateTime?> syncedAt,
       Value<int> rowid,
     });
-typedef $$TaskImagesTableUpdateCompanionBuilder =
-    TaskImagesCompanion Function({
+typedef $$TaskSubmissionsTableUpdateCompanionBuilder =
+    TaskSubmissionsCompanion Function({
       Value<String> id,
       Value<String> taskId,
-      Value<String> localPath,
-      Value<String?> message,
+      Value<String?> observations,
+      Value<String> verificationAnswers,
+      Value<String> imagePaths,
+      Value<String> status,
       Value<double?> latitude,
       Value<double?> longitude,
-      Value<DateTime> capturedAt,
-      Value<String> syncStatus,
+      Value<DateTime> submittedAt,
       Value<DateTime?> syncedAt,
       Value<int> rowid,
     });
 
-class $$TaskImagesTableFilterComposer
-    extends Composer<_$AppDatabase, $TaskImagesTable> {
-  $$TaskImagesTableFilterComposer({
+class $$TaskSubmissionsTableFilterComposer
+    extends Composer<_$AppDatabase, $TaskSubmissionsTable> {
+  $$TaskSubmissionsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4083,13 +4149,23 @@ class $$TaskImagesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get localPath => $composableBuilder(
-    column: $table.localPath,
+  ColumnFilters<String> get observations => $composableBuilder(
+    column: $table.observations,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get message => $composableBuilder(
-    column: $table.message,
+  ColumnFilters<String> get verificationAnswers => $composableBuilder(
+    column: $table.verificationAnswers,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get imagePaths => $composableBuilder(
+    column: $table.imagePaths,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4103,13 +4179,8 @@ class $$TaskImagesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get capturedAt => $composableBuilder(
-    column: $table.capturedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get syncStatus => $composableBuilder(
-    column: $table.syncStatus,
+  ColumnFilters<DateTime> get submittedAt => $composableBuilder(
+    column: $table.submittedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4119,9 +4190,9 @@ class $$TaskImagesTableFilterComposer
   );
 }
 
-class $$TaskImagesTableOrderingComposer
-    extends Composer<_$AppDatabase, $TaskImagesTable> {
-  $$TaskImagesTableOrderingComposer({
+class $$TaskSubmissionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TaskSubmissionsTable> {
+  $$TaskSubmissionsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4138,13 +4209,23 @@ class $$TaskImagesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get localPath => $composableBuilder(
-    column: $table.localPath,
+  ColumnOrderings<String> get observations => $composableBuilder(
+    column: $table.observations,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get message => $composableBuilder(
-    column: $table.message,
+  ColumnOrderings<String> get verificationAnswers => $composableBuilder(
+    column: $table.verificationAnswers,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get imagePaths => $composableBuilder(
+    column: $table.imagePaths,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4158,13 +4239,8 @@ class $$TaskImagesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get capturedAt => $composableBuilder(
-    column: $table.capturedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get syncStatus => $composableBuilder(
-    column: $table.syncStatus,
+  ColumnOrderings<DateTime> get submittedAt => $composableBuilder(
+    column: $table.submittedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4174,9 +4250,9 @@ class $$TaskImagesTableOrderingComposer
   );
 }
 
-class $$TaskImagesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $TaskImagesTable> {
-  $$TaskImagesTableAnnotationComposer({
+class $$TaskSubmissionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TaskSubmissionsTable> {
+  $$TaskSubmissionsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4189,11 +4265,23 @@ class $$TaskImagesTableAnnotationComposer
   GeneratedColumn<String> get taskId =>
       $composableBuilder(column: $table.taskId, builder: (column) => column);
 
-  GeneratedColumn<String> get localPath =>
-      $composableBuilder(column: $table.localPath, builder: (column) => column);
+  GeneratedColumn<String> get observations => $composableBuilder(
+    column: $table.observations,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get message =>
-      $composableBuilder(column: $table.message, builder: (column) => column);
+  GeneratedColumn<String> get verificationAnswers => $composableBuilder(
+    column: $table.verificationAnswers,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get imagePaths => $composableBuilder(
+    column: $table.imagePaths,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<double> get latitude =>
       $composableBuilder(column: $table.latitude, builder: (column) => column);
@@ -4201,13 +4289,8 @@ class $$TaskImagesTableAnnotationComposer
   GeneratedColumn<double> get longitude =>
       $composableBuilder(column: $table.longitude, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get capturedAt => $composableBuilder(
-    column: $table.capturedAt,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get syncStatus => $composableBuilder(
-    column: $table.syncStatus,
+  GeneratedColumn<DateTime> get submittedAt => $composableBuilder(
+    column: $table.submittedAt,
     builder: (column) => column,
   );
 
@@ -4215,56 +4298,64 @@ class $$TaskImagesTableAnnotationComposer
       $composableBuilder(column: $table.syncedAt, builder: (column) => column);
 }
 
-class $$TaskImagesTableTableManager
+class $$TaskSubmissionsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $TaskImagesTable,
-          TaskImage,
-          $$TaskImagesTableFilterComposer,
-          $$TaskImagesTableOrderingComposer,
-          $$TaskImagesTableAnnotationComposer,
-          $$TaskImagesTableCreateCompanionBuilder,
-          $$TaskImagesTableUpdateCompanionBuilder,
+          $TaskSubmissionsTable,
+          TaskSubmission,
+          $$TaskSubmissionsTableFilterComposer,
+          $$TaskSubmissionsTableOrderingComposer,
+          $$TaskSubmissionsTableAnnotationComposer,
+          $$TaskSubmissionsTableCreateCompanionBuilder,
+          $$TaskSubmissionsTableUpdateCompanionBuilder,
           (
-            TaskImage,
-            BaseReferences<_$AppDatabase, $TaskImagesTable, TaskImage>,
+            TaskSubmission,
+            BaseReferences<
+              _$AppDatabase,
+              $TaskSubmissionsTable,
+              TaskSubmission
+            >,
           ),
-          TaskImage,
+          TaskSubmission,
           PrefetchHooks Function()
         > {
-  $$TaskImagesTableTableManager(_$AppDatabase db, $TaskImagesTable table)
-    : super(
+  $$TaskSubmissionsTableTableManager(
+    _$AppDatabase db,
+    $TaskSubmissionsTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$TaskImagesTableFilterComposer($db: db, $table: table),
+              $$TaskSubmissionsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$TaskImagesTableOrderingComposer($db: db, $table: table),
+              $$TaskSubmissionsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$TaskImagesTableAnnotationComposer($db: db, $table: table),
+              $$TaskSubmissionsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
                 Value<String> taskId = const Value.absent(),
-                Value<String> localPath = const Value.absent(),
-                Value<String?> message = const Value.absent(),
+                Value<String?> observations = const Value.absent(),
+                Value<String> verificationAnswers = const Value.absent(),
+                Value<String> imagePaths = const Value.absent(),
+                Value<String> status = const Value.absent(),
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
-                Value<DateTime> capturedAt = const Value.absent(),
-                Value<String> syncStatus = const Value.absent(),
+                Value<DateTime> submittedAt = const Value.absent(),
                 Value<DateTime?> syncedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => TaskImagesCompanion(
+              }) => TaskSubmissionsCompanion(
                 id: id,
                 taskId: taskId,
-                localPath: localPath,
-                message: message,
+                observations: observations,
+                verificationAnswers: verificationAnswers,
+                imagePaths: imagePaths,
+                status: status,
                 latitude: latitude,
                 longitude: longitude,
-                capturedAt: capturedAt,
-                syncStatus: syncStatus,
+                submittedAt: submittedAt,
                 syncedAt: syncedAt,
                 rowid: rowid,
               ),
@@ -4272,23 +4363,25 @@ class $$TaskImagesTableTableManager
               ({
                 required String id,
                 required String taskId,
-                required String localPath,
-                Value<String?> message = const Value.absent(),
+                Value<String?> observations = const Value.absent(),
+                required String verificationAnswers,
+                required String imagePaths,
+                Value<String> status = const Value.absent(),
                 Value<double?> latitude = const Value.absent(),
                 Value<double?> longitude = const Value.absent(),
-                Value<DateTime> capturedAt = const Value.absent(),
-                Value<String> syncStatus = const Value.absent(),
+                Value<DateTime> submittedAt = const Value.absent(),
                 Value<DateTime?> syncedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => TaskImagesCompanion.insert(
+              }) => TaskSubmissionsCompanion.insert(
                 id: id,
                 taskId: taskId,
-                localPath: localPath,
-                message: message,
+                observations: observations,
+                verificationAnswers: verificationAnswers,
+                imagePaths: imagePaths,
+                status: status,
                 latitude: latitude,
                 longitude: longitude,
-                capturedAt: capturedAt,
-                syncStatus: syncStatus,
+                submittedAt: submittedAt,
                 syncedAt: syncedAt,
                 rowid: rowid,
               ),
@@ -4300,18 +4393,21 @@ class $$TaskImagesTableTableManager
       );
 }
 
-typedef $$TaskImagesTableProcessedTableManager =
+typedef $$TaskSubmissionsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $TaskImagesTable,
-      TaskImage,
-      $$TaskImagesTableFilterComposer,
-      $$TaskImagesTableOrderingComposer,
-      $$TaskImagesTableAnnotationComposer,
-      $$TaskImagesTableCreateCompanionBuilder,
-      $$TaskImagesTableUpdateCompanionBuilder,
-      (TaskImage, BaseReferences<_$AppDatabase, $TaskImagesTable, TaskImage>),
-      TaskImage,
+      $TaskSubmissionsTable,
+      TaskSubmission,
+      $$TaskSubmissionsTableFilterComposer,
+      $$TaskSubmissionsTableOrderingComposer,
+      $$TaskSubmissionsTableAnnotationComposer,
+      $$TaskSubmissionsTableCreateCompanionBuilder,
+      $$TaskSubmissionsTableUpdateCompanionBuilder,
+      (
+        TaskSubmission,
+        BaseReferences<_$AppDatabase, $TaskSubmissionsTable, TaskSubmission>,
+      ),
+      TaskSubmission,
       PrefetchHooks Function()
     >;
 
@@ -4324,6 +4420,6 @@ class $AppDatabaseManager {
       $$ProfilesTableTableManager(_db, _db.profiles);
   $$TasksTableTableManager get tasks =>
       $$TasksTableTableManager(_db, _db.tasks);
-  $$TaskImagesTableTableManager get taskImages =>
-      $$TaskImagesTableTableManager(_db, _db.taskImages);
+  $$TaskSubmissionsTableTableManager get taskSubmissions =>
+      $$TaskSubmissionsTableTableManager(_db, _db.taskSubmissions);
 }
