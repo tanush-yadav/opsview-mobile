@@ -10,10 +10,8 @@ import '../widgets/location_status_card.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../models/task/captured_photo.dart';
-import '../../models/task/reported_issue.dart';
-
-import '../../models/task/task_instruction.dart';
-import '../../models/task/verification_item.dart';
+import '../../models/task/checklist_item.dart';
+import '../../models/task/task_meta_data.dart';
 import '../../viewmodels/task_capture_viewmodel.dart';
 
 class TaskCaptureScreen extends ConsumerStatefulWidget {
@@ -27,11 +25,11 @@ class TaskCaptureScreen extends ConsumerStatefulWidget {
 class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   final TextEditingController _observationsController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _observationsInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    // Load task data when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(taskCaptureViewModelProvider.notifier).loadTask(widget.taskId);
     });
@@ -127,10 +125,10 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     ref.read(taskCaptureViewModelProvider.notifier).removePhoto(index);
   }
 
-  void _setVerificationAnswer(int index, bool? answer) {
+  void _setChecklistAnswer(int index, String value) {
     ref
         .read(taskCaptureViewModelProvider.notifier)
-        .setVerificationAnswer(index, answer);
+        .setChecklistAnswer(index, value);
   }
 
   void _updateObservations(String text) {
@@ -151,6 +149,14 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     final strings = ref.watch(appStringsProvider);
     final viewModel = ref.read(taskCaptureViewModelProvider.notifier);
 
+    // Sync observations controller when state loads for the first time
+    if (!_observationsInitialized && state.observations.isNotEmpty) {
+      _observationsInitialized = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _observationsController.text = state.observations;
+      });
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       body: Column(
@@ -166,7 +172,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 16),
-                        const SizedBox(height: 16),
                         LocationStatusCard(
                           status: state.locationStatus,
                           formattedDistance: state.formattedDistance,
@@ -174,21 +179,27 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                           onRetry: viewModel.retryLocationDetection,
                         ),
                         const SizedBox(height: 24),
-                        _buildInstructionsSection(state.instructions),
+                        // Show instructions from metaData if available
+                        if (state.metaData != null)
+                          _buildInstructionsSection(state.metaData!),
                         const SizedBox(height: 24),
-                        _buildReportedIssuesSection(state.reportedIssues),
-                        const SizedBox(height: 24),
-                        _buildPhotoEvidenceSection(state.capturedPhotos),
-                        const SizedBox(height: 24),
+                        // Conditionally show IMAGE or CHECKLIST content
+                        if (state.isImageTask) ...[
+                          _buildPhotoEvidenceSection(state.capturedPhotos),
+                          const SizedBox(height: 24),
+                        ],
+                        if (state.isChecklistTask &&
+                            state.checklist.isNotEmpty) ...[
+                          _buildChecklistSection(state.checklist),
+                          const SizedBox(height: 24),
+                        ],
                         _buildObservationsSection(),
-                        const SizedBox(height: 24),
-                        _buildVerificationSection(state.verificationChecklist),
                         const SizedBox(height: 100),
                       ],
                     ),
                   ),
           ),
-          _buildBottomButton(state.answeredCount),
+          _buildBottomButton(state),
         ],
       ),
     );
@@ -244,14 +255,18 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     );
   }
 
-  Widget _buildInstructionsSection(List<TaskInstruction> instructions) {
+  Widget _buildInstructionsSection(TaskMetaData metaData) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(
           icon: Icons.format_list_numbered,
-          title: 'INSTRUCTIONS',
+          title: metaData.taskInstructionHeader.toUpperCase(),
         ),
+        if (metaData.taskInstructionSubHeader.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(metaData.taskInstructionSubHeader, style: AppTextStyles.muted),
+        ],
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
@@ -260,9 +275,10 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
-            children: instructions.asMap().entries.map((entry) {
+            children: metaData.taskInstructionSet.asMap().entries.map((entry) {
+              final index = entry.key;
               final instruction = entry.value;
-              final isLast = entry.key == instructions.length - 1;
+              final isLast = index == metaData.taskInstructionSet.length - 1;
               return Padding(
                 padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
                 child: Row(
@@ -277,8 +293,8 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          '${instruction.step}',
-                          style: TextStyle(
+                          '${index + 1}',
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primary,
@@ -288,7 +304,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(instruction.text, style: AppTextStyles.body),
+                      child: Text(instruction, style: AppTextStyles.body),
                     ),
                   ],
                 ),
@@ -297,89 +313,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildReportedIssuesSection(List<ReportedIssue> issues) {
-    if (issues.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(icon: Icons.info_outline, title: 'REPORTED ISSUES'),
-        const SizedBox(height: 12),
-        ...issues.map((issue) => _buildIssueCard(issue)),
-      ],
-    );
-  }
-
-  Widget _buildIssueCard(ReportedIssue issue) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.chat_bubble_outline,
-              color: AppColors.primary,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  issue.title,
-                  style: AppTextStyles.h4.copyWith(fontSize: 16),
-                ),
-                const SizedBox(height: 4),
-                Text(issue.description, style: AppTextStyles.bodySmall),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceLight,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Text(
-                        issue.priority,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(issue.reportedTime, style: AppTextStyles.mutedSmall),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -460,14 +393,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
               ),
             ),
           ),
-          Positioned(
-            left: 12,
-            bottom: 12,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [],
-            ),
-          ),
         ],
       ),
     );
@@ -484,7 +409,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: AppColors.primary.withValues(alpha: 0.3),
-            style: BorderStyle.solid,
             width: 1.5,
           ),
         ),
@@ -498,7 +422,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.camera_alt_outlined,
                 color: AppColors.primary,
                 size: 28,
@@ -519,43 +443,12 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     );
   }
 
-  Widget _buildObservationsSection() {
+  Widget _buildChecklistSection(List<ChecklistItem> checklist) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(
-          icon: Icons.description_outlined,
-          title: 'OBSERVATIONS',
-        ),
-        const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primary),
-          ),
-          child: TextField(
-            controller: _observationsController,
-            maxLines: 4,
-            style: AppTextStyles.body,
-            onChanged: _updateObservations,
-            decoration: InputDecoration(
-              hintText: 'Add any notes about the server room condition...',
-              hintStyle: AppTextStyles.muted,
-              contentPadding: const EdgeInsets.all(16),
-              border: InputBorder.none,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVerificationSection(List<VerificationItem> checklist) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(
-          icon: Icons.help_outline,
+          icon: Icons.checklist,
           title: 'VERIFICATION CHECKLIST',
         ),
         const SizedBox(height: 12),
@@ -569,7 +462,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             children: checklist.asMap().entries.map((entry) {
               final index = entry.key;
               final item = entry.value;
-              return _buildVerificationItem(index, item, checklist.length);
+              return _buildChecklistItem(index, item, checklist.length);
             }).toList(),
           ),
         ),
@@ -577,7 +470,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     );
   }
 
-  Widget _buildVerificationItem(int index, VerificationItem item, int total) {
+  Widget _buildChecklistItem(int index, ChecklistItem item, int total) {
     return Padding(
       padding: EdgeInsets.only(bottom: index < total - 1 ? 20 : 0),
       child: Column(
@@ -595,8 +488,8 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    '${item.step}',
-                    style: TextStyle(
+                    '${index + 1}',
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primary,
@@ -605,7 +498,21 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(child: Text(item.question, style: AppTextStyles.body)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.question, style: AppTextStyles.body),
+                    if (item.required)
+                      Text(
+                        'Required',
+                        style: AppTextStyles.mutedSmall.copyWith(
+                          color: AppColors.error,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -616,16 +523,16 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 Expanded(
                   child: _buildAnswerButton(
                     label: 'Yes',
-                    isSelected: item.answer == true,
-                    onTap: () => _setVerificationAnswer(index, true),
+                    isSelected: item.value == 'YES',
+                    onTap: () => _setChecklistAnswer(index, 'YES'),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildAnswerButton(
                     label: 'No',
-                    isSelected: item.answer == false,
-                    onTap: () => _setVerificationAnswer(index, false),
+                    isSelected: item.value == 'NO',
+                    onTap: () => _setChecklistAnswer(index, 'NO'),
                   ),
                 ),
               ],
@@ -669,7 +576,38 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     );
   }
 
-  Widget _buildBottomButton(int answeredCount) {
+  Widget _buildObservationsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader(
+          icon: Icons.description_outlined,
+          title: 'OBSERVATIONS',
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.primary),
+          ),
+          child: TextField(
+            controller: _observationsController,
+            maxLines: 4,
+            style: AppTextStyles.body,
+            onChanged: _updateObservations,
+            decoration: InputDecoration(
+              hintText: 'Add any notes or observations...',
+              hintStyle: AppTextStyles.muted,
+              contentPadding: const EdgeInsets.all(16),
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomButton(TaskCaptureState state) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -685,10 +623,11 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
       child: SafeArea(
         top: false,
         child: ElevatedButton(
-          onPressed: _completeTask,
+          onPressed: state.canComplete ? _completeTask : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.textLight,
+            disabledBackgroundColor: AppColors.border,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -696,7 +635,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             minimumSize: const Size(double.infinity, 52),
           ),
           child: Text(
-            'Complete Task ($answeredCount)',
+            'Complete Task',
             style: AppTextStyles.button.copyWith(fontSize: 16),
           ),
         ),

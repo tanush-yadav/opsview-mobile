@@ -14,16 +14,15 @@ final profileSyncServiceProvider = Provider<ProfileSyncService>((ref) {
 });
 
 class ProfileSyncService {
-
   ProfileSyncService(this._db, this._api);
   final AppDatabase _db;
   final ApiService _api;
 
   /// Get all profiles that haven't been synced to backend yet
   Future<List<Profile>> getUnsyncedProfiles() async {
-    return (_db.select(_db.profiles)
-          ..where((p) => p.backendProfileId.isNull()))
-        .get();
+    return (_db.select(
+      _db.profiles,
+    )..where((p) => p.backendProfileId.isNull())).get();
   }
 
   /// Sync a single profile to the backend
@@ -37,18 +36,20 @@ class ProfileSyncService {
         return false;
       }
 
-      final payload = {
+      final payload = <String, dynamic>{
         'id': profile.id,
         'name': profile.name,
         'contact': profile.contact,
         'age': profile.age,
         'aadhaar': profile.aadhaar,
-        'livenessStatus': profile.livenessStatus,
-        'livenessScore': profile.livenessScore ?? 0,
-        'livenessAttemptedAt': profile.livenessAttemptedAt?.toIso8601String(),
-        'location': profile.location,
-        'mobileVerificationId': profile.mobileVerificationId,
-        'creationTime': profile.createdAt.toIso8601String(),
+        'livenessStatus': profile.livenessStatus ?? 'PASSED',
+        'livenessScore': profile.livenessScore ?? 0.0,
+        'livenessAttemptedAt':
+            profile.livenessAttemptedAt?.toUtc().toIso8601String() ??
+            DateTime.now().toUtc().toIso8601String(),
+        'location': profile.location ?? '',
+        'mobileVerificationId': profile.mobileVerificationId ?? '',
+        'creationTime': profile.createdAt.toUtc().toIso8601String(),
       };
 
       final response = await _api.createProfile(
@@ -62,9 +63,7 @@ class ProfileSyncService {
 
         // Update profile with backend ID
         await (_db.update(_db.profiles)..where((p) => p.id.equals(profile.id)))
-            .write(ProfilesCompanion(
-          backendProfileId: Value(backendId),
-        ));
+            .write(ProfilesCompanion(backendProfileId: Value(backendId)));
 
         return true;
       }
@@ -92,9 +91,9 @@ class ProfileSyncService {
 
   /// Check if there are any unsynced profiles
   Future<bool> hasUnsyncedProfiles() async {
-    final count = await (_db.select(_db.profiles)
-          ..where((p) => p.backendProfileId.isNull()))
-        .get();
+    final count = await (_db.select(
+      _db.profiles,
+    )..where((p) => p.backendProfileId.isNull())).get();
     return count.isNotEmpty;
   }
 }

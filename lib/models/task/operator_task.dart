@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import '../auth/shift.dart';
+import 'checklist_item.dart';
+import 'task_meta_data.dart';
 
 class OperatorTasksResponse {
-
   OperatorTasksResponse({required this.data});
 
   factory OperatorTasksResponse.fromJson(Map<String, dynamic> json) {
@@ -14,7 +17,6 @@ class OperatorTasksResponse {
 }
 
 class ShiftWithTasks {
-
   ShiftWithTasks({required this.shift, required this.tasks});
 
   factory ShiftWithTasks.fromJson(Map<String, dynamic> json) {
@@ -29,7 +31,6 @@ class ShiftWithTasks {
 }
 
 class OperatorTask {
-
   OperatorTask({
     required this.id,
     required this.clientCode,
@@ -46,9 +47,24 @@ class OperatorTask {
     required this.taskStatus,
     required this.centerCode,
     required this.centerName,
+    this.metaData,
+    this.checklist,
   });
 
   factory OperatorTask.fromJson(Map<String, dynamic> json) {
+    // Parse metaData
+    TaskMetaData? metaData;
+    if (json['metaData'] != null) {
+      metaData = TaskMetaData.fromJson(json['metaData']);
+    }
+
+    // Parse checklist
+    List<ChecklistItem>? checklist;
+    if (json['checklist'] != null) {
+      final checklistList = json['checklist'] as List<dynamic>;
+      checklist = checklistList.map((e) => ChecklistItem.fromJson(e)).toList();
+    }
+
     return OperatorTask(
       id: json['id'] ?? '',
       clientCode: json['clientCode'] ?? '',
@@ -65,8 +81,11 @@ class OperatorTask {
       taskStatus: json['taskStatus'] ?? 'PENDING',
       centerCode: json['centerCode'] ?? '',
       centerName: json['centerName'] ?? '',
+      metaData: metaData,
+      checklist: checklist,
     );
   }
+
   final String id;
   final String clientCode;
   final String examId;
@@ -82,6 +101,8 @@ class OperatorTask {
   final String taskStatus;
   final String centerCode;
   final String centerName;
+  final TaskMetaData? metaData;
+  final List<ChecklistItem>? checklist;
 
   Map<String, dynamic> toJson() {
     return {
@@ -100,6 +121,17 @@ class OperatorTask {
       'taskStatus': taskStatus,
       'centerCode': centerCode,
       'centerName': centerName,
+      'metaData': metaData?.toJson(),
+      'checklist': checklist?.map((e) => e.toJson()).toList(),
     };
   }
+
+  /// Get metaDataJson string for database storage
+  String? get metaDataJson =>
+      metaData != null ? jsonEncode(metaData!.toJson()) : null;
+
+  /// Get checklistJson string for database storage
+  String? get checklistJson => checklist != null
+      ? jsonEncode(checklist!.map((e) => e.toJson()).toList())
+      : null;
 }

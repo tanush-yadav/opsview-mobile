@@ -8,10 +8,9 @@ import 'package:uuid/uuid.dart';
 
 import '../core/providers/app_state_provider.dart';
 import '../models/task/captured_photo.dart';
-import '../models/task/reported_issue.dart';
+import '../models/task/checklist_item.dart';
 import '../models/task/task_enums.dart';
-import '../models/task/task_instruction.dart';
-import '../models/task/verification_item.dart';
+import '../models/task/task_meta_data.dart';
 import '../services/database/app_database.dart';
 import '../core/enums/location_status.dart';
 
@@ -19,9 +18,8 @@ class TaskCaptureState {
   const TaskCaptureState({
     this.task,
     this.isLoading = true,
-    this.instructions = const [],
-    this.reportedIssues = const [],
-    this.verificationChecklist = const [],
+    this.metaData,
+    this.checklist = const [],
     this.capturedPhotos = const [],
     this.observations = '',
     this.error,
@@ -36,9 +34,8 @@ class TaskCaptureState {
 
   final Task? task;
   final bool isLoading;
-  final List<TaskInstruction> instructions;
-  final List<ReportedIssue> reportedIssues;
-  final List<VerificationItem> verificationChecklist;
+  final TaskMetaData? metaData;
+  final List<ChecklistItem> checklist;
   final List<CapturedPhoto> capturedPhotos;
   final String observations;
   final String? error;
@@ -53,9 +50,8 @@ class TaskCaptureState {
   TaskCaptureState copyWith({
     Task? task,
     bool? isLoading,
-    List<TaskInstruction>? instructions,
-    List<ReportedIssue>? reportedIssues,
-    List<VerificationItem>? verificationChecklist,
+    TaskMetaData? metaData,
+    List<ChecklistItem>? checklist,
     List<CapturedPhoto>? capturedPhotos,
     String? observations,
     String? error,
@@ -70,10 +66,8 @@ class TaskCaptureState {
     return TaskCaptureState(
       task: task ?? this.task,
       isLoading: isLoading ?? this.isLoading,
-      instructions: instructions ?? this.instructions,
-      reportedIssues: reportedIssues ?? this.reportedIssues,
-      verificationChecklist:
-          verificationChecklist ?? this.verificationChecklist,
+      metaData: metaData ?? this.metaData,
+      checklist: checklist ?? this.checklist,
       capturedPhotos: capturedPhotos ?? this.capturedPhotos,
       observations: observations ?? this.observations,
       error: error,
@@ -95,12 +89,27 @@ class TaskCaptureState {
     return '${(distanceFromCenter! / 1000).toStringAsFixed(1)}km';
   }
 
-  int get answeredCount =>
-      verificationChecklist.where((item) => item.answer != null).length;
+  /// Whether this is an IMAGE type task (show photo capture)
+  bool get isImageTask => task?.taskType == 'IMAGE';
 
-  bool get canComplete =>
-      verificationChecklist.isNotEmpty &&
-      verificationChecklist.every((item) => item.answer != null);
+  /// Whether this is a CHECKLIST type task (show checklist questions)
+  bool get isChecklistTask => task?.taskType == 'CHECKLIST';
+
+  /// Count of answered checklist items
+  int get answeredCount => checklist.where((item) => item.value != 'NA').length;
+
+  /// Whether all required fields are complete
+  bool get canComplete {
+    if (isImageTask) {
+      return capturedPhotos.isNotEmpty;
+    } else if (isChecklistTask) {
+      return checklist.isNotEmpty &&
+          checklist
+              .where((item) => item.required)
+              .every((item) => item.value != 'NA');
+    }
+    return true;
+  }
 }
 
 class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
@@ -115,20 +124,36 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
     final appState = ref.read(appStateProvider);
 
     // Find task from app state
-    print(taskId);
     final task = appState.tasks.where((t) => t.taskId == taskId).firstOrNull;
-    print(task?.taskDesc);
 
     if (task == null) {
       state = state.copyWith(isLoading: false, error: 'Task not found');
       return;
     }
 
-    // TODO: In the future, load instructions, issues, and verification from API/DB
-    // For now, using mock data based on task type
-    final instructions = _getMockInstructions(task);
-    final reportedIssues = _getMockReportedIssues(task);
-    var verificationChecklist = _getMockVerificationChecklist(task);
+    // Parse metaData from JSON
+    TaskMetaData? metaData;
+    if (task.metaDataJson != null) {
+      try {
+        final metaDataMap = jsonDecode(task.metaDataJson!);
+        metaData = TaskMetaData.fromJson(metaDataMap);
+      } catch (e) {
+        print('Error parsing metaData: $e');
+      }
+    }
+
+    // Parse checklist from JSON
+    List<ChecklistItem> checklist = [];
+    if (task.checklistJson != null) {
+      try {
+        final List<dynamic> checklistList = jsonDecode(task.checklistJson!);
+        checklist = checklistList
+            .map((e) => ChecklistItem.fromJson(e))
+            .toList();
+      } catch (e) {
+        print('Error parsing checklist: $e');
+      }
+    }
 
     // Check for existing submission
     final submission = appState.taskSubmissions
@@ -143,18 +168,18 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       submissionId = submission.id;
       observations = submission.observations ?? '';
 
-      // Load verification answers
+      // Load checklist answers from submission
       try {
         final List<dynamic> answersJson = jsonDecode(
           submission.verificationAnswers,
         );
-        verificationChecklist = verificationChecklist.map((item) {
+        checklist = checklist.map((item) {
           final answerData = answersJson.firstWhere(
-            (a) => a['step'] == item.step,
+            (a) => a['id'] == item.id,
             orElse: () => null,
           );
           if (answerData != null) {
-            return item.copyWith(answer: answerData['answer']);
+            return item.copyWith(value: answerData['value']);
           }
           return item;
         }).toList();
@@ -176,9 +201,8 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
     state = state.copyWith(
       task: task,
       isLoading: false,
-      instructions: instructions,
-      reportedIssues: reportedIssues,
-      verificationChecklist: verificationChecklist,
+      metaData: metaData,
+      checklist: checklist,
       observations: observations,
       capturedPhotos: capturedPhotos,
       submissionId: submissionId,
@@ -193,14 +217,12 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
     state = state.copyWith(locationStatus: LocationStatus.detecting);
 
     try {
-      // Check if location services are enabled
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         state = state.copyWith(locationStatus: LocationStatus.error);
         return;
       }
 
-      // Check and request permission
       var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -215,14 +237,12 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
         return;
       }
 
-      // Get current position
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
         ),
       );
 
-      // Calculate distance from center
       double? distance;
       if (state.centerLat != null && state.centerLng != null) {
         distance = Geolocator.distanceBetween(
@@ -248,65 +268,10 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
     await _detectLocation();
   }
 
-  List<TaskInstruction> _getMockInstructions(Task task) {
-    // Mock instructions - replace with actual data from API when available
-    return [
-      const TaskInstruction(
-        step: 1,
-        text:
-            "Verify the cooling unit's temperature reading is within normal range (18°C - 22°C).",
-      ),
-      const TaskInstruction(
-        step: 2,
-        text:
-            "Inspect for any visible leaks or condensation around the base units.",
-      ),
-      const TaskInstruction(
-        step: 3,
-        text:
-            "Ensure all server rack doors are securely locked after inspection.",
-      ),
-    ];
-  }
-
-  List<ReportedIssue> _getMockReportedIssues(Task task) {
-    // Mock reported issues - replace with actual data from API when available
-    return [
-      const ReportedIssue(
-        title: "Check cooling unit 3",
-        description:
-            "Reported noise issues from previous shift. Please verify if it's still persisting.",
-        priority: "HIGH PRIORITY",
-        reportedTime: "TODAY, 09:15 AM",
-      ),
-    ];
-  }
-
-  List<VerificationItem> _getMockVerificationChecklist(Task task) {
-    // Mock verification checklist - replace with actual data from API when available
-    return [
-      VerificationItem(
-        step: 1,
-        question:
-            "Is the cooling unit operating within normal temperature range?",
-      ),
-      VerificationItem(
-        step: 2,
-        question: "Are all server rack doors properly locked?",
-      ),
-      VerificationItem(
-        step: 3,
-        question: "Did you observe any unusual noise from equipment?",
-      ),
-    ];
-  }
-
-  void setVerificationAnswer(int index, bool? answer) {
-    final updatedList = List<VerificationItem>.from(
-      state.verificationChecklist,
-    );
-    updatedList[index] = updatedList[index].copyWith(answer: answer);
-    state = state.copyWith(verificationChecklist: updatedList);
+  void setChecklistAnswer(int index, String value) {
+    final updatedList = List<ChecklistItem>.from(state.checklist);
+    updatedList[index] = updatedList[index].copyWith(value: value);
+    state = state.copyWith(checklist: updatedList);
   }
 
   void updateObservations(String text) {
@@ -324,7 +289,6 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
 
       if (image == null) return;
 
-      // Add photo to state
       addPhoto(CapturedPhoto(imagePath: image.path));
     } catch (e) {
       state = state.copyWith(error: 'Failed to capture photo');
@@ -348,29 +312,27 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       final db = ref.read(appDatabaseProvider);
       final taskId = state.task!.taskId;
 
-      // Serialize verification answers to JSON
-      final verificationAnswersJson = jsonEncode(
-        state.verificationChecklist
+      // Serialize checklist answers to JSON
+      final checklistAnswersJson = jsonEncode(
+        state.checklist
             .map(
               (item) => {
-                'step': item.step,
+                'id': item.id,
                 'question': item.question,
-                'answer': item.answer,
+                'value': item.value,
               },
             )
             .toList(),
       );
 
-      // Serialize image paths to JSON (List<String>)
+      // Serialize image paths to JSON
       final imagePathsJson = jsonEncode(
         state.capturedPhotos.map((photo) => photo.imagePath).toList(),
       );
 
-      // Get current location from state
       final latitude = state.currentLat;
       final longitude = state.currentLng;
 
-      // Create or update submission record
       if (state.submissionId != null) {
         // Update existing record
         await (db.update(
@@ -378,10 +340,10 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
         )..where((t) => t.id.equals(state.submissionId!))).write(
           TaskSubmissionsCompanion(
             observations: Value(state.observations),
-            verificationAnswers: Value(verificationAnswersJson),
+            verificationAnswers: Value(checklistAnswersJson),
             imagePaths: Value(imagePathsJson),
             status: Value(SyncStatus.unsynced.toDbValue),
-            submittedAt: Value(DateTime.now()), // Update submitted time
+            submittedAt: Value(DateTime.now()),
             latitude: Value(latitude),
             longitude: Value(longitude),
           ),
@@ -396,7 +358,7 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
                 id: newSubmissionId,
                 taskId: taskId,
                 observations: Value(state.observations),
-                verificationAnswers: verificationAnswersJson,
+                verificationAnswers: checklistAnswersJson,
                 imagePaths: imagePathsJson,
                 status: Value(SyncStatus.unsynced.toDbValue),
                 latitude: Value(latitude),
@@ -410,7 +372,7 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
         TasksCompanion(taskStatus: Value(TaskStatus.submitted.toDbValue)),
       );
 
-      // Refresh app state to reflect changes
+      // Refresh app state
       await ref.read(appStateProvider.notifier).loadFromDatabase();
 
       return true;

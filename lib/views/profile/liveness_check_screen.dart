@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_liveness_check/flutter_liveness_check.dart';
+import 'package:flutter_liveness_detection_randomized_plugin/index.dart'
+    hide Scaffold, CircularProgressIndicator;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import '../../core/localization/app_strings.dart';
+import '../../core/utils/snackbar_utils.dart';
 import '../../viewmodels/profile_viewmodel.dart';
 
 class LivenessCheckPage extends ConsumerWidget {
@@ -12,42 +14,64 @@ class LivenessCheckPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = ref.watch(appStringsProvider);
-    final viewModel = ref.read(profileViewModelProvider.notifier);
 
-    return LivenessCheckScreen(
-      config: LivenessCheckConfig(
-        appBarConfig: AppBarConfig(
-          title: strings.faceVerification,
-          showBackButton: true,
-        ),
-        callbacks: LivenessCheckCallbacks(
-          onPhotoTaken: (imagePath, antiSpoofingPassed) async {
-            viewModel.setSelfieImage(imagePath);
-            // Small delay to allow library to clean up internal state
-            await Future.delayed(const Duration(milliseconds: 500));
-            if (context.mounted) {
-              context.pop();
-            }
-          },
-          onCancel: () async {
-            await Future.delayed(const Duration(milliseconds: 300));
-            if (context.mounted) {
-              context.pop();
-            }
-          },
-          onError: (error) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(error)));
-              context.pop();
-            }
-          },
-          onTryAgain: () {
-            // User wants to retry - stay on this screen
-          },
-        ),
-      ),
-    );
+    // Start liveness detection immediately when this page is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startLivenessDetection(context, ref, strings);
+    });
+
+    // Show a loading screen while the detection starts
+    return const Scaffold(child: Center(child: CircularProgressIndicator()));
+  }
+
+  Future<void> _startLivenessDetection(
+    BuildContext context,
+    WidgetRef ref,
+    AppStrings strings,
+  ) async {
+    try {
+      final result = await FlutterLivenessDetectionRandomizedPlugin.instance
+          .livenessDetection(
+            context: context,
+            config: LivenessDetectionConfig(
+              startWithInfoScreen: false,
+              isDarkMode: false,
+              showCurrentStep: true,
+              isEnableSnackBar: false,
+              durationLivenessVerify: 60,
+              shuffleListWithSmileLast: true,
+              cameraResolution: ResolutionPreset.medium,
+              imageQuality: 90,
+              isEnableMaxBrightness: true,
+              // Skip some challenges for faster verification
+              useCustomizedLabel: true,
+              customizedLabel: LivenessDetectionLabelModel(
+                blink: null, // Use default "Blink"
+                lookDown: '', // Skip look down
+                lookLeft: null, // Use default
+                lookRight: null, // Use default
+                lookUp: '', // Skip look up
+                smile: null, // Use default "Smile"
+              ),
+            ),
+          );
+
+      if (context.mounted) {
+        if (result != null && result.isNotEmpty) {
+          // Success - save the image path
+          ref.read(profileViewModelProvider.notifier).setSelfieImage(result);
+          context.pop();
+        } else {
+          // Failed or cancelled
+          SnackBarUtils.error(context, strings.somethingWentWrong);
+          context.pop();
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        SnackBarUtils.error(context, strings.somethingWentWrong);
+        context.pop();
+      }
+    }
   }
 }

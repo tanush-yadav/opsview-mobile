@@ -34,7 +34,7 @@ dependencies:
   camera: ^0.10.6
   geolocator: ^14.0.2
   permission_handler: ^11.0.1
-  flutter_liveness_check: ^1.0.14
+  flutter_liveness_detection_randomized_plugin: ^1.1.0
 
   # Navigation
   go_router: ^17.0.1
@@ -45,6 +45,8 @@ dependencies:
   flutter_image_compress: ^2.4.0
   url_launcher: ^6.2.5
   image_picker: ^1.0.7
+  device_info_plus: ^11.0.0
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:

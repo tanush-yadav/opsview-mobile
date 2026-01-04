@@ -16,7 +16,13 @@ class Tasks extends Table {
   TextColumn get taskStatus => text().withDefault(const Constant('PENDING'))();
   TextColumn get centerCode => text()();
   TextColumn get centerName => text()();
-  DateTimeColumn get downloadedAt => dateTime().withDefault(currentDateAndTime)();
+
+  // JSON columns for nested data
+  TextColumn get metaDataJson => text().nullable()();
+  TextColumn get checklistJson => text().nullable()();
+
+  DateTimeColumn get downloadedAt =>
+      dateTime().withDefault(currentDateAndTime)();
 
   @override
   Set<Column> get primaryKey => {id};

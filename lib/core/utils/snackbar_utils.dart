@@ -24,6 +24,7 @@ class SnackBarUtils {
         );
       },
       location: ToastLocation.bottomCenter,
+      showDuration: const Duration(seconds: 2),
     );
   }
 

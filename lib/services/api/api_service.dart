@@ -94,7 +94,7 @@ class ApiService {
         selfieFile.path,
         filename: 'selfie.jpg',
       ),
-      'payload': payload,
+      'payload': jsonEncode(payload),
     });
 
     final response = await _dio.post(

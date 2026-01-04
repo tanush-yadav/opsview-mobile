@@ -36,7 +36,7 @@ class SplashViewModel extends Notifier<void> {
         case OnboardingStep.shiftSelection:
           return AppRoutes.shiftSelection;
         case OnboardingStep.profile:
-          return AppRoutes.home;
+          return AppRoutes.profile;
         case OnboardingStep.training:
           return AppRoutes.training;
         case OnboardingStep.completed:

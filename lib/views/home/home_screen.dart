@@ -313,15 +313,6 @@ class HomeScreen extends ConsumerWidget {
                               style: AppTextStyles.h4,
                             ),
                           ),
-                          if (task.required)
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: AppColors.error,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
                         ],
                       ),
                       if (task.taskDesc != null && task.taskDesc!.isNotEmpty)

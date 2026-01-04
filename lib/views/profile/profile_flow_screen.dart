@@ -1,17 +1,54 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import '../../core/localization/app_strings.dart';
+import '../../core/providers/app_state_provider.dart';
+import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../viewmodels/profile_viewmodel.dart';
 import 'steps/profile_details_step.dart';
 import 'steps/profile_selfie_step.dart';
 
-class ProfileFlowScreen extends ConsumerWidget {
+class ProfileFlowScreen extends ConsumerStatefulWidget {
   const ProfileFlowScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileFlowScreen> createState() => _ProfileFlowScreenState();
+}
+
+class _ProfileFlowScreenState extends ConsumerState<ProfileFlowScreen> {
+  bool _hasCheckedProfile = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkExistingProfile();
+    });
+  }
+
+  void _checkExistingProfile() {
+    if (_hasCheckedProfile) return;
+    _hasCheckedProfile = true;
+
+    final appState = ref.read(appStateProvider);
+    final selectedShiftId = appState.selectedShiftId;
+    final profile = appState.profile;
+
+    // If a profile already exists for this shift, skip to home
+    if (profile != null &&
+        selectedShiftId != null &&
+        profile.shiftId == selectedShiftId) {
+      debugPrint(
+        '[ProfileFlow] Profile exists for shift $selectedShiftId, skipping to home',
+      );
+      context.go(AppRoutes.training);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(profileViewModelProvider);
 
     return Scaffold(

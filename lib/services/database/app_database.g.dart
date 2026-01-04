@@ -1645,6 +1645,28 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _metaDataJsonMeta = const VerificationMeta(
+    'metaDataJson',
+  );
+  @override
+  late final GeneratedColumn<String> metaDataJson = GeneratedColumn<String>(
+    'meta_data_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _checklistJsonMeta = const VerificationMeta(
+    'checklistJson',
+  );
+  @override
+  late final GeneratedColumn<String> checklistJson = GeneratedColumn<String>(
+    'checklist_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _downloadedAtMeta = const VerificationMeta(
     'downloadedAt',
   );
@@ -1674,6 +1696,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     taskStatus,
     centerCode,
     centerName,
+    metaDataJson,
+    checklistJson,
     downloadedAt,
   ];
   @override
@@ -1795,6 +1819,24 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     } else if (isInserting) {
       context.missing(_centerNameMeta);
     }
+    if (data.containsKey('meta_data_json')) {
+      context.handle(
+        _metaDataJsonMeta,
+        metaDataJson.isAcceptableOrUnknown(
+          data['meta_data_json']!,
+          _metaDataJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('checklist_json')) {
+      context.handle(
+        _checklistJsonMeta,
+        checklistJson.isAcceptableOrUnknown(
+          data['checklist_json']!,
+          _checklistJsonMeta,
+        ),
+      );
+    }
     if (data.containsKey('downloaded_at')) {
       context.handle(
         _downloadedAtMeta,
@@ -1873,6 +1915,14 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         DriftSqlType.string,
         data['${effectivePrefix}center_name'],
       )!,
+      metaDataJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}meta_data_json'],
+      ),
+      checklistJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}checklist_json'],
+      ),
       downloadedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}downloaded_at'],
@@ -1902,6 +1952,8 @@ class Task extends DataClass implements Insertable<Task> {
   final String taskStatus;
   final String centerCode;
   final String centerName;
+  final String? metaDataJson;
+  final String? checklistJson;
   final DateTime downloadedAt;
   const Task({
     required this.id,
@@ -1919,6 +1971,8 @@ class Task extends DataClass implements Insertable<Task> {
     required this.taskStatus,
     required this.centerCode,
     required this.centerName,
+    this.metaDataJson,
+    this.checklistJson,
     required this.downloadedAt,
   });
   @override
@@ -1941,6 +1995,12 @@ class Task extends DataClass implements Insertable<Task> {
     map['task_status'] = Variable<String>(taskStatus);
     map['center_code'] = Variable<String>(centerCode);
     map['center_name'] = Variable<String>(centerName);
+    if (!nullToAbsent || metaDataJson != null) {
+      map['meta_data_json'] = Variable<String>(metaDataJson);
+    }
+    if (!nullToAbsent || checklistJson != null) {
+      map['checklist_json'] = Variable<String>(checklistJson);
+    }
     map['downloaded_at'] = Variable<DateTime>(downloadedAt);
     return map;
   }
@@ -1964,6 +2024,12 @@ class Task extends DataClass implements Insertable<Task> {
       taskStatus: Value(taskStatus),
       centerCode: Value(centerCode),
       centerName: Value(centerName),
+      metaDataJson: metaDataJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(metaDataJson),
+      checklistJson: checklistJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(checklistJson),
       downloadedAt: Value(downloadedAt),
     );
   }
@@ -1989,6 +2055,8 @@ class Task extends DataClass implements Insertable<Task> {
       taskStatus: serializer.fromJson<String>(json['taskStatus']),
       centerCode: serializer.fromJson<String>(json['centerCode']),
       centerName: serializer.fromJson<String>(json['centerName']),
+      metaDataJson: serializer.fromJson<String?>(json['metaDataJson']),
+      checklistJson: serializer.fromJson<String?>(json['checklistJson']),
       downloadedAt: serializer.fromJson<DateTime>(json['downloadedAt']),
     );
   }
@@ -2011,6 +2079,8 @@ class Task extends DataClass implements Insertable<Task> {
       'taskStatus': serializer.toJson<String>(taskStatus),
       'centerCode': serializer.toJson<String>(centerCode),
       'centerName': serializer.toJson<String>(centerName),
+      'metaDataJson': serializer.toJson<String?>(metaDataJson),
+      'checklistJson': serializer.toJson<String?>(checklistJson),
       'downloadedAt': serializer.toJson<DateTime>(downloadedAt),
     };
   }
@@ -2031,6 +2101,8 @@ class Task extends DataClass implements Insertable<Task> {
     String? taskStatus,
     String? centerCode,
     String? centerName,
+    Value<String?> metaDataJson = const Value.absent(),
+    Value<String?> checklistJson = const Value.absent(),
     DateTime? downloadedAt,
   }) => Task(
     id: id ?? this.id,
@@ -2048,6 +2120,10 @@ class Task extends DataClass implements Insertable<Task> {
     taskStatus: taskStatus ?? this.taskStatus,
     centerCode: centerCode ?? this.centerCode,
     centerName: centerName ?? this.centerName,
+    metaDataJson: metaDataJson.present ? metaDataJson.value : this.metaDataJson,
+    checklistJson: checklistJson.present
+        ? checklistJson.value
+        : this.checklistJson,
     downloadedAt: downloadedAt ?? this.downloadedAt,
   );
   Task copyWithCompanion(TasksCompanion data) {
@@ -2075,6 +2151,12 @@ class Task extends DataClass implements Insertable<Task> {
       centerName: data.centerName.present
           ? data.centerName.value
           : this.centerName,
+      metaDataJson: data.metaDataJson.present
+          ? data.metaDataJson.value
+          : this.metaDataJson,
+      checklistJson: data.checklistJson.present
+          ? data.checklistJson.value
+          : this.checklistJson,
       downloadedAt: data.downloadedAt.present
           ? data.downloadedAt.value
           : this.downloadedAt,
@@ -2099,6 +2181,8 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('taskStatus: $taskStatus, ')
           ..write('centerCode: $centerCode, ')
           ..write('centerName: $centerName, ')
+          ..write('metaDataJson: $metaDataJson, ')
+          ..write('checklistJson: $checklistJson, ')
           ..write('downloadedAt: $downloadedAt')
           ..write(')'))
         .toString();
@@ -2121,6 +2205,8 @@ class Task extends DataClass implements Insertable<Task> {
     taskStatus,
     centerCode,
     centerName,
+    metaDataJson,
+    checklistJson,
     downloadedAt,
   );
   @override
@@ -2142,6 +2228,8 @@ class Task extends DataClass implements Insertable<Task> {
           other.taskStatus == this.taskStatus &&
           other.centerCode == this.centerCode &&
           other.centerName == this.centerName &&
+          other.metaDataJson == this.metaDataJson &&
+          other.checklistJson == this.checklistJson &&
           other.downloadedAt == this.downloadedAt);
 }
 
@@ -2161,6 +2249,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<String> taskStatus;
   final Value<String> centerCode;
   final Value<String> centerName;
+  final Value<String?> metaDataJson;
+  final Value<String?> checklistJson;
   final Value<DateTime> downloadedAt;
   final Value<int> rowid;
   const TasksCompanion({
@@ -2179,6 +2269,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.taskStatus = const Value.absent(),
     this.centerCode = const Value.absent(),
     this.centerName = const Value.absent(),
+    this.metaDataJson = const Value.absent(),
+    this.checklistJson = const Value.absent(),
     this.downloadedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -2198,6 +2290,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.taskStatus = const Value.absent(),
     required String centerCode,
     required String centerName,
+    this.metaDataJson = const Value.absent(),
+    this.checklistJson = const Value.absent(),
     this.downloadedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -2226,6 +2320,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<String>? taskStatus,
     Expression<String>? centerCode,
     Expression<String>? centerName,
+    Expression<String>? metaDataJson,
+    Expression<String>? checklistJson,
     Expression<DateTime>? downloadedAt,
     Expression<int>? rowid,
   }) {
@@ -2245,6 +2341,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (taskStatus != null) 'task_status': taskStatus,
       if (centerCode != null) 'center_code': centerCode,
       if (centerName != null) 'center_name': centerName,
+      if (metaDataJson != null) 'meta_data_json': metaDataJson,
+      if (checklistJson != null) 'checklist_json': checklistJson,
       if (downloadedAt != null) 'downloaded_at': downloadedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2266,6 +2364,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Value<String>? taskStatus,
     Value<String>? centerCode,
     Value<String>? centerName,
+    Value<String?>? metaDataJson,
+    Value<String?>? checklistJson,
     Value<DateTime>? downloadedAt,
     Value<int>? rowid,
   }) {
@@ -2285,6 +2385,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
       taskStatus: taskStatus ?? this.taskStatus,
       centerCode: centerCode ?? this.centerCode,
       centerName: centerName ?? this.centerName,
+      metaDataJson: metaDataJson ?? this.metaDataJson,
+      checklistJson: checklistJson ?? this.checklistJson,
       downloadedAt: downloadedAt ?? this.downloadedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -2338,6 +2440,12 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (centerName.present) {
       map['center_name'] = Variable<String>(centerName.value);
     }
+    if (metaDataJson.present) {
+      map['meta_data_json'] = Variable<String>(metaDataJson.value);
+    }
+    if (checklistJson.present) {
+      map['checklist_json'] = Variable<String>(checklistJson.value);
+    }
     if (downloadedAt.present) {
       map['downloaded_at'] = Variable<DateTime>(downloadedAt.value);
     }
@@ -2365,6 +2473,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('taskStatus: $taskStatus, ')
           ..write('centerCode: $centerCode, ')
           ..write('centerName: $centerName, ')
+          ..write('metaDataJson: $metaDataJson, ')
+          ..write('checklistJson: $checklistJson, ')
           ..write('downloadedAt: $downloadedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -3706,6 +3816,8 @@ typedef $$TasksTableCreateCompanionBuilder =
       Value<String> taskStatus,
       required String centerCode,
       required String centerName,
+      Value<String?> metaDataJson,
+      Value<String?> checklistJson,
       Value<DateTime> downloadedAt,
       Value<int> rowid,
     });
@@ -3726,6 +3838,8 @@ typedef $$TasksTableUpdateCompanionBuilder =
       Value<String> taskStatus,
       Value<String> centerCode,
       Value<String> centerName,
+      Value<String?> metaDataJson,
+      Value<String?> checklistJson,
       Value<DateTime> downloadedAt,
       Value<int> rowid,
     });
@@ -3810,6 +3924,16 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
 
   ColumnFilters<String> get centerName => $composableBuilder(
     column: $table.centerName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get metaDataJson => $composableBuilder(
+    column: $table.metaDataJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get checklistJson => $composableBuilder(
+    column: $table.checklistJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3903,6 +4027,16 @@ class $$TasksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get metaDataJson => $composableBuilder(
+    column: $table.metaDataJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get checklistJson => $composableBuilder(
+    column: $table.checklistJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get downloadedAt => $composableBuilder(
     column: $table.downloadedAt,
     builder: (column) => ColumnOrderings(column),
@@ -3971,6 +4105,16 @@ class $$TasksTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get metaDataJson => $composableBuilder(
+    column: $table.metaDataJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get checklistJson => $composableBuilder(
+    column: $table.checklistJson,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get downloadedAt => $composableBuilder(
     column: $table.downloadedAt,
     builder: (column) => column,
@@ -4020,6 +4164,8 @@ class $$TasksTableTableManager
                 Value<String> taskStatus = const Value.absent(),
                 Value<String> centerCode = const Value.absent(),
                 Value<String> centerName = const Value.absent(),
+                Value<String?> metaDataJson = const Value.absent(),
+                Value<String?> checklistJson = const Value.absent(),
                 Value<DateTime> downloadedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TasksCompanion(
@@ -4038,6 +4184,8 @@ class $$TasksTableTableManager
                 taskStatus: taskStatus,
                 centerCode: centerCode,
                 centerName: centerName,
+                metaDataJson: metaDataJson,
+                checklistJson: checklistJson,
                 downloadedAt: downloadedAt,
                 rowid: rowid,
               ),
@@ -4058,6 +4206,8 @@ class $$TasksTableTableManager
                 Value<String> taskStatus = const Value.absent(),
                 required String centerCode,
                 required String centerName,
+                Value<String?> metaDataJson = const Value.absent(),
+                Value<String?> checklistJson = const Value.absent(),
                 Value<DateTime> downloadedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TasksCompanion.insert(
@@ -4076,6 +4226,8 @@ class $$TasksTableTableManager
                 taskStatus: taskStatus,
                 centerCode: centerCode,
                 centerName: centerName,
+                metaDataJson: metaDataJson,
+                checklistJson: checklistJson,
                 downloadedAt: downloadedAt,
                 rowid: rowid,
               ),

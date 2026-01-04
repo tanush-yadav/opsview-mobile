@@ -14,7 +14,6 @@ import '../services/api/api_service.dart';
 import '../services/database/app_database.dart';
 
 class LoginState {
-
   const LoginState({
     this.isLoading = false,
     this.error,
@@ -24,11 +23,7 @@ class LoginState {
   final String? error;
   final bool isSuccess;
 
-  LoginState copyWith({
-    bool? isLoading,
-    String? error,
-    bool? isSuccess,
-  }) {
+  LoginState copyWith({bool? isLoading, String? error, bool? isSuccess}) {
     return LoginState(
       isLoading: isLoading ?? this.isLoading,
       error: error,
@@ -70,7 +65,9 @@ class LoginViewModel extends Notifier<LoginState> {
         // Store session data in database (structured data)
         final db = ref.read(appDatabaseProvider);
         final data = response.data as Map<String, dynamic>;
-        await db.into(db.sessions).insertOnConflictUpdate(
+        await db
+            .into(db.sessions)
+            .insertOnConflictUpdate(
               SessionsCompanion.insert(
                 id: loginResponse.user.id,
                 service: Value(loginResponse.service),
@@ -97,10 +94,7 @@ class LoginViewModel extends Notifier<LoginState> {
         return false;
       }
     } on AppException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
+      state = state.copyWith(isLoading: false, error: e.message);
       return false;
     } catch (e) {
       final strings = ref.read(appStringsProvider);
@@ -116,18 +110,24 @@ class LoginViewModel extends Notifier<LoginState> {
     state = state.copyWith(error: null);
   }
 
-  Future<void> _fetchAndStoreTasks(ApiService apiService, AppDatabase db) async {
+  Future<void> _fetchAndStoreTasks(
+    ApiService apiService,
+    AppDatabase db,
+  ) async {
     try {
       final tasksResponse = await apiService.getOperatorTasks();
 
       if (tasksResponse.isSuccess && tasksResponse.data != null) {
-        final operatorTasksResponse =
-            OperatorTasksResponse.fromJson({'data': tasksResponse.data});
+        final operatorTasksResponse = OperatorTasksResponse.fromJson({
+          'data': tasksResponse.data,
+        });
 
         // Store all tasks from all shifts
         for (final shiftWithTasks in operatorTasksResponse.data) {
           for (final task in shiftWithTasks.tasks) {
-            await db.into(db.tasks).insertOnConflictUpdate(
+            await db
+                .into(db.tasks)
+                .insertOnConflictUpdate(
                   TasksCompanion.insert(
                     id: task.id,
                     clientCode: task.clientCode,
@@ -144,6 +144,8 @@ class LoginViewModel extends Notifier<LoginState> {
                     taskStatus: Value(task.taskStatus),
                     centerCode: task.centerCode,
                     centerName: task.centerName,
+                    metaDataJson: Value(task.metaDataJson),
+                    checklistJson: Value(task.checklistJson),
                   ),
                 );
           }
@@ -155,5 +157,6 @@ class LoginViewModel extends Notifier<LoginState> {
   }
 }
 
-final loginViewModelProvider =
-    NotifierProvider<LoginViewModel, LoginState>(LoginViewModel.new);
+final loginViewModelProvider = NotifierProvider<LoginViewModel, LoginState>(
+  LoginViewModel.new,
+);
