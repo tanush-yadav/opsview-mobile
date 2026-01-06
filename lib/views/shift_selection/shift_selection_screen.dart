@@ -13,6 +13,14 @@ import '../../viewmodels/shift_selection_viewmodel.dart';
 class ShiftSelectionScreen extends ConsumerWidget {
   const ShiftSelectionScreen({super.key});
 
+  /// Formats time from "HH:mm:ss" to "HH:mm" (removes seconds)
+  String _formatTimeHHMM(String time) {
+    if (time.length >= 5) {
+      return time.substring(0, 5);
+    }
+    return time;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = ref.watch(appStringsProvider);
@@ -272,7 +280,7 @@ class ShiftSelectionScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${shift.startTime} - ${shift.endTime}',
+                        '${_formatTimeHHMM(shift.startTime)} - ${_formatTimeHHMM(shift.endTime)}',
                         style: AppTextStyles.bodySmall,
                       ),
                     ],

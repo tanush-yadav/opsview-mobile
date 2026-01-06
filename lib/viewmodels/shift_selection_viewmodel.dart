@@ -83,8 +83,22 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
     final appState = ref.watch(appStateProvider);
 
     if (appState.isLoaded && appState.exam != null) {
+      final shifts = appState.exam!.shifts;
+
+      // Determine which tab has shifts - prefer exam, but if empty use mock
+      final examShifts =
+          shifts.where((s) => s.type == AppConstants.shiftTypeExamDay).toList();
+      final mockShifts =
+          shifts.where((s) => s.type == AppConstants.shiftTypeMockDay).toList();
+
+      ShiftType defaultType = ShiftType.exam;
+      if (examShifts.isEmpty && mockShifts.isNotEmpty) {
+        defaultType = ShiftType.mock;
+      }
+
       return ShiftSelectionState(
-        shifts: appState.exam!.shifts,
+        shifts: shifts,
+        selectedType: defaultType,
         isLoading: false,
       );
     }
