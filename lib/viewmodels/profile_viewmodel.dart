@@ -110,11 +110,23 @@ class ProfileState {
 
   bool get isMobileVerified => mobileVerificationId != null;
 
+  /// Validates age is a number between 18 and 100
+  bool get isAgeValid {
+    final ageInt = int.tryParse(age);
+    return ageInt != null && ageInt >= 18 && ageInt <= 100;
+  }
+
+  /// Validates mobile number is exactly 10 digits
+  bool get isMobileValid => RegExp(r'^\d{10}$').hasMatch(mobileNumber);
+
+  /// Validates Aadhaar number is exactly 12 digits
+  bool get isAadhaarValid => RegExp(r'^\d{12}$').hasMatch(aadhaarNumber);
+
   bool get isDetailsValid =>
-      fullName.isNotEmpty &&
-      age.isNotEmpty &&
-      mobileNumber.length >= 10 &&
-      aadhaarNumber.length >= 12;
+      fullName.trim().isNotEmpty &&
+      isAgeValid &&
+      isMobileValid &&
+      isAadhaarValid;
 
   String get maskedAadhaar {
     if (aadhaarNumber.length < 4) return aadhaarNumber;
@@ -365,6 +377,8 @@ class ProfileViewModel extends Notifier<ProfileState> {
 
   void clearSelfie() {
     state = state.copyWith(selfieImagePath: null, livenessScore: null);
+    // Re-detect location to ensure the Capture Photo button is enabled
+    _detectLocation();
   }
 
   Future<void> submitProfile() async {
@@ -379,6 +393,12 @@ class ProfileViewModel extends Notifier<ProfileState> {
         throw Exception('No shift selected');
       }
 
+      // Validate age is a valid number before submission
+      final parsedAge = int.tryParse(state.age);
+      if (parsedAge == null || parsedAge < 18 || parsedAge > 100) {
+        throw Exception('Invalid age. Please enter a valid age between 18 and 100.');
+      }
+
       // Generate UUID for the profile
       final profileId = const Uuid().v4();
       final now = DateTime.now();
@@ -390,9 +410,9 @@ class ProfileViewModel extends Notifier<ProfileState> {
             ProfilesCompanion.insert(
               id: profileId,
               shiftId: shiftId,
-              name: state.fullName,
+              name: state.fullName.trim(),
               contact: state.mobileNumber,
-              age: int.parse(state.age),
+              age: parsedAge,
               aadhaar: state.aadhaarNumber,
               selfieLocalPath: Value(state.selfieImagePath),
               livenessStatus: const Value('PASSED'),
