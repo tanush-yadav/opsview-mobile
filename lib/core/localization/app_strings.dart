@@ -86,6 +86,7 @@ abstract class AppStrings {
   String get priority;
   String get mandatory;
   String get completed;
+  String get skip;
 
   // Home
   String get notSubmitted;
