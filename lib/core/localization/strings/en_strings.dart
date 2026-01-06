@@ -58,6 +58,8 @@ class EnStrings implements AppStrings {
   String get afternoonShift => 'Afternoon Shift';
   @override
   String get confirmShift => 'Confirm Shift';
+  @override
+  String get noShiftsAvailable => 'No shifts available';
 
   // Profile
   @override

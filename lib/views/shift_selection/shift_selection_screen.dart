@@ -52,21 +52,39 @@ class ShiftSelectionScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               // Scrollable shifts list
               Expanded(
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: state.groupedShifts.entries.map((entry) {
-                      return _buildDateGroup(
-                        context,
-                        ref,
-                        entry.key,
-                        entry.value,
-                        state.selectedShift,
-                      );
-                    }).toList(),
-                  ),
-                ),
+                child: state.groupedShifts.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.event_busy_outlined,
+                              size: 64,
+                              color: AppColors.textMuted,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              strings.noShiftsAvailable,
+                              style: AppTextStyles.muted,
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: state.groupedShifts.entries.map((entry) {
+                            return _buildDateGroup(
+                              context,
+                              ref,
+                              entry.key,
+                              entry.value,
+                              state.selectedShift,
+                            );
+                          }).toList(),
+                        ),
+                      ),
               ),
               // Confirm button
               const SizedBox(height: 16),
