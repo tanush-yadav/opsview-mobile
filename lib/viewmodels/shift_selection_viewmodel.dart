@@ -140,6 +140,24 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
     return null;
   }
 
+  /// Checks if a shift is in the future (hasn't started yet)
+  bool isShiftFuture(model.Shift shift) {
+    final now = DateTime.now();
+    final today = DateFormat('yyyy-MM-dd').format(now);
+    final currentTime = DateFormat('HH:mm:ss').format(now);
+
+    // Future if start date is after today
+    if (shift.startDate.compareTo(today) > 0) {
+      return true;
+    }
+    // Future if same day but start time hasn't been reached
+    if (shift.startDate.compareTo(today) == 0 &&
+        shift.startTime.compareTo(currentTime) > 0) {
+      return true;
+    }
+    return false;
+  }
+
   void selectType(ShiftType type) {
     state = state.copyWith(selectedType: type, selectedShift: null);
   }
