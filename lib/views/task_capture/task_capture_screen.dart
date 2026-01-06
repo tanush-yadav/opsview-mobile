@@ -178,6 +178,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                           formattedDistance: state.formattedDistance,
                           strings: strings,
                           onRetry: viewModel.retryLocationDetection,
+                          isInsideGeofence: state.isInsideGeofence,
                         ),
                         const SizedBox(height: 24),
                         // Show instructions from metaData if available
@@ -186,7 +187,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                         const SizedBox(height: 24),
                         // Conditionally show IMAGE or CHECKLIST content
                         if (state.isImageTask) ...[
-                          _buildPhotoEvidenceSection(state.capturedPhotos),
+                          _buildPhotoEvidenceSection(state),
                           const SizedBox(height: 24),
                         ],
                         if (state.isChecklistTask &&
@@ -317,19 +318,83 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     );
   }
 
-  Widget _buildPhotoEvidenceSection(List<CapturedPhoto> photos) {
+  Widget _buildPhotoEvidenceSection(TaskCaptureState state) {
+    final photos = state.capturedPhotos;
+    final requiredCount = state.requiredImageCount;
+    final hasReachedLimit = state.hasReachedImageLimit;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(
-          icon: Icons.camera_alt_outlined,
-          title: 'PHOTO EVIDENCE',
+        // Header with photo count
+        Row(
+          children: [
+            Expanded(
+              child: _buildSectionHeader(
+                icon: Icons.camera_alt_outlined,
+                title: 'PHOTO EVIDENCE',
+              ),
+            ),
+            // Photo count indicator
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: hasReachedLimit
+                    ? AppColors.success.withValues(alpha: 0.1)
+                    : AppColors.warning.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: hasReachedLimit
+                      ? AppColors.success.withValues(alpha: 0.5)
+                      : AppColors.warning.withValues(alpha: 0.5),
+                ),
+              ),
+              child: Text(
+                '${photos.length}/$requiredCount',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: hasReachedLimit ? AppColors.success : AppColors.warning,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         ...photos.asMap().entries.map((entry) {
           return _buildCapturedPhotoCard(entry.key, entry.value);
         }),
-        _buildTakePhotoCard(photos.isNotEmpty),
+        // Only show "Take Photo" if limit not reached
+        if (!hasReachedLimit) _buildTakePhotoCard(photos.isNotEmpty),
+        // Show completion message if limit reached
+        if (hasReachedLimit)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppColors.success.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.check_circle,
+                  size: 18,
+                  color: AppColors.success,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Required photo captured',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.success,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

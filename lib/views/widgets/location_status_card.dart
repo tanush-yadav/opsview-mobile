@@ -11,12 +11,14 @@ class LocationStatusCard extends StatelessWidget {
     required this.formattedDistance,
     required this.strings,
     required this.onRetry,
+    this.isInsideGeofence = false,
   });
 
   final LocationStatus status;
   final String formattedDistance;
   final AppStrings strings;
   final VoidCallback onRetry;
+  final bool isInsideGeofence;
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +133,50 @@ class LocationStatusCard extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Inside/Outside geofence indicator
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isInsideGeofence
+                          ? AppColors.success.withValues(alpha: 0.15)
+                          : AppColors.warning.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isInsideGeofence
+                            ? AppColors.success.withValues(alpha: 0.5)
+                            : AppColors.warning.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isInsideGeofence
+                              ? Icons.check_circle
+                              : Icons.warning_amber_rounded,
+                          size: 16,
+                          color: isInsideGeofence
+                              ? AppColors.success
+                              : AppColors.warning,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isInsideGeofence ? 'Inside Zone' : 'Outside Zone',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isInsideGeofence
+                                ? AppColors.success
+                                : AppColors.warning,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ],

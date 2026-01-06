@@ -89,6 +89,15 @@ class TaskCaptureState {
     return '${(distanceFromCenter! / 1000).toStringAsFixed(1)}km';
   }
 
+  /// Geofence radius in meters (500m is typical)
+  static const double geofenceRadius = 500.0;
+
+  /// Whether the user is inside the geofence (within 500m of center)
+  bool get isInsideGeofence {
+    if (distanceFromCenter == null) return false;
+    return distanceFromCenter! <= geofenceRadius;
+  }
+
   /// Whether this is an IMAGE type task (show photo capture)
   bool get isImageTask => task?.taskType == 'IMAGE';
 
@@ -98,10 +107,18 @@ class TaskCaptureState {
   /// Count of answered checklist items
   int get answeredCount => checklist.where((item) => item.value != 'NA').length;
 
+  /// Required number of images for this task (default: 1)
+  /// TODO: Parse from task metaData when API provides no-img-cnt field
+  int get requiredImageCount => 1;
+
+  /// Whether the image limit has been reached
+  bool get hasReachedImageLimit => capturedPhotos.length >= requiredImageCount;
+
   /// Whether all required fields are complete
   bool get canComplete {
     if (isImageTask) {
-      return capturedPhotos.isNotEmpty;
+      // Must have exactly the required number of images
+      return capturedPhotos.length == requiredImageCount;
     } else if (isChecklistTask) {
       return checklist.isNotEmpty &&
           checklist
