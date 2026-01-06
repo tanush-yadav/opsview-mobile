@@ -272,7 +272,7 @@ class HomeScreen extends ConsumerWidget {
   ) {
     return GestureDetector(
       onTap: () =>
-          context.push('${AppRoutes.taskCapture}?taskId=${task.taskId}'),
+          context.push('${AppRoutes.taskCapture}?taskId=${task.id}'),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -366,7 +366,7 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildSyncStatus(WidgetRef ref, Task task, AppStrings strings) {
     final viewModel = ref.read(homeViewModelProvider.notifier);
-    final syncStatus = viewModel.getSyncStatus(task.taskId);
+    final syncStatus = viewModel.getSyncStatus(task.id);
 
     final color = syncStatus == SyncStatus.synced ? AppColors.synced : AppColors.unsynced;
 

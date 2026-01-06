@@ -62,14 +62,14 @@ class TaskSyncService {
 
       // 2. Fetch Task and Profile Info
       String profileId = 'Unknown';
-      String apiTaskId =
-          submission.taskId; // Default to existing if lookup fails (unlikely)
+      // submission.taskId now stores the task UUID (not CODE)
+      String apiTaskId = submission.taskId;
 
-      // Fetch the task to get the correct UUID (id) and shiftId
-      // Note: submission.taskId likely stores the Code (e.g. FRISK_M_T2), so we query t.taskId
+      // Fetch the task by UUID to get shiftId for profile lookup
+      // Note: submission.taskId now stores the UUID, so we query by t.id
       final task = await (_db.select(
         _db.tasks,
-      )..where((t) => t.taskId.equals(submission.taskId))).getSingleOrNull();
+      )..where((t) => t.id.equals(submission.taskId))).getSingleOrNull();
 
       if (task != null) {
         apiTaskId = task.id; // Use the UUID for the API

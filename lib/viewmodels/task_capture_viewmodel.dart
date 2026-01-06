@@ -120,11 +120,16 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
     return const TaskCaptureState();
   }
 
-  void loadTask(String taskId) {
+  /// Load task by its UUID (not the CODE)
+  void loadTask(String taskUuid) {
+    // CRITICAL: Reset state completely before loading new task
+    // This prevents cross-contamination of observations/photos between tasks
+    state = const TaskCaptureState(isLoading: true);
+
     final appState = ref.read(appStateProvider);
 
-    // Find task from app state
-    final task = appState.tasks.where((t) => t.taskId == taskId).firstOrNull;
+    // Find task by UUID (task.id), NOT by CODE (task.taskId)
+    final task = appState.tasks.where((t) => t.id == taskUuid).firstOrNull;
 
     if (task == null) {
       state = state.copyWith(isLoading: false, error: 'Task not found');
@@ -155,9 +160,9 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       }
     }
 
-    // Check for existing submission
+    // Check for existing submission by task UUID (not CODE)
     final submission = appState.taskSubmissions
-        .where((s) => s.taskId == taskId)
+        .where((s) => s.taskId == task.id)
         .firstOrNull;
 
     String observations = '';
@@ -310,7 +315,8 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
 
     try {
       final db = ref.read(appDatabaseProvider);
-      final taskId = state.task!.taskId;
+      // Use the task UUID, NOT the CODE
+      final taskUuid = state.task!.id;
 
       // Serialize checklist answers to JSON
       final checklistAnswersJson = jsonEncode(
@@ -349,14 +355,14 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
           ),
         );
       } else {
-        // Insert new record
+        // Insert new record with task UUID (not CODE)
         final newSubmissionId = const Uuid().v4();
         await db
             .into(db.taskSubmissions)
             .insert(
               TaskSubmissionsCompanion.insert(
                 id: newSubmissionId,
-                taskId: taskId,
+                taskId: taskUuid, // Store UUID, not CODE
                 observations: Value(state.observations),
                 verificationAnswers: checklistAnswersJson,
                 imagePaths: imagePathsJson,
@@ -367,8 +373,8 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
             );
       }
 
-      // Update task status to SUBMITTED
-      await (db.update(db.tasks)..where((t) => t.taskId.equals(taskId))).write(
+      // Update task status to SUBMITTED (query by UUID, not CODE)
+      await (db.update(db.tasks)..where((t) => t.id.equals(taskUuid))).write(
         TasksCompanion(taskStatus: Value(TaskStatus.submitted.toDbValue)),
       );
 
