@@ -32,6 +32,9 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Clear observations controller and reset flag before loading new task
+      _observationsController.clear();
+      _observationsInitialized = false;
       ref.read(taskCaptureViewModelProvider.notifier).loadTask(widget.taskId);
     });
   }
