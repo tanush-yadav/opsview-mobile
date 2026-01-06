@@ -67,9 +67,11 @@ class SettingsViewModel extends Notifier<SettingsState> {
   SettingsState build() {
     final appState = ref.watch(appStateProvider);
 
-    // Check for pending sync (tasks that are not submitted)
-    final hasPendingSync = appState.tasks.any(
-      (t) => t.taskStatus == TaskStatus.pending.toDbValue,
+    // Check for unsynced SUBMISSIONS, not pending tasks
+    // A task can be pending (not yet done) which is normal.
+    // We only care about submissions that haven't been synced to the server.
+    final hasUnsyncedSubmissions = appState.taskSubmissions.any(
+      (s) => s.status == SyncStatus.unsynced.toDbValue,
     );
 
     return SettingsState(
@@ -78,7 +80,7 @@ class SettingsViewModel extends Notifier<SettingsState> {
       center: appState.center,
       service: appState.user?.service,
       profile: appState.profile,
-      hasPendingSync: hasPendingSync,
+      hasPendingSync: hasUnsyncedSubmissions,
     );
   }
 
@@ -98,13 +100,13 @@ class SettingsViewModel extends Notifier<SettingsState> {
       // Refresh App State to reflect changes (e.g. sync status)
       await ref.read(appStateProvider.notifier).loadFromDatabase();
 
-      // Re-evaluate pending sync status
+      // Re-evaluate sync status - check for unsynced submissions
       final appState = ref.read(appStateProvider);
-      final hasPendingSync = appState.tasks.any(
-        (t) => t.taskStatus == TaskStatus.pending.toDbValue,
+      final hasUnsyncedSubmissions = appState.taskSubmissions.any(
+        (s) => s.status == SyncStatus.unsynced.toDbValue,
       );
 
-      state = state.copyWith(isSyncing: false, hasPendingSync: hasPendingSync);
+      state = state.copyWith(isSyncing: false, hasPendingSync: hasUnsyncedSubmissions);
       return true;
     } catch (e) {
       state = state.copyWith(isSyncing: false);

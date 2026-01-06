@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../core/constants/app_constants.dart';
 import '../core/providers/app_state_provider.dart';
+import '../core/providers/connectivity_provider.dart';
 import '../core/router/app_router.dart';
 
 class SplashViewModel extends Notifier<void> {
@@ -23,6 +24,9 @@ class SplashViewModel extends Notifier<void> {
       // Load app state from database
       await ref.read(appStateProvider.notifier).loadFromDatabase();
       final appState = ref.read(appStateProvider);
+
+      // Initialize connectivity sync service for auto-sync when internet available
+      ref.read(connectivitySyncServiceProvider).initialize();
 
       if (!appState.isLoggedIn) {
         return AppRoutes.login;

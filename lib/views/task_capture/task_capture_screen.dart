@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/localization/app_strings.dart';
+import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/location_status_card.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -334,66 +335,104 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   }
 
   Widget _buildCapturedPhotoCard(int index, CapturedPhoto photo) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: AppColors.textPrimary,
+    return GestureDetector(
+      onTap: () => FullScreenImageViewer.show(
+        context,
+        photo.imagePath,
+        title: 'Photo ${index + 1}',
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.file(
-              File(photo.imagePath),
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.3),
-                        AppColors.primaryDark.withValues(alpha: 0.5),
-                      ],
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: AppColors.textPrimary,
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                File(photo.imagePath),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.primary.withValues(alpha: 0.3),
+                          AppColors.primaryDark.withValues(alpha: 0.5),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.image,
-                      size: 48,
-                      color: AppColors.textLight.withValues(alpha: 0.5),
+                    child: Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 48,
+                        color: AppColors.textLight.withValues(alpha: 0.5),
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: GestureDetector(
-              onTap: () => _removePhoto(index),
+            // Tap to view hint
+            Positioned(
+              bottom: 8,
+              left: 8,
               child: Container(
-                width: 32,
-                height: 32,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.textPrimary.withValues(alpha: 0.6),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Icon(
-                  Icons.close,
-                  color: AppColors.textLight,
-                  size: 18,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.zoom_in,
+                      color: AppColors.textLight,
+                      size: 14,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Tap to view',
+                      style: TextStyle(
+                        color: AppColors.textLight,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
+            // Delete button
+            Positioned(
+              top: 8,
+              right: 8,
+              child: GestureDetector(
+                onTap: () => _removePhoto(index),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.textPrimary.withValues(alpha: 0.6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    color: AppColors.textLight,
+                    size: 18,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -635,7 +674,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             minimumSize: const Size(double.infinity, 52),
           ),
           child: Text(
-            'Complete Task',
+            'Submit Task',
             style: AppTextStyles.button.copyWith(fontSize: 16),
           ),
         ),
