@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' as material;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -8,6 +9,7 @@ import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/snackbar_utils.dart';
+import '../../core/utils/text_formatters.dart';
 import '../../viewmodels/login_viewmodel.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -135,6 +137,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             controller: _examCodeController,
                             hintText: strings.examCodeHint,
                             icon: Icons.tag,
+                            inputFormatters: [LowerCaseTextFormatter()],
                           ),
                           const Divider(height: 24, color: AppColors.border),
                           // Username Field
@@ -150,6 +153,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             controller: _usernameController,
                             hintText: strings.usernameHint,
                             icon: Icons.person_outline,
+                            inputFormatters: [LowerCaseTextFormatter()],
                           ),
                           const Divider(height: 24, color: AppColors.border),
                           // Password Field
@@ -236,6 +240,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     required IconData icon,
     bool obscureText = false,
     Widget? suffixIcon,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Row(
       children: [
@@ -245,6 +250,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: material.TextField(
             controller: controller,
             obscureText: obscureText,
+            inputFormatters: inputFormatters,
             decoration: material.InputDecoration(
               hintText: hintText,
               hintStyle: const TextStyle(color: AppColors.textMuted),
