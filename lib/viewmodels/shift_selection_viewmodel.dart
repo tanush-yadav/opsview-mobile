@@ -85,16 +85,30 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
     if (appState.isLoaded && appState.exam != null) {
       final shifts = appState.exam!.shifts;
 
-      // Determine which tab has shifts - prefer exam, but if empty use mock
       final examShifts =
           shifts.where((s) => s.type == AppConstants.shiftTypeExamDay).toList();
       final mockShifts =
           shifts.where((s) => s.type == AppConstants.shiftTypeMockDay).toList();
 
+      // Priority 1: Find active shift and show its tab
+      final activeShift = _findActiveShift(shifts);
+      if (activeShift != null) {
+        final activeType = activeShift.type == AppConstants.shiftTypeExamDay
+            ? ShiftType.exam
+            : ShiftType.mock;
+        return ShiftSelectionState(
+          shifts: shifts,
+          selectedType: activeType,
+          isLoading: false,
+        );
+      }
+
+      // Priority 2: Show non-empty tab (prefer exam, fallback to mock)
       ShiftType defaultType = ShiftType.exam;
       if (examShifts.isEmpty && mockShifts.isNotEmpty) {
         defaultType = ShiftType.mock;
       }
+      // If both empty, defaults to exam (nothing to show anyway)
 
       return ShiftSelectionState(
         shifts: shifts,
@@ -104,6 +118,26 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
     }
 
     return const ShiftSelectionState();
+  }
+
+  /// Finds a shift that is currently active based on date and time
+  model.Shift? _findActiveShift(List<model.Shift> shifts) {
+    final now = DateTime.now();
+    final today = DateFormat('yyyy-MM-dd').format(now);
+    final currentTime = DateFormat('HH:mm:ss').format(now);
+
+    for (final shift in shifts) {
+      // Check if today falls within shift date range
+      if (shift.startDate.compareTo(today) <= 0 &&
+          shift.endDate.compareTo(today) >= 0) {
+        // Check if current time falls within shift time range
+        if (shift.startTime.compareTo(currentTime) <= 0 &&
+            shift.endTime.compareTo(currentTime) >= 0) {
+          return shift;
+        }
+      }
+    }
+    return null;
   }
 
   void selectType(ShiftType type) {
