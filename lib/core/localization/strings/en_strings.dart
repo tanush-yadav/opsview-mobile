@@ -133,6 +133,8 @@ class EnStrings implements AppStrings {
   String get mandatory => 'Mandatory';
   @override
   String get completed => 'Completed';
+  @override
+  String get skip => 'Skip';
 
   // Home
   @override

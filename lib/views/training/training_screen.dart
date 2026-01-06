@@ -64,6 +64,22 @@ class TrainingScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+              // Skip Button
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () {
+                    context.go(AppRoutes.home);
+                  },
+                  child: Text(
+                    strings.skip,
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -132,50 +148,6 @@ class TrainingScreen extends ConsumerWidget {
                     style: AppTextStyles.h3,
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      // Duration
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            strings.duration.toUpperCase(),
-                            style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '4m 20s',
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 32),
-                      // Priority
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            strings.priority.toUpperCase(),
-                            style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            strings.mandatory,
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.error,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
