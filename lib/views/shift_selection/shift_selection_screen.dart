@@ -13,6 +13,14 @@ import '../../viewmodels/shift_selection_viewmodel.dart';
 class ShiftSelectionScreen extends ConsumerWidget {
   const ShiftSelectionScreen({super.key});
 
+  /// Formats time from "HH:mm:ss" to "HH:mm" (removes seconds)
+  String _formatTimeHHMM(String time) {
+    if (time.length >= 5) {
+      return time.substring(0, 5);
+    }
+    return time;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = ref.watch(appStringsProvider);
@@ -44,21 +52,39 @@ class ShiftSelectionScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               // Scrollable shifts list
               Expanded(
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: state.groupedShifts.entries.map((entry) {
-                      return _buildDateGroup(
-                        context,
-                        ref,
-                        entry.key,
-                        entry.value,
-                        state.selectedShift,
-                      );
-                    }).toList(),
-                  ),
-                ),
+                child: state.groupedShifts.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.event_busy_outlined,
+                              size: 64,
+                              color: AppColors.textMuted,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              strings.noShiftsAvailable,
+                              style: AppTextStyles.muted,
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: state.groupedShifts.entries.map((entry) {
+                            return _buildDateGroup(
+                              context,
+                              ref,
+                              entry.key,
+                              entry.value,
+                              state.selectedShift,
+                            );
+                          }).toList(),
+                        ),
+                      ),
               ),
               // Confirm button
               const SizedBox(height: 16),
@@ -189,6 +215,9 @@ class ShiftSelectionScreen extends ConsumerWidget {
         // Shift cards
         ...shifts.map((shift) {
           final isSelected = selectedShift?.id == shift.id;
+          final isFuture = ref
+              .read(shiftSelectionViewModelProvider.notifier)
+              .isShiftFuture(shift);
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: _buildShiftCard(
@@ -196,6 +225,7 @@ class ShiftSelectionScreen extends ConsumerWidget {
               ref,
               shift,
               isSelected,
+              isFuture,
             ),
           );
         }),
@@ -209,98 +239,113 @@ class ShiftSelectionScreen extends ConsumerWidget {
     WidgetRef ref,
     model.Shift shift,
     bool isSelected,
+    bool isFuture,
   ) {
     // Determine morning/afternoon based on start time (before 12:00 = morning)
     final hour = int.tryParse(shift.startTime.split(':').first) ?? 0;
     final isMorning = hour < 12;
 
     return GestureDetector(
-      onTap: () =>
-          ref.read(shiftSelectionViewModelProvider.notifier).selectShift(shift),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: AppColors.shadow,
-              blurRadius: 8,
-              offset: Offset(0, 2),
+      onTap: isFuture
+          ? null
+          : () => ref
+              .read(shiftSelectionViewModelProvider.notifier)
+              .selectShift(shift),
+      child: Opacity(
+        opacity: isFuture ? 0.5 : 1.0,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isFuture ? AppColors.surfaceLight : AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+              width: isSelected ? 2 : 1,
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Icon
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                isMorning ? Icons.wb_sunny_outlined : Icons.nightlight_outlined,
-                color: AppColors.primary,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            // Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    shift.name,
-                    style: AppTextStyles.label.copyWith(
-                      fontWeight: FontWeight.w600,
+            boxShadow: isFuture
+                ? null
+                : const [
+                    BoxShadow(
+                      color: AppColors.shadow,
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.access_time,
-                        size: 14,
-                        color: AppColors.textMuted,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${shift.startTime} - ${shift.endTime}',
-                        style: AppTextStyles.bodySmall,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // Selection indicator
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.border,
-                  width: 2,
+                  ],
+          ),
+          child: Row(
+            children: [
+              // Icon
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isFuture
+                      ? AppColors.textMuted.withValues(alpha: 0.1)
+                      : AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                color: isSelected ? AppColors.primary : Colors.transparent,
+                child: Icon(
+                  isMorning
+                      ? Icons.wb_sunny_outlined
+                      : Icons.nightlight_outlined,
+                  color: isFuture ? AppColors.textMuted : AppColors.primary,
+                  size: 24,
+                ),
               ),
-              child: isSelected
-                  ? const Icon(
-                      Icons.check,
-                      size: 16,
-                      color: AppColors.textLight,
-                    )
-                  : null,
-            ),
-          ],
+              const SizedBox(width: 16),
+              // Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      shift.name,
+                      style: AppTextStyles.label.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: isFuture ? AppColors.textMuted : null,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.access_time,
+                          size: 14,
+                          color: AppColors.textMuted,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${_formatTimeHHMM(shift.startTime)} - ${_formatTimeHHMM(shift.endTime)}',
+                          style: AppTextStyles.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // Selection indicator (hidden for future shifts)
+              if (!isFuture)
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : AppColors.border,
+                      width: 2,
+                    ),
+                    color: isSelected ? AppColors.primary : Colors.transparent,
+                  ),
+                  child: isSelected
+                      ? const Icon(
+                          Icons.check,
+                          size: 16,
+                          color: AppColors.textLight,
+                        )
+                      : null,
+                ),
+            ],
+          ),
         ),
       ),
     );

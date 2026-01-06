@@ -45,6 +45,7 @@ abstract class AppStrings {
   String get morningShift;
   String get afternoonShift;
   String get confirmShift;
+  String get noShiftsAvailable;
 
   // Profile
   String get operatorProfile;
