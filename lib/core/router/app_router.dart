@@ -4,7 +4,6 @@ import '../../views/splash/splash_screen.dart';
 import '../../views/login/login_screen.dart';
 import '../../views/confirmation/confirmation_screen.dart';
 import '../../views/profile/profile_flow_screen.dart';
-import '../../views/profile/liveness_check_screen.dart';
 import '../../views/shift_selection/shift_selection_screen.dart';
 import '../../views/training/training_screen.dart';
 import '../../views/home/home_screen.dart';
@@ -16,7 +15,6 @@ abstract class AppRoutes {
   static const login = '/login';
   static const confirmation = '/confirmation';
   static const profile = '/profile';
-  static const livenessCheck = '/liveness-check';
   static const shiftSelection = '/shift-selection';
   static const training = '/training';
   static const home = '/home';
@@ -42,10 +40,6 @@ final appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.profile,
       builder: (context, state) => const ProfileFlowScreen(),
-    ),
-    GoRoute(
-      path: AppRoutes.livenessCheck,
-      builder: (context, state) => const LivenessCheckPage(),
     ),
     GoRoute(
       path: AppRoutes.shiftSelection,

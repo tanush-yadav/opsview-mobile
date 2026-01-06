@@ -34,7 +34,9 @@ dependencies:
   camera: ^0.10.6
   geolocator: ^14.0.2
   permission_handler: ^11.0.1
-  flutter_liveness_detection_randomized_plugin: ^1.1.0
+  
+  # Passive Liveness Detection
+  face_anti_spoofing_detector: ^0.0.3
 
   # Navigation
   go_router: ^17.0.1

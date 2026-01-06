@@ -73,6 +73,7 @@ class ProfileSelfieStep extends ConsumerWidget {
           const SizedBox(height: 24),
           // Buttons
           if (state.selfieImagePath != null) ...[
+            // Selfie captured - show Retake and Submit buttons
             Row(
               children: [
                 Expanded(
@@ -101,33 +102,52 @@ class ProfileSelfieStep extends ConsumerWidget {
               ],
             ),
           ] else ...[
+            // No selfie yet - show Capture button
             SizedBox(
               width: double.infinity,
               height: 56,
               child: PrimaryButton(
-                onPressed: state.isLocationValid
-                    ? () => context.push(AppRoutes.livenessCheck)
+                onPressed: state.isLocationValid && !state.isLoading
+                    ? () => _handleCapture(context, ref, strings)
                     : null,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.camera_alt, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      strings.capturePhoto,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                child: state.isLoading
+                    ? const CircularProgressIndicator()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.camera_alt, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            strings.capturePhoto,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ],
         ],
       ),
     );
+  }
+
+  Future<void> _handleCapture(
+    BuildContext context,
+    WidgetRef ref,
+    AppStrings strings,
+  ) async {
+    try {
+      await ref
+          .read(profileViewModelProvider.notifier)
+          .captureAndVerifySelfie();
+    } catch (e) {
+      if (context.mounted) {
+        SnackBarUtils.error(context, e.toString());
+      }
+    }
   }
 
   Future<void> _handleSubmit(
