@@ -356,20 +356,22 @@ class SettingsScreen extends ConsumerWidget {
             width: double.infinity,
             height: 48,
             child: material.OutlinedButton(
-              onPressed: state.hasPendingSync
-                  ? null
-                  : () async {
-                      await viewModel.logout();
-                      if (context.mounted) {
-                        context.go(AppRoutes.login);
-                      }
-                    },
+              onPressed: () async {
+                if (state.hasPendingSync) {
+                  // Show confirmation dialog for unsynced data
+                  final shouldLogout = await _showLogoutConfirmation(
+                    context,
+                    strings,
+                  );
+                  if (shouldLogout != true) return;
+                }
+                await viewModel.logout();
+                if (context.mounted) {
+                  context.go(AppRoutes.login);
+                }
+              },
               style: material.OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: state.hasPendingSync
-                      ? AppColors.textMuted
-                      : AppColors.border,
-                ),
+                side: const BorderSide(color: AppColors.border),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -377,23 +379,42 @@ class SettingsScreen extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.logout,
-                    color: state.hasPendingSync
-                        ? AppColors.textMuted
-                        : AppColors.textSecondary,
-                  ),
+                  const Icon(Icons.logout, color: AppColors.textSecondary),
                   const SizedBox(width: 8),
                   Text(
                     strings.logout,
                     style: AppTextStyles.button.copyWith(
-                      color: state.hasPendingSync
-                          ? AppColors.textMuted
-                          : AppColors.textSecondary,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool?> _showLogoutConfirmation(
+    BuildContext context,
+    AppStrings strings,
+  ) {
+    return material.showDialog<bool>(
+      context: context,
+      builder: (context) => material.AlertDialog(
+        title: Text(strings.logout),
+        content: Text(strings.logoutWithUnsyncedDataWarning),
+        actions: [
+          material.TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(strings.cancel),
+          ),
+          material.TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              strings.logout,
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],

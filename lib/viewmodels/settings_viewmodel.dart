@@ -67,10 +67,13 @@ class SettingsViewModel extends Notifier<SettingsState> {
   SettingsState build() {
     final appState = ref.watch(appStateProvider);
 
-    // Check for pending sync (tasks that are not submitted)
-    final hasPendingSync = appState.tasks.any(
-      (t) => t.taskStatus == TaskStatus.pending.toDbValue,
+    // Check for unsynced data (submissions not yet synced OR profile not synced)
+    final hasUnsyncedSubmissions = appState.taskSubmissions.any(
+      (s) => s.status == SyncStatus.unsynced.toDbValue,
     );
+    final hasUnsyncedProfile =
+        appState.profile != null && appState.profile!.backendProfileId == null;
+    final hasPendingSync = hasUnsyncedSubmissions || hasUnsyncedProfile;
 
     return SettingsState(
       user: appState.user,
@@ -100,9 +103,12 @@ class SettingsViewModel extends Notifier<SettingsState> {
 
       // Re-evaluate pending sync status
       final appState = ref.read(appStateProvider);
-      final hasPendingSync = appState.tasks.any(
-        (t) => t.taskStatus == TaskStatus.pending.toDbValue,
+      final hasUnsyncedSubmissions = appState.taskSubmissions.any(
+        (s) => s.status == SyncStatus.unsynced.toDbValue,
       );
+      final hasUnsyncedProfile =
+          appState.profile != null && appState.profile!.backendProfileId == null;
+      final hasPendingSync = hasUnsyncedSubmissions || hasUnsyncedProfile;
 
       state = state.copyWith(isSyncing: false, hasPendingSync: hasPendingSync);
       return true;

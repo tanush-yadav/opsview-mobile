@@ -179,6 +179,9 @@ class EnStrings implements AppStrings {
   String get syncSuccess => 'Sync process completed';
   @override
   String get syncFailed => 'Sync failed. Please try again.';
+  @override
+  String get logoutWithUnsyncedDataWarning =>
+      'You have unsynced data that will be lost if you log out. Are you sure you want to continue?';
 
   // Task Capture
   @override

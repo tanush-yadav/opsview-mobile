@@ -112,6 +112,7 @@ abstract class AppStrings {
   String get logout;
   String get syncSuccess;
   String get syncFailed;
+  String get logoutWithUnsyncedDataWarning;
 
   // Task Capture
   String get taskDetails;
