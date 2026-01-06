@@ -100,20 +100,33 @@ class HomeViewModel extends Notifier<HomeState> {
     state = state.copyWith(currentTab: tab);
   }
 
-  /// Get sync status for a task by its UUID (not the CODE)
+  /// Get sync status for a task by its UUID
+  /// Also checks by CODE for backward compatibility with old submissions
   SyncStatus getSyncStatus(String taskUuid) {
     final appState = ref.read(appStateProvider);
-    // taskSubmissions.taskId now stores the task UUID, not the CODE
-    final submission = appState.taskSubmissions
+
+    // Find the task to get its CODE for backward compatibility
+    final task = appState.tasks.where((t) => t.id == taskUuid).firstOrNull;
+    final taskCode = task?.taskId;
+
+    // Try to find submission by UUID first (new format)
+    var submission = appState.taskSubmissions
         .where((s) => s.taskId == taskUuid)
         .firstOrNull;
+
+    // Fallback: try by CODE (old submissions before UUID fix)
+    if (submission == null && taskCode != null) {
+      submission = appState.taskSubmissions
+          .where((s) => s.taskId == taskCode)
+          .firstOrNull;
+    }
 
     // If no submission exists, the task hasn't been submitted yet (pending)
     if (submission == null) return SyncStatus.unsynced;
 
     try {
       return SyncStatus.values.firstWhere(
-        (e) => e.toDbValue == submission.status,
+        (e) => e.toDbValue == submission!.status,
         orElse: () => SyncStatus.unsynced,
       );
     } catch (_) {

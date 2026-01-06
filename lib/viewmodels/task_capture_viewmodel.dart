@@ -177,9 +177,14 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       }
     }
 
-    // Check for existing submission by task UUID (not CODE)
-    final submission = appState.taskSubmissions
+    // Check for existing submission by task UUID first, then by CODE (backward compat)
+    var submission = appState.taskSubmissions
         .where((s) => s.taskId == task.id)
+        .firstOrNull;
+
+    // Fallback: try by CODE for old submissions
+    submission ??= appState.taskSubmissions
+        .where((s) => s.taskId == task.taskId)
         .firstOrNull;
 
     String observations = '';
