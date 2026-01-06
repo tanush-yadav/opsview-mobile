@@ -32,11 +32,20 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Clear observations controller and reset flag before loading new task
-      _observationsController.clear();
-      _observationsInitialized = false;
+    // Clear observations controller and reset flag before loading new task
+    _observationsController.clear();
+    _observationsInitialized = false;
       ref.read(taskCaptureViewModelProvider.notifier).loadTask(widget.taskId);
     });
+  }
+
+  @override
+  void deactivate() {
+    // Clear ViewModel state when leaving the screen
+    // This prevents stale data from showing when opening a different task
+    // Using deactivate() because ref is still valid here, unlike in dispose()
+    ref.invalidate(taskCaptureViewModelProvider);
+    super.deactivate();
   }
 
   @override
@@ -357,7 +366,9 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: hasReachedLimit ? AppColors.success : AppColors.warning,
+                  color: hasReachedLimit
+                      ? AppColors.success
+                      : AppColors.warning,
                 ),
               ),
             ),
@@ -461,11 +472,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.zoom_in,
-                      color: AppColors.textLight,
-                      size: 14,
-                    ),
+                    Icon(Icons.zoom_in, color: AppColors.textLight, size: 14),
                     SizedBox(width: 4),
                     Text(
                       'Tap to view',
