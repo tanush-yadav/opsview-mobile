@@ -578,10 +578,10 @@ Training link from: `data.exam.shifts[].services[].trainingLink`
 **BUG FIXES REQUIRED**:
 
 1. Show INSIDE/OUTSIDE indicator while capturing photos
-2. Disable gallery access — camera only throughout app
-3. Enforce image count limits from task config (`no-img-cnt`)
+2. ~~Disable gallery access — camera only throughout app~~ **[UPDATED: Gallery access IS allowed]**
+3. ~~Enforce image count limits from task config (`no-img-cnt`)~~ **[DEFERRED: Field not present in API]**
 4. Button should say "Submit Task" not "Complete Task"
-5. Submit button active ONLY when exact required images are taken
+5. ~~Submit button active ONLY when exact required images are taken~~ **[DEFERRED: See #3]**
 6. User must be able to view full image of last submission
 7. Each task's observations/messages must be isolated
 </aside>
@@ -589,7 +589,7 @@ Training link from: `data.exam.shifts[].services[].trainingLink`
 ### UI Elements
 
 - **Task title & instructions**
-- **Camera preview / Capture button** (no gallery)
+- **Camera preview / Capture button** (gallery allowed)
 - **Captured image preview**
 - **INSIDE/OUTSIDE badge** — informative only, not blocking
 - **Distance indicator** (e.g., "120m from center")
