@@ -98,7 +98,10 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
                       controller: _fullNameController,
                       icon: Icons.person_outline,
                       onChanged: viewModel.updateFullName,
+                      hasError: state.showNameError,
                     ),
+                    if (state.showNameError)
+                      _buildErrorText(strings.invalidName),
                     const SizedBox(height: 20),
                     // Age
                     _buildFieldLabel(strings.age),
@@ -108,17 +111,24 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
                       icon: Icons.calendar_today_outlined,
                       keyboardType: TextInputType.number,
                       onChanged: viewModel.updateAge,
+                      hasError: state.showAgeError,
                     ),
+                    if (state.showAgeError)
+                      _buildErrorText(strings.invalidAge),
                     const SizedBox(height: 20),
                     // Mobile Number
                     _buildFieldLabel(strings.mobileNumber),
                     const SizedBox(height: 8),
                     _buildMobileField(state, strings),
+                    if (state.showMobileError && !state.showOtpInput && !state.isMobileVerified)
+                      _buildErrorText(strings.invalidMobile),
                     const SizedBox(height: 20),
                     // Aadhaar Number
                     _buildFieldLabel(strings.aadhaarNumber),
                     const SizedBox(height: 8),
                     _buildAadhaarField(state),
+                    if (state.showAadhaarError)
+                      _buildErrorText(strings.invalidAadhaar),
                   ],
                 ),
               ),
@@ -164,21 +174,36 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
     );
   }
 
+  Widget _buildErrorText(String message) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, left: 4),
+      child: Text(
+        message,
+        style: AppTextStyles.bodySmall.copyWith(
+          color: AppColors.error,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextField({
     required material.TextEditingController controller,
     required IconData icon,
     required ValueChanged<String> onChanged,
     TextInputType keyboardType = TextInputType.text,
+    bool hasError = false,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(12),
+        border: hasError ? Border.all(color: AppColors.error, width: 1) : null,
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColors.textMuted),
+          Icon(icon, size: 20, color: hasError ? AppColors.error : AppColors.textMuted),
           const SizedBox(width: 12),
           Expanded(
             child: material.TextField(

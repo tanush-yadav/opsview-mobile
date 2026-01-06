@@ -152,6 +152,16 @@ class EnStrings implements AppStrings {
   @override
   String get somethingWentWrong => 'Something went wrong';
 
+  // Validation Errors
+  @override
+  String get invalidName => 'Please enter your full name';
+  @override
+  String get invalidAge => 'Enter a valid age';
+  @override
+  String get invalidMobile => 'Enter a valid 10-digit mobile number';
+  @override
+  String get invalidAadhaar => 'Enter a valid 12-digit Aadhaar number';
+
   // Settings
   @override
   String get profile => 'Profile';

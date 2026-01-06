@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_liveness_detection_randomized_plugin/index.dart'
     hide Scaffold, CircularProgressIndicator;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,6 +31,20 @@ class LivenessCheckPage extends ConsumerWidget {
     AppStrings strings,
   ) async {
     try {
+      // DEBUG BYPASS: Skip liveness detection on emulator/debug mode
+      if (kDebugMode) {
+        await Future.delayed(const Duration(seconds: 1));
+        if (context.mounted) {
+          // Use a placeholder path for debug - the actual selfie won't be uploaded
+          ref.read(profileViewModelProvider.notifier).setSelfieImage(
+            'debug_selfie_bypass',
+            livenessScore: 0.95,
+          );
+          context.pop();
+        }
+        return;
+      }
+
       final result = await FlutterLivenessDetectionRandomizedPlugin.instance
           .livenessDetection(
             context: context,

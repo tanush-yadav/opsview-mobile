@@ -122,6 +122,23 @@ class ProfileState {
   /// Validates Aadhaar number is exactly 12 digits
   bool get isAadhaarValid => RegExp(r'^\d{12}$').hasMatch(aadhaarNumber);
 
+  /// Validates full name contains only letters and spaces (no numbers)
+  bool get isNameValid =>
+      fullName.trim().isNotEmpty &&
+      RegExp(r'^[a-zA-Z\s]+$').hasMatch(fullName.trim());
+
+  /// Returns true if name field should show an error (has content but invalid)
+  bool get showNameError => fullName.isNotEmpty && !isNameValid;
+
+  /// Returns true if age field should show an error (has content but invalid)
+  bool get showAgeError => age.isNotEmpty && !isAgeValid;
+
+  /// Returns true if mobile field should show an error (has content but invalid)
+  bool get showMobileError => mobileNumber.isNotEmpty && !isMobileValid;
+
+  /// Returns true if aadhaar field should show an error (has content but invalid)
+  bool get showAadhaarError => aadhaarNumber.isNotEmpty && !isAadhaarValid;
+
   bool get isDetailsValid =>
       fullName.trim().isNotEmpty &&
       isAgeValid &&
@@ -377,8 +394,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
 
   void clearSelfie() {
     state = state.copyWith(selfieImagePath: null, livenessScore: null);
-    // Re-detect location to ensure the Capture Photo button is enabled
-    _detectLocation();
+    // Don't re-detect location - it was already detected and user just wants to retake photo
   }
 
   Future<void> submitProfile() async {

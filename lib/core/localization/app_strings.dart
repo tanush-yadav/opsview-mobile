@@ -98,6 +98,12 @@ abstract class AppStrings {
   // Errors
   String get somethingWentWrong;
 
+  // Validation Errors
+  String get invalidName;
+  String get invalidAge;
+  String get invalidMobile;
+  String get invalidAadhaar;
+
   // Settings
   String get profile;
   String get operatorAssignmentDetails;
