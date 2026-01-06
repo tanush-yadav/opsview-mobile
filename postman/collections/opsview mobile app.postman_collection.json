@@ -1,0 +1,1793 @@
+{
+	"info": {
+		"_postman_id": "f4bdc73b-444f-472e-a351-3e5808cc4fa2",
+		"name": "opsview mobile app",
+		"description": "Postman collection for the OpsView Mobile App APIs. This collection contains all the relevant endpoints needed for the mobile application including authentication, profile management, mobile verification, task management, and exam data retrieval.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48337533",
+		"_collection_link": "https://tanush-yadav-6239921.postman.co/workspace/e7ec5f19-85f9-460f-82d3-ed64189a9f7b/collection/48337533-f4bdc73b-444f-472e-a351-3e5808cc4fa2?action=share&source=collection_link&creator=48337533"
+	},
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Operator Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.accessToken) {",
+									"        pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
+									"        console.log(\"Access token saved to collection variable\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "*/*"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"string\",\n    \"password\": \"string\",\n    \"examCode\": \"string\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/op-login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"op-login"
+							]
+						},
+						"description": "Authenticate an operator using exam code, username, and password. On successful login, returns access token and user details including exam and center information for the confirmation screen."
+					},
+					"response": [
+						{
+							"name": "Successful Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"operator@example.com\",\n    \"password\": \"password123\",\n    \"examCode\": \"EXAM2024\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/op-login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"op-login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"code\": \"200\",\n    \"data\": {\n        \"accessToken\": \"eyJhbGciOiJIUzUxMiJ9...\",\n        \"tokenType\": \"Bearer\",\n        \"user\": {\n            \"id\": \"4aa9d0f1-30cb-4e0d-8523-b3efc4f60e14\",\n            \"username\": \"operator@example.com\",\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"active\": true,\n            \"userType\": \"OP\",\n            \"roles\": [\n                {\n                    \"id\": 2,\n                    \"name\": \"ROLE_OPERATOR\",\n                    \"description\": \"Operator role\"\n                }\n            ]\n        }\n    },\n    \"notify\": {\n        \"message\": \"Successfully authenticated\",\n        \"type\": \"success\",\n        \"timeout\": 2000\n    }\n}"
+						},
+						{
+							"name": "Successful Operator Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"center060_frisking\",\n    \"password\": \"Braj1234\",\n    \"examCode\": \"neet1\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/op-login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"op-login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 04:29:02 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"code\": \"200\",\n    \"data\": {\n        \"accessToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3ZDU4MDZjOS1jYjc5LTRiOGMtYjg3ZS0yM2ViYWYwZWUzNjEiLCJncmFudHMiOiJST0xFX0NFTlRFUl9GUklTS0lORyIsImV4YW1JZCI6ImY2M2ZkY2NhLTMxMGUtNDZkMC1iMDIzLTIyMzYxOGIyZDAyZiIsImNlbnRlcklkIjoiMGZiYmM2OWUtZjlmZC00M2IzLWI1ZGMtZTkxMmFkNjIzYWRjIiwic2VydmljZSI6ImZyaXNraW5nIiwiaWF0IjoxNzY2NzIzMzQyLCJleHAiOjE3NjczMjgxNDJ9.LgMMJH9e28ccVo-D9TB9tQGAEL9gcAVRtoIvIQ35T43975X-gYGm2H93OQF2jIggQ0MA4eyGk7LfnHahdL4Xiw\",\n        \"tokenType\": \"Bearer\",\n        \"user\": {\n            \"id\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n            \"username\": \"neet1_center060_frisking\",\n            \"firstName\": \"Operator-CENTER060\",\n            \"lastName\": \"frisking\",\n            \"active\": true,\n            \"roles\": [\n                {\n                    \"id\": 5,\n                    \"name\": \"ROLE_CENTER_FRISKING\",\n                    \"description\": \"Frisking Role\",\n                    \"shortName\": \"frisking\",\n                    \"deleted\": 0\n                }\n            ],\n            \"userType\": null,\n            \"centerCode\": \"CENTER060\",\n            \"clientCode\": \"NEET\",\n            \"photoUrl\": null,\n            \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n            \"examCode\": null,\n            \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n            \"service\": \"frisking\"\n        },\n        \"exam\": {\n            \"id\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n            \"clientCode\": \"NEET\",\n            \"code\": \"NEET1\",\n            \"name\": \"NEET Examination 2025\",\n            \"projectCode\": \"\",\n            \"fenceRadius\": 0,\n            \"shifts\": [\n                {\n                    \"id\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"clientCode\": \"NEET\",\n                    \"examCode\": \"NEET1\",\n                    \"name\": \"Mock Day Shift\",\n                    \"type\": \"ExamDay\",\n                    \"startDate\": \"2025-12-17\",\n                    \"startTime\": \"09:00:00\",\n                    \"endDate\": \"2025-12-17\",\n                    \"endTime\": \"13:00:00\",\n                    \"services\": [\n                        {\n                            \"name\": \"frisking\",\n                            \"templateName\": \"frisking_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/frisking\"\n                        },\n                        {\n                            \"name\": \"biometric\",\n                            \"templateName\": \"biometric_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/biometric\"\n                        },\n                        {\n                            \"name\": \"cso\",\n                            \"templateName\": \"cso_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/cso\"\n                        }\n                    ]\n                },\n                {\n                    \"id\": \"7a2e053b-e174-44a9-9089-7bdac39cac2a\",\n                    \"clientCode\": \"NEET\",\n                    \"examCode\": \"NEET1\",\n                    \"name\": \"Shift 1766561501317\",\n                    \"type\": \"ExamDay\",\n                    \"startDate\": \"2025-12-24\",\n                    \"startTime\": \"09:00:00\",\n                    \"endDate\": \"2025-12-24\",\n                    \"endTime\": \"12:00:00\",\n                    \"services\": []\n                },\n                {\n                    \"id\": \"868f1549-494e-444b-9789-b3642a2933d9\",\n                    \"clientCode\": \"NEET\",\n                    \"examCode\": \"NEET1\",\n                    \"name\": \"Exam Day Shift 2\",\n                    \"type\": \"ExamDay\",\n                    \"startDate\": \"2025-12-19\",\n                    \"startTime\": \"14:00:00\",\n                    \"endDate\": \"2025-12-19\",\n                    \"endTime\": \"17:00:00\",\n                    \"services\": [\n                        {\n                            \"name\": \"frisking\",\n                            \"templateName\": \"frisking_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/frisking\"\n                        },\n                        {\n                            \"name\": \"biometric\",\n                            \"templateName\": \"biometric_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/biometric\"\n                        },\n                        {\n                            \"name\": \"cso\",\n                            \"templateName\": \"cso_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/cso\"\n                        }\n                    ]\n                },\n                {\n                    \"id\": \"96ff05e3-02be-4d80-847b-27a1e059b0bf\",\n                    \"clientCode\": \"NEET\",\n                    \"examCode\": \"NEET1\",\n                    \"name\": \"Shift 1766561373423\",\n                    \"type\": \"ExamDay\",\n                    \"startDate\": \"2025-12-24\",\n                    \"startTime\": \"09:00:00\",\n                    \"endDate\": \"2025-12-24\",\n                    \"endTime\": \"12:00:00\",\n                    \"services\": [\n                        {\n                            \"name\": \"frisking\",\n                            \"templateName\": \"frisking_checkpoints_latest.json\",\n                            \"trainingLink\": \"\"\n                        }\n                    ]\n                },\n                {\n                    \"id\": \"9ce0502f-1a58-4ed0-a572-c9d24501ddc4\",\n                    \"clientCode\": \"NEET\",\n                    \"examCode\": \"NEET1\",\n                    \"name\": \"Evening Shift\",\n                    \"type\": \"ExamDay\",\n                    \"startDate\": \"2025-12-19\",\n                    \"startTime\": \"15:00:00\",\n                    \"endDate\": \"2025-12-19\",\n                    \"endTime\": \"17:00:00\",\n                    \"services\": [\n                        {\n                            \"name\": \"biometric\",\n                            \"templateName\": \"biometric_checkpoints_latest.json\",\n                            \"trainingLink\": null\n                        }\n                    ]\n                },\n                {\n                    \"id\": \"f93f43bd-c7bf-41da-b68b-27a3d1bb8723\",\n                    \"clientCode\": \"NEET\",\n                    \"examCode\": \"NEET1\",\n                    \"name\": \"Exam Day Shift 1\",\n                    \"type\": \"ExamDay\",\n                    \"startDate\": \"2025-12-18\",\n                    \"startTime\": \"09:00:00\",\n                    \"endDate\": \"2025-12-18\",\n                    \"endTime\": \"12:00:00\",\n                    \"services\": [\n                        {\n                            \"name\": \"frisking\",\n                            \"templateName\": \"frisking_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/frisking\"\n                        },\n                        {\n                            \"name\": \"biometric\",\n                            \"templateName\": \"biometric_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/biometric\"\n                        },\n                        {\n                            \"name\": \"cso\",\n                            \"templateName\": \"cso_checkpoints_latest.json\",\n                            \"trainingLink\": \"https://example.com/training/cso\"\n                        }\n                    ]\n                }\n            ]\n        },\n        \"center\": {\n            \"id\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n            \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n            \"clientCode\": \"NEET\",\n            \"code\": \"CENTER060\",\n            \"name\": \"New Delhi Examination Center 60\",\n            \"address\": \"Plot 60, Sector 1, Main Road\",\n            \"city\": \"New Delhi\",\n            \"state\": \"Delhi\",\n            \"pinCode\": \"110060\",\n            \"zone\": \"North\",\n            \"description\": \"Exam center equipped with CCTV, biometric and frisking facilities\",\n            \"lat\": \"28.619900\",\n            \"lng\": \"77.215000\",\n            \"spoc1Name\": \"Ravi Kumar 60\",\n            \"spoc1Contact\": \"900000060\",\n            \"spoc2Name\": \"Anita Sharma 60\",\n            \"spoc2Contact\": \"900000060\"\n        },\n        \"service\": \"frisking\"\n    },\n    \"notify\": {\n        \"message\": \"Successfully authenticated\",\n        \"type\": \"success\",\n        \"timeout\": 2000,\n        \"tag\": \"notify\"\n    }\n}"
+						},
+						{
+							"name": "Failed Operator Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"center060_frisking\",\n    \"password\": \"Braj1234\",\n    \"examCode\": \"neet11\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/op-login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"op-login"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 04:29:34 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"FAILED\",\n    \"code\": \"401\",\n    \"message\": \"Bad credentials\",\n    \"notify\": {\n        \"message\": \"Username or password is incorrect\",\n        \"type\": \"error\",\n        \"timeout\": 8000,\n        \"tag\": \"notify\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Login and authentication endpoints for the operator"
+		},
+		{
+			"name": "2. Mobile Verification",
+			"item": [
+				{
+					"name": "Initiate Mobile Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "*/*"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contact\": \"9876543210\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/mobile-verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"mobile-verifications"
+							]
+						},
+						"description": "Creates a new mobile verification request and sends an OTP to the given 10-digit mobile number. The contact must be a 10-digit Indian mobile number without the +91 country code."
+					},
+					"response": [
+						{
+							"name": "OTP Sent Successfully",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"contact\": \"9876543210\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/mobile-verifications",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"mobile-verifications"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"data\": {\n        \"id\": \"a3f9c8b0-1d23-4e56-9f78-1234567890ab\",\n        \"status\": \"PENDING\"\n    }\n}"
+						},
+						{
+							"name": "Success Initiate Mobile Verification",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"contact\": \"8287476378\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/mobile-verifications",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"mobile-verifications"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 04:32:26 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"code\": \"2001\",\n    \"data\": {\n        \"id\": \"dd0ada5f-83a2-4d21-b7a3-d855b28358ed\",\n        \"contact\": \"8287476378\",\n        \"status\": \"OTP_SENT\",\n        \"attemptedAt\": \"2025-12-26T04:32:26.246Z\",\n        \"expiresAt\": \"2025-12-26T04:34:26.246Z\",\n        \"verifiedAt\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "*/*"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/mobile-verifications/:id/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"mobile-verifications",
+								":id",
+								"verify"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "a3f9c8b0-1d23-4e56-9f78-1234567890ab",
+									"description": "Verification ID received from the initiate request"
+								}
+							]
+						},
+						"description": "Verifies the OTP for the given verification ID and marks it as VERIFIED on success. The OTP must match the one sent to the mobile number."
+					},
+					"response": [
+						{
+							"name": "OTP Verified Successfully",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"otp\": \"123456\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/mobile-verifications/:id/verify",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"mobile-verifications",
+										":id",
+										"verify"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "a3f9c8b0-1d23-4e56-9f78-1234567890ab"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"data\": {\n        \"id\": \"a3f9c8b0-1d23-4e56-9f78-1234567890ab\",\n        \"status\": \"VERIFIED\"\n    }\n}"
+						},
+						{
+							"name": "Success Verify OTP",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"otp\": \"4296\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/mobile-verifications/:id/verify",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"mobile-verifications",
+										":id",
+										"verify"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "dd0ada5f-83a2-4d21-b7a3-d855b28358ed",
+											"description": "Verification ID received from the initiate request"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 04:33:29 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"code\": \"2000\",\n    \"data\": {\n        \"id\": \"dd0ada5f-83a2-4d21-b7a3-d855b28358ed\",\n        \"contact\": \"8287476378\",\n        \"status\": \"VERIFIED\",\n        \"attemptedAt\": \"2025-12-26T04:32:26.246Z\",\n        \"expiresAt\": \"2025-12-26T04:34:26.246Z\",\n        \"verifiedAt\": \"2025-12-26T04:33:29.045Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Resend OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/mobile-verifications/:id/resend",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"mobile-verifications",
+								":id",
+								"resend"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "a3f9c8b0-1d23-4e56-9f78-1234567890ab",
+									"description": "Verification ID received from the initiate request"
+								}
+							]
+						},
+						"description": "Re-sends an OTP for an existing verification ID. No mobile number is needed again as it uses the one from the original request."
+					},
+					"response": [
+						{
+							"name": "OTP Resent Successfully",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/mobile-verifications/:id/resend",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"mobile-verifications",
+										":id",
+										"resend"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "a3f9c8b0-1d23-4e56-9f78-1234567890ab"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"message\": \"OTP re-sent successfully\"\n}"
+						},
+						{
+							"name": "Already verified Resend OTP",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/mobile-verifications/:id/resend",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"mobile-verifications",
+										":id",
+										"resend"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "dd0ada5f-83a2-4d21-b7a3-d855b28358ed",
+											"description": "Verification ID received from the initiate request"
+										}
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 04:34:03 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"FAILED\",\n    \"code\": \"409\",\n    \"data\": \"Mobile number already verified\",\n    \"notify\": {\n        \"message\": \"Mobile number already verified\",\n        \"type\": \"error\",\n        \"timeout\": 3000,\n        \"tag\": \"notify\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "OTP-based mobile number verification endpoints"
+		},
+		{
+			"name": "3. Profile Management",
+			"item": [
+				{
+					"name": "Create Operator Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "*/*"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"description": "Selfie image file (mandatory)",
+									"type": "file",
+									"src": "ajROtn8-a/BrajKishore_PassportSizePhoto.jpg"
+								},
+								{
+									"key": "payload",
+									"value": "{\n  \"id\": \"a99d6214-d37d-43a7-a566-b4870d71fcb3\",\n  \"name\": \"Rajesh Kumar\",\n  \"contact\": \"9876543210\",\n  \"age\": 28,\n  \"aadhaar\": \"123412341234\",\n  \"livenessStatus\": \"PASSED\",\n  \"livenessScore\": 97.2,\n  \"livenessAttemptedAt\": \"2025-12-06T06:07:40.328Z\",\n  \"location\": \"HCL Chack Gajaria Campus\",\n  \"mobileVerificationId\": \"a3f9c8b0-1d23-4e56-9f78-1234567890ab\",\n  \"creationTime\": \"2025-11-23T03:32:57Z\"\n}",
+									"description": "Profile details as JSON string",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/profiles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"profiles"
+							]
+						},
+						"description": "Creates a new operator profile with selfie image and profile details. Required every login. The request must be sent as multipart/form-data with:\n- file: Mandatory selfie image with geo-tag and timestamp\n- payload: JSON string containing profile details including name, contact, Aadhaar, liveness check results, and mobile verification ID\n\nProfile is created per exam + shift + user."
+					},
+					"response": [
+						{
+							"name": "Profile Created Successfully",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "payload",
+											"value": "{\n    \"name\": \"Rajesh Kumar\",\n    \"contact\": \"9876543210\",\n    \"age\": 28,\n    \"aadhaar\": \"123412341234\",\n    \"livenessStatus\": \"PASSED\",\n    \"livenessScore\": 97.2,\n    \"livenessAttemptedAt\": \"2025-12-06T06:07:40.328Z\",\n    \"location\": \"HCL Chack Gajaria Campus\",\n    \"mobileVerificationId\": \"a3f9c8b0-1d23-4e56-9f78-1234567890ab\"\n}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/profiles",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"profiles"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"data\": {\n        \"id\": \"profile-id-123\",\n        \"name\": \"Rajesh Kumar\",\n        \"contact\": \"9876543210\",\n        \"createdAt\": \"2025-12-06T06:10:00Z\"\n    }\n}"
+						},
+						{
+							"name": "Success Create Operator Profile",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"description": "Selfie image file (mandatory)",
+											"type": "file",
+											"src": "ajROtn8-a/BrajKishore_PassportSizePhoto.jpg"
+										},
+										{
+											"key": "payload",
+											"value": "{\n  \"id\": \"a99d6214-d37d-43a7-a566-b4870d71fcb3\",\n  \"name\": \"Rajesh Kumar\",\n  \"contact\": \"9876543210\",\n  \"age\": 28,\n  \"aadhaar\": \"123412341234\",\n  \"livenessStatus\": \"PASSED\",\n  \"livenessScore\": 97.2,\n  \"livenessAttemptedAt\": \"2025-12-06T06:07:40.328Z\",\n  \"location\": \"HCL Chack Gajaria Campus\",\n  \"mobileVerificationId\": \"a3f9c8b0-1d23-4e56-9f78-1234567890ab\",\n  \"creationTime\": \"2025-11-23T03:32:57Z\"\n}",
+											"description": "Profile details as JSON string",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/profiles",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"profiles"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 07:29:16 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"code\": \"2001\",\n    \"data\": {\n        \"id\": \"a99d6214-d37d-43a7-a566-b4870d71fcb3\",\n        \"clientCode\": \"NEET\",\n        \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n        \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n        \"service\": \"frisking\",\n        \"name\": \"Rajesh Kumar\",\n        \"contact\": \"9876543210\",\n        \"age\": 28,\n        \"aadhaar\": \"XXXX-XXXX-1234\",\n        \"otpVerified\": false,\n        \"verifiedAt\": null,\n        \"livenessStatus\": \"PASSED\",\n        \"livenessScore\": 97.2,\n        \"livenessAttemptedAt\": \"2025-12-06T06:07:40.328\",\n        \"location\": \"HCL Chack Gajaria Campus\",\n        \"lat\": 0,\n        \"lng\": 0,\n        \"imei\": \"****\",\n        \"model\": null,\n        \"brand\": null,\n        \"appVersion\": null,\n        \"ip\": \"122.171.18.226\",\n        \"userAgent\": \"PostmanRuntime/7.51.0\",\n        \"file\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/0fbbc69e-f9fd-43b3-b5dc-e912ad623adc/frisking/profiles/f98128a34e355449eac7f353387d0c2f5-BrajKishore_PassportSizePhoto.jpg\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Operator profile creation and management endpoints"
+		},
+		{
+			"name": "4. Exam & Data Download",
+			"item": [
+				{
+					"name": "Get Exam Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/exams/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exams",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "exam-id-123",
+									"description": "Exam ID"
+								}
+							]
+						},
+						"description": "Fetches exam details for offline use. Should be called after profile creation to download all exam data including shifts, centers, and related information."
+					},
+					"response": [
+						{
+							"name": "Exam Details Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/exams/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"exams",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "exam-id-123"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"data\": {\n        \"id\": \"exam-id-123\",\n        \"code\": \"EXAM2024\",\n        \"name\": \"Sample Examination 2024\",\n        \"shifts\": [],\n        \"centers\": []\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Operator Tasks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/operator-tasks?shiftId=shift-id-123",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"operator-tasks"
+							],
+							"query": [
+								{
+									"key": "shiftId",
+									"value": "shift-id-123",
+									"description": "Optional shift ID to filter tasks for a specific shift"
+								}
+							]
+						},
+						"description": "Returns all tasks assigned to the logged-in operator. If shiftId is provided, tasks are filtered for that shift; otherwise, tasks across all shifts are returned. Used for downloading task data for offline work."
+					},
+					"response": [
+						{
+							"name": "Operator Tasks Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/tasks/operator-tasks?shiftId=shift-id-123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										"operator-tasks"
+									],
+									"query": [
+										{
+											"key": "shiftId",
+											"value": "shift-id-123"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"data\": {\n        \"shift\": {\n            \"id\": \"shift-id-123\",\n            \"name\": \"Morning Shift\"\n        },\n        \"tasks\": [\n            {\n                \"id\": \"task-id-1\",\n                \"taskId\": \"TASK001\",\n                \"name\": \"Entry Gate Photo\",\n                \"instructions\": \"Capture photo of entry gate\",\n                \"status\": \"PENDING\"\n            }\n        ]\n    }\n}"
+						},
+						{
+							"name": "Success Get Operator Tasks",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/tasks/operator-tasks?shiftId=3becd6a0-f2ae-4529-926a-e6128b3c0ecf",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										"operator-tasks"
+									],
+									"query": [
+										{
+											"key": "shiftId",
+											"value": "3becd6a0-f2ae-4529-926a-e6128b3c0ecf",
+											"description": "Optional shift ID to filter tasks for a specific shift"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 05:19:25 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"code\": \"2000\",\n    \"data\": [\n        {\n            \"shift\": {\n                \"id\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                \"clientCode\": \"NEET\",\n                \"examCode\": \"NEET1\",\n                \"name\": \"Mock Day Shift\",\n                \"type\": \"ExamDay\",\n                \"startDate\": \"2025-12-17\",\n                \"startTime\": \"09:00:00\",\n                \"endDate\": \"2025-12-17\",\n                \"endTime\": \"13:00:00\",\n                \"services\": [\n                    {\n                        \"name\": \"frisking\",\n                        \"templateName\": \"frisking_checkpoints_latest.json\",\n                        \"trainingLink\": \"https://example.com/training/frisking\"\n                    }\n                ]\n            },\n            \"tasks\": [\n                {\n                    \"id\": \"1b5468f8-1329-445d-9aff-33d102209c65\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_M_T2\",\n                    \"taskLabel\": \"Material Image\",\n                    \"taskDesc\": \"Upload image showing frisking-related materials available before starting mock day duty\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [\n                        {\n                            \"createdAt\": \"2025-12-22T20:48:51Z\",\n                            \"updatedAt\": \"2025-12-22T20:48:51Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"5ec48be8-171f-49ee-8976-f64c7a9efd34\",\n                            \"taskId\": \"1b5468f8-1329-445d-9aff-33d102209c65\",\n                            \"filename\": \"Gemini_Generated_Image_tshjxftshjxftshj.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/1b5468f8-1329-445d-9aff-33d102209c65/fd65375e59bf54839b9b23dd2b6c914f3-Gemini_Generated_Image_tshjxftshjxftshj.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:48:51.716Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:48:51Z\",\n                            \"updatedAt\": \"2025-12-22T20:48:51Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"b0f7157f-bc33-4211-b27b-2af178b0ce33\",\n                            \"taskId\": \"1b5468f8-1329-445d-9aff-33d102209c65\",\n                            \"filename\": \"ChatGPT Image Sep 16, 2025, 04_14_17 PM.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/1b5468f8-1329-445d-9aff-33d102209c65/fa89b4884c8ab426595a9473720325ed0-ChatGPT_Image_Sep_16__2025__04_14_17_PM.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:48:51.716Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:48:51Z\",\n                            \"updatedAt\": \"2025-12-22T20:48:51Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"e290646b-1966-478f-80c7-f791c323d28f\",\n                            \"taskId\": \"1b5468f8-1329-445d-9aff-33d102209c65\",\n                            \"filename\": \"Gemini_Generated_Image_pdvty2pdvty2pdvt.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/1b5468f8-1329-445d-9aff-33d102209c65/f8f560eef55db4072abb5b623c2232691-Gemini_Generated_Image_pdvty2pdvty2pdvt.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:48:51.716Z\",\n                            \"profile\": null\n                        }\n                    ],\n                    \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                    \"syncedAt\": \"2025-12-22T20:48:51.716Z\",\n                    \"taskStatus\": \"COMPLETED\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"210b360d-0c4f-4669-b91e-29db91f32cc3\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_M_T1\",\n                    \"taskLabel\": \"Attendance Selfie\",\n                    \"taskDesc\": \"Geo-tagged selfie to record operator attendance for frisking duty on mock day\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [\n                        {\n                            \"createdAt\": \"2025-12-22T20:49:18Z\",\n                            \"updatedAt\": \"2025-12-22T20:49:18Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"4e54a9da-650a-4cef-8d68-f7288b13877f\",\n                            \"taskId\": \"210b360d-0c4f-4669-b91e-29db91f32cc3\",\n                            \"filename\": \"ChatGPT Image Sep 16, 2025, 04_14_17 PM.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/210b360d-0c4f-4669-b91e-29db91f32cc3/fefa2e415527d4b09823b7f65246e66c3-ChatGPT_Image_Sep_16__2025__04_14_17_PM.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:49:18.836Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:49:18Z\",\n                            \"updatedAt\": \"2025-12-22T20:49:18Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"b181c65c-6404-479d-838f-d82d2ef445fa\",\n                            \"taskId\": \"210b360d-0c4f-4669-b91e-29db91f32cc3\",\n                            \"filename\": \"Gemini_Generated_Image_tshjxftshjxftshj.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/210b360d-0c4f-4669-b91e-29db91f32cc3/f2bcbad9fd8264aa3bb7baecead9c6016-Gemini_Generated_Image_tshjxftshjxftshj.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:49:18.836Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:49:18Z\",\n                            \"updatedAt\": \"2025-12-22T20:49:18Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"ee93c66d-ed43-47fa-9932-64db117392ff\",\n                            \"taskId\": \"210b360d-0c4f-4669-b91e-29db91f32cc3\",\n                            \"filename\": \"Gemini_Generated_Image_pdvty2pdvty2pdvt.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/210b360d-0c4f-4669-b91e-29db91f32cc3/f8996647f040349038a75be40353b9d24-Gemini_Generated_Image_pdvty2pdvty2pdvt.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:49:18.836Z\",\n                            \"profile\": null\n                        }\n                    ],\n                    \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                    \"syncedAt\": \"2025-12-22T20:49:18.836Z\",\n                    \"taskStatus\": \"COMPLETED\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"21d7b3e0-48c5-49d9-93f4-df0157e2af5f\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T2\",\n                    \"taskLabel\": \"ID Card\",\n                    \"taskDesc\": \"Upload a clear image of the operator’s official ID card for identity verification\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:19Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:19Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"4912cca4-ef7b-4fc9-b236-9b3bd3275853\",\n                            \"taskId\": \"21d7b3e0-48c5-49d9-93f4-df0157e2af5f\",\n                            \"filename\": \"ChatGPT Image Sep 17, 2025, 05_33_49 PM.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/21d7b3e0-48c5-49d9-93f4-df0157e2af5f/faf98e3646c5942e1bc6d4efda126cb12-ChatGPT_Image_Sep_17__2025__05_33_49_PM.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida, Gautam Buddh Nagar District, Uttar Pradesh, India – PIN 201301\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:19.859Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:19Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:19Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"4aaf471e-d45a-459a-ac8f-2865ab4e1d3f\",\n                            \"taskId\": \"21d7b3e0-48c5-49d9-93f4-df0157e2af5f\",\n                            \"filename\": \"Gemini_Generated_Image_ku0z3pku0z3pku0z.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/21d7b3e0-48c5-49d9-93f4-df0157e2af5f/fbe318bd650364314b560cfad5a0199f6-Gemini_Generated_Image_ku0z3pku0z3pku0z.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:19.859Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:19Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:19Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"bf493715-9f5d-4792-8a13-d07faeeded3a\",\n                            \"taskId\": \"21d7b3e0-48c5-49d9-93f4-df0157e2af5f\",\n                            \"filename\": \"hero_image.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/21d7b3e0-48c5-49d9-93f4-df0157e2af5f/f3d332e95284b4633a664ad78b57880de-hero_image.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:19.859Z\",\n                            \"profile\": null\n                        }\n                    ],\n                    \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                    \"syncedAt\": \"2025-12-22T20:50:19.859Z\",\n                    \"taskStatus\": \"COMPLETED\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"2782477c-8725-45bf-95be-09f7d9f30852\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T5\",\n                    \"taskLabel\": \"CSR Report\",\n                    \"taskDesc\": \"Upload a clear image of the final CSR report prepared after frisking operations\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:54Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:54Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"500e2e0d-e786-497e-bfba-3592c6407c26\",\n                            \"taskId\": \"2782477c-8725-45bf-95be-09f7d9f30852\",\n                            \"filename\": \"hero_image.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/2782477c-8725-45bf-95be-09f7d9f30852/fa8f540b34458438ab25765e4ddf0e2b9-hero_image.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"OUTSIDE\",\n                            \"distFromCenter\": 2000,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:54.861Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:54Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:54Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"57387b3f-05c3-4c73-bfef-9c19436cfb36\",\n                            \"taskId\": \"2782477c-8725-45bf-95be-09f7d9f30852\",\n                            \"filename\": \"ChatGPT Image Sep 17, 2025, 05_33_49 PM.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/2782477c-8725-45bf-95be-09f7d9f30852/f4521b19d0d1248849a9512be2f658033-ChatGPT_Image_Sep_17__2025__05_33_49_PM.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"OUTSIDE\",\n                            \"distFromCenter\": 2000,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:54.861Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:54Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:54Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"79c407e4-140a-4f05-9edd-b30cd6626690\",\n                            \"taskId\": \"2782477c-8725-45bf-95be-09f7d9f30852\",\n                            \"filename\": \"Gemini_Generated_Image_ku0z3pku0z3pku0z.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/2782477c-8725-45bf-95be-09f7d9f30852/fff08e87c1a2f4ca89349fe55a9d13e48-Gemini_Generated_Image_ku0z3pku0z3pku0z.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"OUTSIDE\",\n                            \"distFromCenter\": 2000,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:54.861Z\",\n                            \"profile\": null\n                        }\n                    ],\n                    \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                    \"syncedAt\": \"2025-12-22T20:50:54.861Z\",\n                    \"taskStatus\": \"COMPLETED\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"439d5043-4b4b-4215-a8bf-4d72c040a34f\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T8\",\n                    \"taskLabel\": \"Exit Selfie\",\n                    \"taskDesc\": \"Geo-tagged selfie to confirm completion of frisking duty at the end of exam day\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"529d19b6-3f5e-4a9b-8ca4-c2bdf1b6d60e\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T3\",\n                    \"taskLabel\": \"Proper Selfie\",\n                    \"taskDesc\": \"Geo-tagged selfie captured during frisking operations to confirm proper duty execution\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"73a4043b-b147-4d99-9808-da6a09acbac3\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_M_T4\",\n                    \"taskLabel\": \"Frisking Location\",\n                    \"taskDesc\": \"Upload a geo-tagged image showing the designated frisking location at the exam center\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"a0103950-164e-4cb1-94ed-15ed2f5ceae1\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_M_T3\",\n                    \"taskLabel\": \"CSR Report\",\n                    \"taskDesc\": \"Upload a clear image of the CSR report prepared during mock day frisking activities\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"a18b7b05-c379-49d4-b950-c5e691ea8425\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T1\",\n                    \"taskLabel\": \"Attendance Selfie\",\n                    \"taskDesc\": \"Geo-tagged selfie to confirm operator presence for frisking duty on exam day\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"c8cb30ae-ea67-49c5-a23e-26d256c46c72\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T6\",\n                    \"taskLabel\": \"Material Handover\",\n                    \"taskDesc\": \"Upload image confirming proper handover of frisking-related materials after duty\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"da709de1-19ad-4c92-bf3f-b757df0338cc\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T7\",\n                    \"taskLabel\": \"Box Image\",\n                    \"taskDesc\": \"Upload image of the sealed material box to confirm security and completeness\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"dd4fac49-ce5f-4f0e-88cc-61f7a722bd76\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T4\",\n                    \"taskLabel\": \"Enclosure\",\n                    \"taskDesc\": \"Upload image showing the frisking enclosure setup at the exam center\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                }\n            ]\n        }\n    ]\n}"
+						},
+						{
+							"name": "Get Operator Tasks",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "*/*"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/tasks/operator-tasks",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										"operator-tasks"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 05:21:14 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"code\": \"2000\",\n    \"data\": [\n        {\n            \"shift\": {\n                \"id\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                \"clientCode\": \"NEET\",\n                \"examCode\": \"NEET1\",\n                \"name\": \"Mock Day Shift\",\n                \"type\": \"ExamDay\",\n                \"startDate\": \"2025-12-17\",\n                \"startTime\": \"09:00:00\",\n                \"endDate\": \"2025-12-17\",\n                \"endTime\": \"13:00:00\",\n                \"services\": [\n                    {\n                        \"name\": \"frisking\",\n                        \"templateName\": \"frisking_checkpoints_latest.json\",\n                        \"trainingLink\": \"https://example.com/training/frisking\"\n                    }\n                ]\n            },\n            \"tasks\": [\n                {\n                    \"id\": \"1b5468f8-1329-445d-9aff-33d102209c65\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_M_T2\",\n                    \"taskLabel\": \"Material Image\",\n                    \"taskDesc\": \"Upload image showing frisking-related materials available before starting mock day duty\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [\n                        {\n                            \"createdAt\": \"2025-12-22T20:48:51Z\",\n                            \"updatedAt\": \"2025-12-22T20:48:51Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"5ec48be8-171f-49ee-8976-f64c7a9efd34\",\n                            \"taskId\": \"1b5468f8-1329-445d-9aff-33d102209c65\",\n                            \"filename\": \"Gemini_Generated_Image_tshjxftshjxftshj.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/1b5468f8-1329-445d-9aff-33d102209c65/fd65375e59bf54839b9b23dd2b6c914f3-Gemini_Generated_Image_tshjxftshjxftshj.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:48:51.716Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:48:51Z\",\n                            \"updatedAt\": \"2025-12-22T20:48:51Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"b0f7157f-bc33-4211-b27b-2af178b0ce33\",\n                            \"taskId\": \"1b5468f8-1329-445d-9aff-33d102209c65\",\n                            \"filename\": \"ChatGPT Image Sep 16, 2025, 04_14_17 PM.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/1b5468f8-1329-445d-9aff-33d102209c65/fa89b4884c8ab426595a9473720325ed0-ChatGPT_Image_Sep_16__2025__04_14_17_PM.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:48:51.716Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:48:51Z\",\n                            \"updatedAt\": \"2025-12-22T20:48:51Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"e290646b-1966-478f-80c7-f791c323d28f\",\n                            \"taskId\": \"1b5468f8-1329-445d-9aff-33d102209c65\",\n                            \"filename\": \"Gemini_Generated_Image_pdvty2pdvty2pdvt.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/1b5468f8-1329-445d-9aff-33d102209c65/f8f560eef55db4072abb5b623c2232691-Gemini_Generated_Image_pdvty2pdvty2pdvt.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:48:51.716Z\",\n                            \"profile\": null\n                        }\n                    ],\n                    \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                    \"syncedAt\": \"2025-12-22T20:48:51.716Z\",\n                    \"taskStatus\": \"COMPLETED\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"210b360d-0c4f-4669-b91e-29db91f32cc3\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_M_T1\",\n                    \"taskLabel\": \"Attendance Selfie\",\n                    \"taskDesc\": \"Geo-tagged selfie to record operator attendance for frisking duty on mock day\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [\n                        {\n                            \"createdAt\": \"2025-12-22T20:49:18Z\",\n                            \"updatedAt\": \"2025-12-22T20:49:18Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"4e54a9da-650a-4cef-8d68-f7288b13877f\",\n                            \"taskId\": \"210b360d-0c4f-4669-b91e-29db91f32cc3\",\n                            \"filename\": \"ChatGPT Image Sep 16, 2025, 04_14_17 PM.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/210b360d-0c4f-4669-b91e-29db91f32cc3/fefa2e415527d4b09823b7f65246e66c3-ChatGPT_Image_Sep_16__2025__04_14_17_PM.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:49:18.836Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:49:18Z\",\n                            \"updatedAt\": \"2025-12-22T20:49:18Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"b181c65c-6404-479d-838f-d82d2ef445fa\",\n                            \"taskId\": \"210b360d-0c4f-4669-b91e-29db91f32cc3\",\n                            \"filename\": \"Gemini_Generated_Image_tshjxftshjxftshj.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/210b360d-0c4f-4669-b91e-29db91f32cc3/f2bcbad9fd8264aa3bb7baecead9c6016-Gemini_Generated_Image_tshjxftshjxftshj.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:49:18.836Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:49:18Z\",\n                            \"updatedAt\": \"2025-12-22T20:49:18Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"ee93c66d-ed43-47fa-9932-64db117392ff\",\n                            \"taskId\": \"210b360d-0c4f-4669-b91e-29db91f32cc3\",\n                            \"filename\": \"Gemini_Generated_Image_pdvty2pdvty2pdvt.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/210b360d-0c4f-4669-b91e-29db91f32cc3/f8996647f040349038a75be40353b9d24-Gemini_Generated_Image_pdvty2pdvty2pdvt.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:49:18.836Z\",\n                            \"profile\": null\n                        }\n                    ],\n                    \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                    \"syncedAt\": \"2025-12-22T20:49:18.836Z\",\n                    \"taskStatus\": \"COMPLETED\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"21d7b3e0-48c5-49d9-93f4-df0157e2af5f\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T2\",\n                    \"taskLabel\": \"ID Card\",\n                    \"taskDesc\": \"Upload a clear image of the operator’s official ID card for identity verification\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:19Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:19Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"4912cca4-ef7b-4fc9-b236-9b3bd3275853\",\n                            \"taskId\": \"21d7b3e0-48c5-49d9-93f4-df0157e2af5f\",\n                            \"filename\": \"ChatGPT Image Sep 17, 2025, 05_33_49 PM.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/21d7b3e0-48c5-49d9-93f4-df0157e2af5f/faf98e3646c5942e1bc6d4efda126cb12-ChatGPT_Image_Sep_17__2025__05_33_49_PM.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida, Gautam Buddh Nagar District, Uttar Pradesh, India – PIN 201301\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:19.859Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:19Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:19Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"4aaf471e-d45a-459a-ac8f-2865ab4e1d3f\",\n                            \"taskId\": \"21d7b3e0-48c5-49d9-93f4-df0157e2af5f\",\n                            \"filename\": \"Gemini_Generated_Image_ku0z3pku0z3pku0z.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/21d7b3e0-48c5-49d9-93f4-df0157e2af5f/fbe318bd650364314b560cfad5a0199f6-Gemini_Generated_Image_ku0z3pku0z3pku0z.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:19.859Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:19Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:19Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"bf493715-9f5d-4792-8a13-d07faeeded3a\",\n                            \"taskId\": \"21d7b3e0-48c5-49d9-93f4-df0157e2af5f\",\n                            \"filename\": \"hero_image.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/21d7b3e0-48c5-49d9-93f4-df0157e2af5f/f3d332e95284b4633a664ad78b57880de-hero_image.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"INSIDE\",\n                            \"distFromCenter\": 120,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:19.859Z\",\n                            \"profile\": null\n                        }\n                    ],\n                    \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                    \"syncedAt\": \"2025-12-22T20:50:19.859Z\",\n                    \"taskStatus\": \"COMPLETED\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"2782477c-8725-45bf-95be-09f7d9f30852\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T5\",\n                    \"taskLabel\": \"CSR Report\",\n                    \"taskDesc\": \"Upload a clear image of the final CSR report prepared after frisking operations\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:54Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:54Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"500e2e0d-e786-497e-bfba-3592c6407c26\",\n                            \"taskId\": \"2782477c-8725-45bf-95be-09f7d9f30852\",\n                            \"filename\": \"hero_image.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/2782477c-8725-45bf-95be-09f7d9f30852/fa8f540b34458438ab25765e4ddf0e2b9-hero_image.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"OUTSIDE\",\n                            \"distFromCenter\": 2000,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:54.861Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:54Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:54Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"57387b3f-05c3-4c73-bfef-9c19436cfb36\",\n                            \"taskId\": \"2782477c-8725-45bf-95be-09f7d9f30852\",\n                            \"filename\": \"ChatGPT Image Sep 17, 2025, 05_33_49 PM.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/2782477c-8725-45bf-95be-09f7d9f30852/f4521b19d0d1248849a9512be2f658033-ChatGPT_Image_Sep_17__2025__05_33_49_PM.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"OUTSIDE\",\n                            \"distFromCenter\": 2000,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:54.861Z\",\n                            \"profile\": null\n                        },\n                        {\n                            \"createdAt\": \"2025-12-22T20:50:54Z\",\n                            \"updatedAt\": \"2025-12-22T20:50:54Z\",\n                            \"createdBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"lastModifiedBy\": \"7d5806c9-cb79-4b8c-b87e-23ebaf0ee361\",\n                            \"actorId\": null,\n                            \"id\": \"79c407e4-140a-4f05-9edd-b30cd6626690\",\n                            \"taskId\": \"2782477c-8725-45bf-95be-09f7d9f30852\",\n                            \"filename\": \"Gemini_Generated_Image_ku0z3pku0z3pku0z.png\",\n                            \"url\": \"https://exmdv.s3.ap-south-1.amazonaws.com/neet/f63fdcca-310e-46d0-b023-223618b2d02f/3becd6a0-f2ae-4529-926a-e6128b3c0ecf/frisking/tasks/2782477c-8725-45bf-95be-09f7d9f30852/fff08e87c1a2f4ca89349fe55a9d13e48-Gemini_Generated_Image_ku0z3pku0z3pku0z.png\",\n                            \"message\": \"Its a frisking selfie photo\",\n                            \"lat\": 28.6139,\n                            \"lng\": 77.209,\n                            \"imei\": \"356789123456789\",\n                            \"model\": \"Samsung-S23\",\n                            \"brand\": \"Samsung\",\n                            \"appVersion\": \"1.0.0\",\n                            \"ip\": \"127.0.0.1\",\n                            \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\",\n                            \"profileId\": \"828b7ff7-6e72-4784-86b0-e693a994da5f\",\n                            \"fenceStatus\": \"OUTSIDE\",\n                            \"distFromCenter\": 2000,\n                            \"location\": \"ABC Examination Center, Sector 12, Noida\",\n                            \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                            \"syncedAt\": \"2025-12-22T20:50:54.861Z\",\n                            \"profile\": null\n                        }\n                    ],\n                    \"submittedAt\": \"2025-12-22T10:30:00Z\",\n                    \"syncedAt\": \"2025-12-22T20:50:54.861Z\",\n                    \"taskStatus\": \"COMPLETED\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"439d5043-4b4b-4215-a8bf-4d72c040a34f\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T8\",\n                    \"taskLabel\": \"Exit Selfie\",\n                    \"taskDesc\": \"Geo-tagged selfie to confirm completion of frisking duty at the end of exam day\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"529d19b6-3f5e-4a9b-8ca4-c2bdf1b6d60e\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T3\",\n                    \"taskLabel\": \"Proper Selfie\",\n                    \"taskDesc\": \"Geo-tagged selfie captured during frisking operations to confirm proper duty execution\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"73a4043b-b147-4d99-9808-da6a09acbac3\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_M_T4\",\n                    \"taskLabel\": \"Frisking Location\",\n                    \"taskDesc\": \"Upload a geo-tagged image showing the designated frisking location at the exam center\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"a0103950-164e-4cb1-94ed-15ed2f5ceae1\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_M_T3\",\n                    \"taskLabel\": \"CSR Report\",\n                    \"taskDesc\": \"Upload a clear image of the CSR report prepared during mock day frisking activities\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"a18b7b05-c379-49d4-b950-c5e691ea8425\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T1\",\n                    \"taskLabel\": \"Attendance Selfie\",\n                    \"taskDesc\": \"Geo-tagged selfie to confirm operator presence for frisking duty on exam day\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"c8cb30ae-ea67-49c5-a23e-26d256c46c72\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T6\",\n                    \"taskLabel\": \"Material Handover\",\n                    \"taskDesc\": \"Upload image confirming proper handover of frisking-related materials after duty\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"da709de1-19ad-4c92-bf3f-b757df0338cc\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T7\",\n                    \"taskLabel\": \"Box Image\",\n                    \"taskDesc\": \"Upload image of the sealed material box to confirm security and completeness\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                },\n                {\n                    \"id\": \"dd4fac49-ce5f-4f0e-88cc-61f7a722bd76\",\n                    \"clientCode\": \"NEET\",\n                    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n                    \"centerId\": \"0fbbc69e-f9fd-43b3-b5dc-e912ad623adc\",\n                    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\n                    \"service\": \"frisking\",\n                    \"seqNumber\": 1,\n                    \"required\": true,\n                    \"taskId\": \"FRISK_E_T4\",\n                    \"taskLabel\": \"Enclosure\",\n                    \"taskDesc\": \"Upload image showing the frisking enclosure setup at the exam center\",\n                    \"taskType\": \"IMAGE\",\n                    \"submissions\": [],\n                    \"submittedAt\": null,\n                    \"syncedAt\": null,\n                    \"taskStatus\": \"PENDING\",\n                    \"centerCode\": \"CENTER060\",\n                    \"centerName\": \"New Delhi Examination Center 60\"\n                }\n            ]\n        },\n        {\n            \"shift\": {\n                \"id\": \"7a2e053b-e174-44a9-9089-7bdac39cac2a\",\n                \"clientCode\": \"NEET\",\n                \"examCode\": \"NEET1\",\n                \"name\": \"Shift 1766561501317\",\n                \"type\": \"ExamDay\",\n                \"startDate\": \"2025-12-24\",\n                \"startTime\": \"09:00:00\",\n                \"endDate\": \"2025-12-24\",\n                \"endTime\": \"12:00:00\",\n                \"services\": []\n            },\n            \"tasks\": null\n        },\n        {\n            \"shift\": {\n                \"id\": \"868f1549-494e-444b-9789-b3642a2933d9\",\n                \"clientCode\": \"NEET\",\n                \"examCode\": \"NEET1\",\n                \"name\": \"Exam Day Shift 2\",\n                \"type\": \"ExamDay\",\n                \"startDate\": \"2025-12-19\",\n                \"startTime\": \"14:00:00\",\n                \"endDate\": \"2025-12-19\",\n                \"endTime\": \"17:00:00\",\n                \"services\": [\n                    {\n                        \"name\": \"frisking\",\n                        \"templateName\": \"frisking_checkpoints_latest.json\",\n                        \"trainingLink\": \"https://example.com/training/frisking\"\n                    }\n                ]\n            },\n            \"tasks\": null\n        },\n        {\n            \"shift\": {\n                \"id\": \"96ff05e3-02be-4d80-847b-27a1e059b0bf\",\n                \"clientCode\": \"NEET\",\n                \"examCode\": \"NEET1\",\n                \"name\": \"Shift 1766561373423\",\n                \"type\": \"ExamDay\",\n                \"startDate\": \"2025-12-24\",\n                \"startTime\": \"09:00:00\",\n                \"endDate\": \"2025-12-24\",\n                \"endTime\": \"12:00:00\",\n                \"services\": [\n                    {\n                        \"name\": \"frisking\",\n                        \"templateName\": \"frisking_checkpoints_latest.json\",\n                        \"trainingLink\": \"\"\n                    }\n                ]\n            },\n            \"tasks\": null\n        },\n        {\n            \"shift\": {\n                \"id\": \"9ce0502f-1a58-4ed0-a572-c9d24501ddc4\",\n                \"clientCode\": \"NEET\",\n                \"examCode\": \"NEET1\",\n                \"name\": \"Evening Shift\",\n                \"type\": \"ExamDay\",\n                \"startDate\": \"2025-12-19\",\n                \"startTime\": \"15:00:00\",\n                \"endDate\": \"2025-12-19\",\n                \"endTime\": \"17:00:00\",\n                \"services\": []\n            },\n            \"tasks\": null\n        },\n        {\n            \"shift\": {\n                \"id\": \"f93f43bd-c7bf-41da-b68b-27a3d1bb8723\",\n                \"clientCode\": \"NEET\",\n                \"examCode\": \"NEET1\",\n                \"name\": \"Exam Day Shift 1\",\n                \"type\": \"ExamDay\",\n                \"startDate\": \"2025-12-18\",\n                \"startTime\": \"09:00:00\",\n                \"endDate\": \"2025-12-18\",\n                \"endTime\": \"12:00:00\",\n                \"services\": [\n                    {\n                        \"name\": \"frisking\",\n                        \"templateName\": \"frisking_checkpoints_latest.json\",\n                        \"trainingLink\": \"https://example.com/training/frisking\"\n                    }\n                ]\n            },\n            \"tasks\": null\n        }\n    ]\n}"
+						}
+					]
+				}
+			],
+			"description": "Endpoints for downloading exam data and tasks for offline use"
+		},
+		{
+			"name": "5. Task Operations",
+			"item": [
+				{
+					"name": "Update Task (Submit Capture)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "*/*"
+							},
+							{
+								"key": "x-lat",
+								"value": "28.6139",
+								"description": "Latitude of capture location"
+							},
+							{
+								"key": "x-lng",
+								"value": "77.2090",
+								"description": "Longitude of capture location"
+							},
+							{
+								"key": "x-imei",
+								"value": "356789123456789",
+								"description": "Device IMEI"
+							},
+							{
+								"key": "x-mod",
+								"value": "Samsung-S23",
+								"description": "Device model"
+							},
+							{
+								"key": "x-brd",
+								"value": "Samsung",
+								"description": "Device brand"
+							},
+							{
+								"key": "x-appv",
+								"value": "1.0.0",
+								"description": "App version"
+							},
+							{
+								"key": "x-profileid",
+								"value": "P12345",
+								"description": "Profile ID"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"description": "Optional image file(s) to upload",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "payload",
+									"value": "{\n    \"taskMessage\": \"Its a frisking selfie photo\",\n    \"submittedAt\": \"2025-08-06T10:30:00Z\",\n    \"fenceStatus\": \"INSIDE\",\n    \"distFromCenter\": 120,\n    \"location\": \"ABC Examination Center, Sector 12, Noida\"\n}",
+									"description": "Task update payload as JSON string",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/:id/update-task",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								":id",
+								"update-task"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "4be54080-603f-4db2-823a-84cb07f00465",
+									"description": "Unique ID of the task (not taskId but id)"
+								}
+							]
+						},
+						"description": "Updates an existing task with captured image and metadata. Used for submitting task captures with geo-tag, timestamp, and distance information.\n\nRequired headers include device information (IMEI, model, brand), location (latitude, longitude), app version, and profile ID.\n\nThe payload includes:\n- taskMessage: Optional message field per task\n- submittedAt: Timestamp when the task was submitted in UTC\n- fenceStatus: Whether capture was INSIDE, OUTSIDE, or UNKNOWN relative to center fence\n- distFromCenter: Distance in meters from center coordinates\n- location: Human-readable location name\n\nImage ID format: examCode_centercode_service_date_shift_taskid"
+					},
+					"response": [
+						{
+							"name": "Task Updated Successfully",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-lat",
+										"value": "28.6139"
+									},
+									{
+										"key": "x-lng",
+										"value": "77.2090"
+									},
+									{
+										"key": "x-imei",
+										"value": "356789123456789"
+									},
+									{
+										"key": "x-mod",
+										"value": "Samsung-S23"
+									},
+									{
+										"key": "x-brd",
+										"value": "Samsung"
+									},
+									{
+										"key": "x-appv",
+										"value": "1.0.0"
+									},
+									{
+										"key": "x-profileid",
+										"value": "P12345"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "files",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "payload",
+											"value": "{\n    \"taskMessage\": \"Its a frisking selfie photo\",\n    \"submittedAt\": \"2025-08-06T10:30:00Z\"\n}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/tasks/:id/update-task",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"tasks",
+										":id",
+										"update-task"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "4be54080-603f-4db2-823a-84cb07f00465"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"data\": {\n        \"id\": \"4be54080-603f-4db2-823a-84cb07f00465\",\n        \"status\": \"SUBMITTED\",\n        \"submittedAt\": \"2025-08-06T10:30:00Z\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Endpoints for updating and managing tasks including image capture and sync"
+		},
+		{
+			"name": "6. App Signals",
+			"item": [
+				{
+					"name": "Add App Signals [Batch]",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "*/*"
+							},
+							{
+								"key": "x-lat",
+								"value": "28.6139",
+								"description": "Latitude of capture location"
+							},
+							{
+								"key": "x-lng",
+								"value": "77.2090",
+								"description": "Longitude of capture location"
+							},
+							{
+								"key": "x-imei",
+								"value": "356789123456789",
+								"description": "Device IMEI"
+							},
+							{
+								"key": "x-mod",
+								"value": "Samsung-S23",
+								"description": "Device model"
+							},
+							{
+								"key": "x-brd",
+								"value": "Samsung",
+								"description": "Device brand"
+							},
+							{
+								"key": "x-appv",
+								"value": "1.0.0",
+								"description": "App version"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  {\r\n    \"centerId\": \"07376131-681c-4690-a1c4-d45a3b291e7f\",\r\n    \"clientTimestamp\": \"2025-12-26T06:34:42Z\",\r\n    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\r\n    \"type\": \"TASKS_DOWNLOADED\"\r\n  },\r\n  {\r\n    \"centerId\": \"07376131-681c-4690-a1c4-d45a3b291e7f\",\r\n    \"clientTimestamp\": \"2025-12-26T06:34:42Z\",\r\n    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\r\n    \"type\": \"SYNC_STATUS\",\r\n    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\r\n    \"metadata\": {\r\n      \"totalTaks\":\"12\",\r\n      \"unSyncedTasks\":\"9\",\r\n      \"syncedTasks\":\"3\"\r\n    }\r\n  }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/signals",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"signals"
+							]
+						},
+						"description": "Accepts a list of telemetry signals. Either the entire batch is saved or none is saved.EndFragment"
+					},
+					"response": [
+						{
+							"name": "App Signals Added Successfully",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "*/*"
+									},
+									{
+										"key": "x-lat",
+										"value": "28.6139",
+										"description": "Latitude of capture location"
+									},
+									{
+										"key": "x-lng",
+										"value": "77.2090",
+										"description": "Longitude of capture location"
+									},
+									{
+										"key": "x-imei",
+										"value": "356789123456789",
+										"description": "Device IMEI"
+									},
+									{
+										"key": "x-mod",
+										"value": "Samsung-S23",
+										"description": "Device model"
+									},
+									{
+										"key": "x-brd",
+										"value": "Samsung",
+										"description": "Device brand"
+									},
+									{
+										"key": "x-appv",
+										"value": "1.0.0",
+										"description": "App version"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n  {\r\n    \"centerId\": \"07376131-681c-4690-a1c4-d45a3b291e7f\",\r\n    \"clientTimestamp\": \"2025-12-26T06:34:42Z\",\r\n    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\r\n    \"type\": \"TASKS_DOWNLOADED\"\r\n  },\r\n  {\r\n    \"centerId\": \"07376131-681c-4690-a1c4-d45a3b291e7f\",\r\n    \"clientTimestamp\": \"2025-12-26T06:34:42Z\",\r\n    \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\r\n    \"type\": \"SYNC_STATUS\",\r\n    \"shiftId\": \"3becd6a0-f2ae-4529-926a-e6128b3c0ecf\",\r\n    \"metadata\": {\r\n      \"totalTaks\":\"12\",\r\n      \"unSyncedTasks\":\"9\",\r\n      \"syncedTasks\":\"3\"\r\n    }\r\n  }\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/signals",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"signals"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.14.0 (Ubuntu)"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 26 Dec 2025 06:38:44 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"code\": \"2001\",\n    \"data\": [\n        {\n            \"id\": \"124849be-9596-4773-9e40-9946ef4265ff\",\n            \"type\": \"TASKS_DOWNLOADED\",\n            \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n            \"centerId\": \"07376131-681c-4690-a1c4-d45a3b291e7f\",\n            \"shiftId\": null,\n            \"username\": \"center060_frisking\",\n            \"clientTimestamp\": \"2025-12-26T06:34:42Z\",\n            \"serverTimestamp\": \"2025-12-26T06:38:44.794Z\",\n            \"metadata\": null,\n            \"lat\": 28.6139,\n            \"lng\": 77.209,\n            \"appVersion\": \"1.0.0\",\n            \"brand\": \"Samsung\",\n            \"model\": \"Samsung-S23\",\n            \"ip\": \"122.171.18.226\",\n            \"userAgent\": \"PostmanRuntime/7.51.0\"\n        },\n        {\n            \"id\": \"68d9b558-b0cd-42e5-9e78-6ec31b333a6e\",\n            \"type\": \"SYNC_STATUS\",\n            \"examId\": \"f63fdcca-310e-46d0-b023-223618b2d02f\",\n            \"centerId\": \"07376131-681c-4690-a1c4-d45a3b291e7f\",\n            \"shiftId\": null,\n            \"username\": \"center060_frisking\",\n            \"clientTimestamp\": \"2025-12-26T06:34:42Z\",\n            \"serverTimestamp\": \"2025-12-26T06:38:44.801Z\",\n            \"metadata\": {\n                \"totalTaks\": \"12\",\n                \"unSyncedTasks\": \"9\",\n                \"syncedTasks\": \"3\"\n            },\n            \"lat\": 28.6139,\n            \"lng\": 77.209,\n            \"appVersion\": \"1.0.0\",\n            \"brand\": \"Samsung\",\n            \"model\": \"Samsung-S23\",\n            \"ip\": \"122.171.18.226\",\n            \"userAgent\": \"PostmanRuntime/7.51.0\"\n        }\n    ]\n}"
+						}
+					]
+				}
+			],
+			"description": "```\nAccepts a list of telemetry signals. Either the entire batch is saved or none is saved.\n\n ```"
+		},
+		{
+			"name": "7. App Config",
+			"item": [
+				{
+					"name": "Mobile Props",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "*/*"
+							},
+							{
+								"key": "x-lat",
+								"value": "28.6139",
+								"description": "Latitude of capture location"
+							},
+							{
+								"key": "x-lng",
+								"value": "77.2090",
+								"description": "Longitude of capture location"
+							},
+							{
+								"key": "x-imei",
+								"value": "356789123456789",
+								"description": "Device IMEI"
+							},
+							{
+								"key": "x-mod",
+								"value": "Samsung-S23",
+								"description": "Device model"
+							},
+							{
+								"key": "x-brd",
+								"value": "Samsung",
+								"description": "Device brand"
+							},
+							{
+								"key": "x-appv",
+								"value": "1.0.0",
+								"description": "App version"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/common/props",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"common",
+								"props"
+							]
+						},
+						"description": "Accepts a list of telemetry signals. Either the entire batch is saved or none is saved.EndFragment"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Place Name",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "*/*"
+							},
+							{
+								"key": "x-lat",
+								"value": "28.6139",
+								"description": "Latitude of capture location"
+							},
+							{
+								"key": "x-lng",
+								"value": "77.2090",
+								"description": "Longitude of capture location"
+							},
+							{
+								"key": "x-imei",
+								"value": "356789123456789",
+								"description": "Device IMEI"
+							},
+							{
+								"key": "x-mod",
+								"value": "Samsung-S23",
+								"description": "Device model"
+							},
+							{
+								"key": "x-brd",
+								"value": "Samsung",
+								"description": "Device brand"
+							},
+							{
+								"key": "x-appv",
+								"value": "1.0.0",
+								"description": "App version"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/common/place-name?lat=12.9321445&lng=77.7351878",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"common",
+								"place-name"
+							],
+							"query": [
+								{
+									"key": "lat",
+									"value": "12.9321445"
+								},
+								{
+									"key": "lng",
+									"value": "77.7351878"
+								}
+							]
+						},
+						"description": "Accepts a list of telemetry signals. Either the entire batch is saved or none is saved.EndFragment"
+					},
+					"response": []
+				}
+			],
+			"description": "```\nEndpoints which are common configurations are grouped here\n\n ```"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://dev-opsview.avyxon.com",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
