@@ -15,7 +15,9 @@ class Profiles extends Table {
 
   // Selfie & liveness
   TextColumn get selfieLocalPath => text().nullable()();
-  TextColumn get livenessStatus => text().withDefault(const Constant('PENDING'))(); // PENDING, PASSED, FAILED
+  TextColumn get livenessStatus => text().withDefault(
+    const Constant('PENDING'),
+  )(); // PENDING, PASSED, FAILED
   RealColumn get livenessScore => real().nullable()();
   DateTimeColumn get livenessAttemptedAt => dateTime().nullable()();
 
@@ -29,6 +31,10 @@ class Profiles extends Table {
 
   // Backend sync - if backendProfileId is not null, profile is synced
   TextColumn get backendProfileId => text().nullable()();
+
+  // Training completion status - tracks if user completed training for this shift
+  BoolColumn get trainingCompleted =>
+      boolean().withDefault(const Constant(false))();
 
   // Timestamps
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();

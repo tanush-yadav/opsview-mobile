@@ -17,7 +17,8 @@ class SettingsState {
     this.exam,
     this.center,
     this.service,
-    this.profile,
+    this.profiles = const [],
+    this.selectedShiftId,
     this.isSyncing = false,
     this.hasIncompleteTasks = false,
     this.hasUnsyncedTasks = false,
@@ -28,11 +29,18 @@ class SettingsState {
   final model.Exam? exam;
   final model.Center? center;
   final String? service;
-  final Profile? profile;
+  final List<Profile> profiles;
+  final String? selectedShiftId;
   final bool isSyncing;
   final bool hasIncompleteTasks; // Tasks not yet submitted
-  final bool hasUnsyncedTasks;   // Submissions not yet synced
+  final bool hasUnsyncedTasks; // Submissions not yet synced
   final bool isLoading;
+
+  /// Get the profile for the current selected shift
+  Profile? get profile {
+    if (selectedShiftId == null) return null;
+    return profiles.where((p) => p.shiftId == selectedShiftId).firstOrNull;
+  }
 
   /// Can only logout if ALL tasks are completed AND all are synced
   bool get canLogout => !hasIncompleteTasks && !hasUnsyncedTasks && !isSyncing;
@@ -45,7 +53,8 @@ class SettingsState {
     model.Exam? exam,
     model.Center? center,
     String? service,
-    Profile? profile,
+    List<Profile>? profiles,
+    String? selectedShiftId,
     bool? isSyncing,
     bool? hasIncompleteTasks,
     bool? hasUnsyncedTasks,
@@ -56,7 +65,8 @@ class SettingsState {
       exam: exam ?? this.exam,
       center: center ?? this.center,
       service: service ?? this.service,
-      profile: profile ?? this.profile,
+      profiles: profiles ?? this.profiles,
+      selectedShiftId: selectedShiftId ?? this.selectedShiftId,
       isSyncing: isSyncing ?? this.isSyncing,
       hasIncompleteTasks: hasIncompleteTasks ?? this.hasIncompleteTasks,
       hasUnsyncedTasks: hasUnsyncedTasks ?? this.hasUnsyncedTasks,
@@ -78,9 +88,13 @@ class SettingsViewModel extends Notifier<SettingsState> {
     final appState = ref.watch(appStateProvider);
 
     // Check for incomplete tasks (tasks without submissions or with PENDING status)
-    final completedTaskIds = appState.taskSubmissions.map((s) => s.taskId).toSet();
+    final completedTaskIds = appState.taskSubmissions
+        .map((s) => s.taskId)
+        .toSet();
     final allTaskIds = appState.tasks.map((t) => t.id).toSet();
-    final hasIncompleteTasks = allTaskIds.difference(completedTaskIds).isNotEmpty;
+    final hasIncompleteTasks = allTaskIds
+        .difference(completedTaskIds)
+        .isNotEmpty;
 
     // Check for unsynced submissions
     final hasUnsyncedTasks = appState.taskSubmissions.any(
@@ -92,7 +106,8 @@ class SettingsViewModel extends Notifier<SettingsState> {
       exam: appState.exam,
       center: appState.center,
       service: appState.user?.service,
-      profile: appState.profile,
+      profiles: appState.profiles,
+      selectedShiftId: appState.selectedShiftId,
       hasIncompleteTasks: hasIncompleteTasks,
       hasUnsyncedTasks: hasUnsyncedTasks,
     );
@@ -128,26 +143,28 @@ class SettingsViewModel extends Notifier<SettingsState> {
   Future<void> refreshSyncStatus() async {
     final db = ref.read(appDatabaseProvider);
     final appState = ref.read(appStateProvider);
-    
+
     // Get all tasks for current shift
     final allTasks = appState.tasks;
     final allTaskIds = allTasks.map((t) => t.id).toSet();
-    
+
     // Get all submissions
     final allSubmissions = await db.select(db.taskSubmissions).get();
     final completedTaskIds = allSubmissions.map((s) => s.taskId).toSet();
-    
+
     // Check for incomplete tasks
-    final hasIncompleteTasks = allTaskIds.difference(completedTaskIds).isNotEmpty;
-    
+    final hasIncompleteTasks = allTaskIds
+        .difference(completedTaskIds)
+        .isNotEmpty;
+
     // Check for unsynced submissions
     final unsyncedSubmissions = allSubmissions.where(
-      (s) => s.status == SyncStatus.unsynced.toDbValue
+      (s) => s.status == SyncStatus.unsynced.toDbValue,
     );
     final hasUnsyncedTasks = unsyncedSubmissions.isNotEmpty;
-    
+
     state = state.copyWith(
-      isSyncing: false, 
+      isSyncing: false,
       hasIncompleteTasks: hasIncompleteTasks,
       hasUnsyncedTasks: hasUnsyncedTasks,
     );

@@ -694,6 +694,21 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _trainingCompletedMeta = const VerificationMeta(
+    'trainingCompleted',
+  );
+  @override
+  late final GeneratedColumn<bool> trainingCompleted = GeneratedColumn<bool>(
+    'training_completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("training_completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -723,6 +738,7 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     location,
     mobileVerificationId,
     backendProfileId,
+    trainingCompleted,
     createdAt,
   ];
   @override
@@ -854,6 +870,15 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         ),
       );
     }
+    if (data.containsKey('training_completed')) {
+      context.handle(
+        _trainingCompletedMeta,
+        trainingCompleted.isAcceptableOrUnknown(
+          data['training_completed']!,
+          _trainingCompletedMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -929,6 +954,10 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         DriftSqlType.string,
         data['${effectivePrefix}backend_profile_id'],
       ),
+      trainingCompleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}training_completed'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -958,6 +987,7 @@ class Profile extends DataClass implements Insertable<Profile> {
   final String? location;
   final String? mobileVerificationId;
   final String? backendProfileId;
+  final bool trainingCompleted;
   final DateTime createdAt;
   const Profile({
     required this.id,
@@ -975,6 +1005,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     this.location,
     this.mobileVerificationId,
     this.backendProfileId,
+    required this.trainingCompleted,
     required this.createdAt,
   });
   @override
@@ -1011,6 +1042,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     if (!nullToAbsent || backendProfileId != null) {
       map['backend_profile_id'] = Variable<String>(backendProfileId);
     }
+    map['training_completed'] = Variable<bool>(trainingCompleted);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -1048,6 +1080,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       backendProfileId: backendProfileId == null && nullToAbsent
           ? const Value.absent()
           : Value(backendProfileId),
+      trainingCompleted: Value(trainingCompleted),
       createdAt: Value(createdAt),
     );
   }
@@ -1077,6 +1110,7 @@ class Profile extends DataClass implements Insertable<Profile> {
         json['mobileVerificationId'],
       ),
       backendProfileId: serializer.fromJson<String?>(json['backendProfileId']),
+      trainingCompleted: serializer.fromJson<bool>(json['trainingCompleted']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -1099,6 +1133,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       'location': serializer.toJson<String?>(location),
       'mobileVerificationId': serializer.toJson<String?>(mobileVerificationId),
       'backendProfileId': serializer.toJson<String?>(backendProfileId),
+      'trainingCompleted': serializer.toJson<bool>(trainingCompleted),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -1119,6 +1154,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     Value<String?> location = const Value.absent(),
     Value<String?> mobileVerificationId = const Value.absent(),
     Value<String?> backendProfileId = const Value.absent(),
+    bool? trainingCompleted,
     DateTime? createdAt,
   }) => Profile(
     id: id ?? this.id,
@@ -1146,6 +1182,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     backendProfileId: backendProfileId.present
         ? backendProfileId.value
         : this.backendProfileId,
+    trainingCompleted: trainingCompleted ?? this.trainingCompleted,
     createdAt: createdAt ?? this.createdAt,
   );
   Profile copyWithCompanion(ProfilesCompanion data) {
@@ -1177,6 +1214,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       backendProfileId: data.backendProfileId.present
           ? data.backendProfileId.value
           : this.backendProfileId,
+      trainingCompleted: data.trainingCompleted.present
+          ? data.trainingCompleted.value
+          : this.trainingCompleted,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -1199,6 +1239,7 @@ class Profile extends DataClass implements Insertable<Profile> {
           ..write('location: $location, ')
           ..write('mobileVerificationId: $mobileVerificationId, ')
           ..write('backendProfileId: $backendProfileId, ')
+          ..write('trainingCompleted: $trainingCompleted, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -1221,6 +1262,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     location,
     mobileVerificationId,
     backendProfileId,
+    trainingCompleted,
     createdAt,
   );
   @override
@@ -1242,6 +1284,7 @@ class Profile extends DataClass implements Insertable<Profile> {
           other.location == this.location &&
           other.mobileVerificationId == this.mobileVerificationId &&
           other.backendProfileId == this.backendProfileId &&
+          other.trainingCompleted == this.trainingCompleted &&
           other.createdAt == this.createdAt);
 }
 
@@ -1261,6 +1304,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
   final Value<String?> location;
   final Value<String?> mobileVerificationId;
   final Value<String?> backendProfileId;
+  final Value<bool> trainingCompleted;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const ProfilesCompanion({
@@ -1279,6 +1323,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.location = const Value.absent(),
     this.mobileVerificationId = const Value.absent(),
     this.backendProfileId = const Value.absent(),
+    this.trainingCompleted = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1298,6 +1343,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.location = const Value.absent(),
     this.mobileVerificationId = const Value.absent(),
     this.backendProfileId = const Value.absent(),
+    this.trainingCompleted = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -1322,6 +1368,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Expression<String>? location,
     Expression<String>? mobileVerificationId,
     Expression<String>? backendProfileId,
+    Expression<bool>? trainingCompleted,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
@@ -1343,6 +1390,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       if (mobileVerificationId != null)
         'mobile_verification_id': mobileVerificationId,
       if (backendProfileId != null) 'backend_profile_id': backendProfileId,
+      if (trainingCompleted != null) 'training_completed': trainingCompleted,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1364,6 +1412,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Value<String?>? location,
     Value<String?>? mobileVerificationId,
     Value<String?>? backendProfileId,
+    Value<bool>? trainingCompleted,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
@@ -1383,6 +1432,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       location: location ?? this.location,
       mobileVerificationId: mobileVerificationId ?? this.mobileVerificationId,
       backendProfileId: backendProfileId ?? this.backendProfileId,
+      trainingCompleted: trainingCompleted ?? this.trainingCompleted,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
@@ -1440,6 +1490,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     if (backendProfileId.present) {
       map['backend_profile_id'] = Variable<String>(backendProfileId.value);
     }
+    if (trainingCompleted.present) {
+      map['training_completed'] = Variable<bool>(trainingCompleted.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1467,6 +1520,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
           ..write('location: $location, ')
           ..write('mobileVerificationId: $mobileVerificationId, ')
           ..write('backendProfileId: $backendProfileId, ')
+          ..write('trainingCompleted: $trainingCompleted, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -3401,6 +3455,7 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       Value<String?> location,
       Value<String?> mobileVerificationId,
       Value<String?> backendProfileId,
+      Value<bool> trainingCompleted,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -3421,6 +3476,7 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<String?> location,
       Value<String?> mobileVerificationId,
       Value<String?> backendProfileId,
+      Value<bool> trainingCompleted,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -3506,6 +3562,11 @@ class $$ProfilesTableFilterComposer
 
   ColumnFilters<String> get backendProfileId => $composableBuilder(
     column: $table.backendProfileId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get trainingCompleted => $composableBuilder(
+    column: $table.trainingCompleted,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3599,6 +3660,11 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get trainingCompleted => $composableBuilder(
+    column: $table.trainingCompleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -3671,6 +3737,11 @@ class $$ProfilesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get trainingCompleted => $composableBuilder(
+    column: $table.trainingCompleted,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
@@ -3718,6 +3789,7 @@ class $$ProfilesTableTableManager
                 Value<String?> location = const Value.absent(),
                 Value<String?> mobileVerificationId = const Value.absent(),
                 Value<String?> backendProfileId = const Value.absent(),
+                Value<bool> trainingCompleted = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProfilesCompanion(
@@ -3736,6 +3808,7 @@ class $$ProfilesTableTableManager
                 location: location,
                 mobileVerificationId: mobileVerificationId,
                 backendProfileId: backendProfileId,
+                trainingCompleted: trainingCompleted,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
@@ -3756,6 +3829,7 @@ class $$ProfilesTableTableManager
                 Value<String?> location = const Value.absent(),
                 Value<String?> mobileVerificationId = const Value.absent(),
                 Value<String?> backendProfileId = const Value.absent(),
+                Value<bool> trainingCompleted = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProfilesCompanion.insert(
@@ -3774,6 +3848,7 @@ class $$ProfilesTableTableManager
                 location: location,
                 mobileVerificationId: mobileVerificationId,
                 backendProfileId: backendProfileId,
+                trainingCompleted: trainingCompleted,
                 createdAt: createdAt,
                 rowid: rowid,
               ),

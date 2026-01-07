@@ -2,18 +2,48 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../core/localization/app_strings.dart';
+import '../../core/providers/app_state_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../models/auth/shift.dart';
 import '../../viewmodels/training_viewmodel.dart';
 
-class TrainingScreen extends ConsumerWidget {
+class TrainingScreen extends ConsumerStatefulWidget {
   const TrainingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TrainingScreen> createState() => _TrainingScreenState();
+}
+
+class _TrainingScreenState extends ConsumerState<TrainingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboardingState();
+  }
+
+  void _checkOnboardingState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appState = ref.read(appStateProvider);
+      final currentStep = OnboardingStep.fromString(appState.onboardingStep);
+
+      // If onboarding step is not 'training', redirect to appropriate screen
+      if (currentStep != OnboardingStep.training) {
+        if (currentStep == OnboardingStep.completed) {
+          context.push(AppRoutes.home);
+        } else if (currentStep == OnboardingStep.profile) {
+          context.push(AppRoutes.profile);
+        }
+        // For other states, stay on this screen (shouldn't happen normally)
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final strings = ref.watch(appStringsProvider);
     final trainingState = ref.watch(trainingViewModelProvider);
     final trainingViewModel = ref.read(trainingViewModelProvider.notifier);
@@ -70,8 +100,6 @@ class TrainingScreen extends ConsumerWidget {
                 width: double.infinity,
                 child: TextButton(
                   onPressed: () async {
-                    // Also complete training when skipping so we don't return here
-                    await trainingViewModel.completeTraining();
                     if (context.mounted) {
                       context.go(AppRoutes.home);
                     }
@@ -112,9 +140,7 @@ class TrainingScreen extends ConsumerWidget {
               height: 200,
               decoration: const BoxDecoration(
                 color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Center(
                 child: Container(
@@ -148,7 +174,9 @@ class TrainingScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    service.name.isNotEmpty ? service.name : 'Morning Shift SOP',
+                    service.name.isNotEmpty
+                        ? service.name
+                        : 'Morning Shift SOP',
                     style: AppTextStyles.h3,
                   ),
                   const SizedBox(height: 12),

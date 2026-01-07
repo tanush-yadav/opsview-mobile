@@ -10,7 +10,6 @@ import '../services/database/app_database.dart';
 enum ShiftType { exam, mock }
 
 class ShiftSelectionState {
-
   const ShiftSelectionState({
     this.shifts = const [],
     this.selectedType = ShiftType.exam,
@@ -85,10 +84,12 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
     if (appState.isLoaded && appState.exam != null) {
       final shifts = appState.exam!.shifts;
 
-      final examShifts =
-          shifts.where((s) => s.type == AppConstants.shiftTypeExamDay).toList();
-      final mockShifts =
-          shifts.where((s) => s.type == AppConstants.shiftTypeMockDay).toList();
+      final examShifts = shifts
+          .where((s) => s.type == AppConstants.shiftTypeExamDay)
+          .toList();
+      final mockShifts = shifts
+          .where((s) => s.type == AppConstants.shiftTypeMockDay)
+          .toList();
 
       // Priority 1: Find active shift and show its tab
       final activeShift = _findActiveShift(shifts);
@@ -172,15 +173,23 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
     final db = ref.read(appDatabaseProvider);
     final shiftId = state.selectedShift!.id;
 
-    // Check if profile already exists for this shift (training was completed)
-    final existingProfile = await (db.select(db.profiles)
-          ..where((p) => p.shiftId.equals(shiftId)))
-        .getSingleOrNull();
+    // Check if profile already exists for this shift
+    final existingProfile = await (db.select(
+      db.profiles,
+    )..where((p) => p.shiftId.equals(shiftId))).getSingleOrNull();
 
-    // Determine the appropriate onboarding step
-    final onboardingStep = existingProfile != null
-        ? OnboardingStep.completed.value // Skip to home if profile exists
-        : OnboardingStep.profile.value; // Start profile creation
+    // Determine the appropriate onboarding step based on profile and training status
+    String onboardingStep;
+    if (existingProfile != null && existingProfile.trainingCompleted) {
+      // Profile exists AND training completed → go to home
+      onboardingStep = OnboardingStep.completed.value;
+    } else if (existingProfile != null) {
+      // Profile exists but training NOT completed → go to training
+      onboardingStep = OnboardingStep.training.value;
+    } else {
+      // No profile → start profile creation
+      onboardingStep = OnboardingStep.profile.value;
+    }
 
     await (db.update(db.sessions)..where((t) => const Constant(true))).write(
       SessionsCompanion(
@@ -197,4 +206,5 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
 
 final shiftSelectionViewModelProvider =
     NotifierProvider<ShiftSelectionViewModel, ShiftSelectionState>(
-        ShiftSelectionViewModel.new);
+      ShiftSelectionViewModel.new,
+    );

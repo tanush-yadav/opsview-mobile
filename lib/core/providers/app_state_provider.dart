@@ -12,7 +12,7 @@ class AppState {
     this.user,
     this.exam,
     this.center,
-    this.profile,
+    this.profiles = const [],
     this.tasks = const [],
     this.taskSubmissions = const [],
     this.selectedShiftId,
@@ -23,7 +23,7 @@ class AppState {
   final model.User? user;
   final model.Exam? exam;
   final model.Center? center;
-  final Profile? profile;
+  final List<Profile> profiles;
   final List<Task> tasks;
   final List<TaskSubmission> taskSubmissions;
   final String? selectedShiftId;
@@ -34,7 +34,7 @@ class AppState {
     model.User? user,
     model.Exam? exam,
     model.Center? center,
-    Profile? profile,
+    List<Profile>? profiles,
     List<Task>? tasks,
     List<TaskSubmission>? taskSubmissions,
     String? selectedShiftId,
@@ -45,7 +45,7 @@ class AppState {
       user: user ?? this.user,
       exam: exam ?? this.exam,
       center: center ?? this.center,
-      profile: profile ?? this.profile,
+      profiles: profiles ?? this.profiles,
       tasks: tasks ?? this.tasks,
       taskSubmissions: taskSubmissions ?? this.taskSubmissions,
       selectedShiftId: selectedShiftId ?? this.selectedShiftId,
@@ -91,7 +91,6 @@ class AppStateNotifier extends Notifier<AppState> {
 
       // Load profile
       final profiles = await db.select(db.profiles).get();
-      final profile = profiles.isNotEmpty ? profiles.first : null;
 
       // Load tasks for selected shift
       List<Task> tasks = [];
@@ -108,7 +107,7 @@ class AppStateNotifier extends Notifier<AppState> {
         user: user,
         exam: exam,
         center: center,
-        profile: profile,
+        profiles: profiles,
         tasks: tasks,
         taskSubmissions: taskSubmissions,
         selectedShiftId: session.selectedShiftId,
@@ -128,8 +127,8 @@ class AppStateNotifier extends Notifier<AppState> {
     state = state.copyWith(selectedShiftId: shiftId);
   }
 
-  void updateProfile(Profile profile) {
-    state = state.copyWith(profile: profile);
+  void updateProfile(List<Profile> profiles) {
+    state = state.copyWith(profiles: profiles);
   }
 
   void updateTasks(List<Task> tasks) {

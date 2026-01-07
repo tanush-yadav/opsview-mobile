@@ -34,16 +34,16 @@ class _ProfileFlowScreenState extends ConsumerState<ProfileFlowScreen> {
 
     final appState = ref.read(appStateProvider);
     final selectedShiftId = appState.selectedShiftId;
-    final profile = appState.profile;
+    final profiles = appState.profiles;
 
     // If a profile already exists for this shift, skip to home
-    if (profile != null &&
+    if (profiles.isNotEmpty &&
         selectedShiftId != null &&
-        profile.shiftId == selectedShiftId) {
+        profiles.any((p) => p.shiftId == selectedShiftId)) {
       debugPrint(
         '[ProfileFlow] Profile exists for shift $selectedShiftId, skipping to home',
       );
-      context.go(AppRoutes.training);
+      context.push(AppRoutes.training);
     }
   }
 
