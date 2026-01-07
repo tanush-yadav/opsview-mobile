@@ -69,8 +69,12 @@ class TrainingScreen extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
-                  onPressed: () {
-                    context.go(AppRoutes.home);
+                  onPressed: () async {
+                    // Also complete training when skipping so we don't return here
+                    await trainingViewModel.completeTraining();
+                    if (context.mounted) {
+                      context.go(AppRoutes.home);
+                    }
                   },
                   child: Text(
                     strings.skip,

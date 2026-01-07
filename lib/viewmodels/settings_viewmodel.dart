@@ -19,7 +19,8 @@ class SettingsState {
     this.service,
     this.profile,
     this.isSyncing = false,
-    this.hasPendingSync = false,
+    this.hasIncompleteTasks = false,
+    this.hasUnsyncedTasks = false,
     this.isLoading = false,
   });
 
@@ -29,8 +30,15 @@ class SettingsState {
   final String? service;
   final Profile? profile;
   final bool isSyncing;
-  final bool hasPendingSync;
+  final bool hasIncompleteTasks; // Tasks not yet submitted
+  final bool hasUnsyncedTasks;   // Submissions not yet synced
   final bool isLoading;
+
+  /// Can only logout if ALL tasks are completed AND all are synced
+  bool get canLogout => !hasIncompleteTasks && !hasUnsyncedTasks && !isSyncing;
+
+  /// Show warning if either incomplete or unsynced
+  bool get showLogoutWarning => hasIncompleteTasks || hasUnsyncedTasks;
 
   SettingsState copyWith({
     model.User? user,
@@ -39,7 +47,8 @@ class SettingsState {
     String? service,
     Profile? profile,
     bool? isSyncing,
-    bool? hasPendingSync,
+    bool? hasIncompleteTasks,
+    bool? hasUnsyncedTasks,
     bool? isLoading,
   }) {
     return SettingsState(
@@ -49,7 +58,8 @@ class SettingsState {
       service: service ?? this.service,
       profile: profile ?? this.profile,
       isSyncing: isSyncing ?? this.isSyncing,
-      hasPendingSync: hasPendingSync ?? this.hasPendingSync,
+      hasIncompleteTasks: hasIncompleteTasks ?? this.hasIncompleteTasks,
+      hasUnsyncedTasks: hasUnsyncedTasks ?? this.hasUnsyncedTasks,
       isLoading: isLoading ?? this.isLoading,
     );
   }
@@ -67,10 +77,13 @@ class SettingsViewModel extends Notifier<SettingsState> {
   SettingsState build() {
     final appState = ref.watch(appStateProvider);
 
-    // Check for unsynced SUBMISSIONS, not pending tasks
-    // A task can be pending (not yet done) which is normal.
-    // We only care about submissions that haven't been synced to the server.
-    final hasUnsyncedSubmissions = appState.taskSubmissions.any(
+    // Check for incomplete tasks (tasks without submissions or with PENDING status)
+    final completedTaskIds = appState.taskSubmissions.map((s) => s.taskId).toSet();
+    final allTaskIds = appState.tasks.map((t) => t.id).toSet();
+    final hasIncompleteTasks = allTaskIds.difference(completedTaskIds).isNotEmpty;
+
+    // Check for unsynced submissions
+    final hasUnsyncedTasks = appState.taskSubmissions.any(
       (s) => s.status == SyncStatus.unsynced.toDbValue,
     );
 
@@ -80,7 +93,8 @@ class SettingsViewModel extends Notifier<SettingsState> {
       center: appState.center,
       service: appState.user?.service,
       profile: appState.profile,
-      hasPendingSync: hasUnsyncedSubmissions,
+      hasIncompleteTasks: hasIncompleteTasks,
+      hasUnsyncedTasks: hasUnsyncedTasks,
     );
   }
 
@@ -100,18 +114,43 @@ class SettingsViewModel extends Notifier<SettingsState> {
       // Refresh App State to reflect changes (e.g. sync status)
       await ref.read(appStateProvider.notifier).loadFromDatabase();
 
-      // Re-evaluate sync status - check for unsynced submissions
-      final appState = ref.read(appStateProvider);
-      final hasUnsyncedSubmissions = appState.taskSubmissions.any(
-        (s) => s.status == SyncStatus.unsynced.toDbValue,
-      );
-
-      state = state.copyWith(isSyncing: false, hasPendingSync: hasUnsyncedSubmissions);
+      // Re-evaluate sync status by querying DB directly for accuracy
+      await refreshSyncStatus();
       return true;
     } catch (e) {
       state = state.copyWith(isSyncing: false);
       return false;
     }
+  }
+
+  /// Refresh sync status by querying the database directly
+  /// This ensures accurate sync status even if in-memory state is stale
+  Future<void> refreshSyncStatus() async {
+    final db = ref.read(appDatabaseProvider);
+    final appState = ref.read(appStateProvider);
+    
+    // Get all tasks for current shift
+    final allTasks = appState.tasks;
+    final allTaskIds = allTasks.map((t) => t.id).toSet();
+    
+    // Get all submissions
+    final allSubmissions = await db.select(db.taskSubmissions).get();
+    final completedTaskIds = allSubmissions.map((s) => s.taskId).toSet();
+    
+    // Check for incomplete tasks
+    final hasIncompleteTasks = allTaskIds.difference(completedTaskIds).isNotEmpty;
+    
+    // Check for unsynced submissions
+    final unsyncedSubmissions = allSubmissions.where(
+      (s) => s.status == SyncStatus.unsynced.toDbValue
+    );
+    final hasUnsyncedTasks = unsyncedSubmissions.isNotEmpty;
+    
+    state = state.copyWith(
+      isSyncing: false, 
+      hasIncompleteTasks: hasIncompleteTasks,
+      hasUnsyncedTasks: hasUnsyncedTasks,
+    );
   }
 
   Future<void> logout() async {

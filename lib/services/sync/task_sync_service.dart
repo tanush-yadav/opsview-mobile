@@ -139,13 +139,24 @@ class TaskSyncService {
       }
 
       // 5. Prepare Payload
-      final payload = {
+      final payload = <String, dynamic>{
         'taskMessage': submission.observations ?? '',
         'submittedAt': submission.submittedAt.toUtc().toIso8601String(),
         'fenceStatus': fenceStatus,
         'distFromCenter': distFromCenter,
         'location': locationName,
       };
+
+      // 5a. Add checklist data for CHECKLIST type tasks
+      if (task != null && task.taskType == 'CHECKLIST') {
+        try {
+          final List<dynamic> checklistAnswers =
+              jsonDecode(submission.verificationAnswers);
+          payload['checklist'] = checklistAnswers;
+        } catch (e) {
+          // Failed to parse checklist, proceed without it
+        }
+      }
 
       // 6. Prepare Headers
       final headers = {

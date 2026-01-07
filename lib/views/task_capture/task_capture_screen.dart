@@ -56,82 +56,8 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   }
 
   void _takePhoto() {
-    final strings = ref.read(appStringsProvider);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.backgroundWhite,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(strings.selectPhotoSource, style: AppTextStyles.h4),
-              const SizedBox(height: 20),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.camera_alt, color: AppColors.primary),
-                ),
-                title: Text(strings.camera, style: AppTextStyles.body),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref
-                      .read(taskCaptureViewModelProvider.notifier)
-                      .capturePhoto(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.photo_library,
-                    color: AppColors.primary,
-                  ),
-                ),
-                title: Text(strings.gallery, style: AppTextStyles.body),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref
-                      .read(taskCaptureViewModelProvider.notifier)
-                      .capturePhoto(ImageSource.gallery);
-                },
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  strings.cancel,
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.textMuted,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    // Directly open camera - gallery is not allowed for task photos
+    ref.read(taskCaptureViewModelProvider.notifier).capturePhoto(ImageSource.camera);
   }
 
   void _removePhoto(int index) {

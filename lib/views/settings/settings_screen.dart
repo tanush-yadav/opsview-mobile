@@ -12,11 +12,25 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/snackbar_utils.dart';
 import '../../viewmodels/settings_viewmodel.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Refresh sync status from DB when screen opens to ensure accurate state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(settingsViewModelProvider.notifier).refreshSyncStatus();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final strings = ref.watch(appStringsProvider);
     final state = ref.watch(settingsViewModelProvider);
     final viewModel = ref.read(settingsViewModelProvider.notifier);
@@ -267,8 +281,8 @@ class SettingsScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Sync Warning
-          if (state.hasPendingSync)
+          // Warning: Tasks incomplete or unsynced
+          if (state.showLogoutWarning)
             Container(
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 12),
@@ -289,13 +303,17 @@ class SettingsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          strings.syncRequired,
+                          state.hasIncompleteTasks 
+                              ? 'Complete All Tasks'
+                              : strings.syncRequired,
                           style: AppTextStyles.label.copyWith(
                             color: AppColors.warning,
                           ),
                         ),
                         Text(
-                          strings.syncBeforeLogout,
+                          state.hasIncompleteTasks
+                              ? 'All tasks must be completed before logout'
+                              : strings.syncBeforeLogout,
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.warning,
                           ),
@@ -351,24 +369,24 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // Logout Button
+          // Logout Button - disabled unless all tasks completed AND synced
           SizedBox(
             width: double.infinity,
             height: 48,
             child: material.OutlinedButton(
-              onPressed: state.hasPendingSync
-                  ? null
-                  : () async {
+              onPressed: state.canLogout
+                  ? () async {
                       await viewModel.logout();
                       if (context.mounted) {
                         context.go(AppRoutes.login);
                       }
-                    },
+                    }
+                  : null,
               style: material.OutlinedButton.styleFrom(
                 side: BorderSide(
-                  color: state.hasPendingSync
-                      ? AppColors.textMuted
-                      : AppColors.border,
+                  color: state.canLogout
+                      ? AppColors.border
+                      : AppColors.textMuted,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -379,17 +397,17 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   Icon(
                     Icons.logout,
-                    color: state.hasPendingSync
-                        ? AppColors.textMuted
-                        : AppColors.textSecondary,
+                    color: state.canLogout
+                        ? AppColors.textSecondary
+                        : AppColors.textMuted,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     strings.logout,
                     style: AppTextStyles.button.copyWith(
-                      color: state.hasPendingSync
-                          ? AppColors.textMuted
-                          : AppColors.textSecondary,
+                      color: state.canLogout
+                          ? AppColors.textSecondary
+                          : AppColors.textMuted,
                     ),
                   ),
                 ],

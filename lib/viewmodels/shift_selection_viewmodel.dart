@@ -170,12 +170,28 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
     if (state.selectedShift == null) return;
 
     final db = ref.read(appDatabaseProvider);
+    final shiftId = state.selectedShift!.id;
+
+    // Check if profile already exists for this shift (training was completed)
+    final existingProfile = await (db.select(db.profiles)
+          ..where((p) => p.shiftId.equals(shiftId)))
+        .getSingleOrNull();
+
+    // Determine the appropriate onboarding step
+    final onboardingStep = existingProfile != null
+        ? OnboardingStep.completed.value // Skip to home if profile exists
+        : OnboardingStep.profile.value; // Start profile creation
+
     await (db.update(db.sessions)..where((t) => const Constant(true))).write(
       SessionsCompanion(
-        onboardingStep: Value(OnboardingStep.profile.value),
-        selectedShiftId: Value(state.selectedShift!.id),
+        onboardingStep: Value(onboardingStep),
+        selectedShiftId: Value(shiftId),
       ),
     );
+
+    // Update in-memory app state
+    ref.read(appStateProvider.notifier).updateSelectedShift(shiftId);
+    ref.read(appStateProvider.notifier).updateOnboardingStep(onboardingStep);
   }
 }
 

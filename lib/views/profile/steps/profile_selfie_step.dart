@@ -21,7 +21,7 @@ class ProfileSelfieStep extends ConsumerWidget {
     final state = ref.watch(profileViewModelProvider);
     final viewModel = ref.read(profileViewModelProvider.notifier);
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,35 +40,34 @@ class ProfileSelfieStep extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           // Camera preview / captured image
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: state.selfieImagePath != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.file(
-                        File(state.selfieImagePath!),
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.camera_alt_outlined,
-                          size: 64,
-                          color: AppColors.textMuted,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(strings.capturePhoto, style: AppTextStyles.muted),
-                      ],
-                    ),
+          Container(
+            width: double.infinity,
+            height: 300,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
             ),
+            child: state.selfieImagePath != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.file(
+                      File(state.selfieImagePath!),
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.camera_alt_outlined,
+                        size: 64,
+                        color: AppColors.textMuted,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(strings.capturePhoto, style: AppTextStyles.muted),
+                    ],
+                  ),
           ),
           const SizedBox(height: 24),
           // Buttons
@@ -80,7 +79,7 @@ class ProfileSelfieStep extends ConsumerWidget {
                   child: SizedBox(
                     height: 52,
                     child: OutlineButton(
-                      onPressed: viewModel.clearSelfie,
+                      onPressed: () => _handleRetake(context, ref, strings),
                       child: Text(strings.retake),
                     ),
                   ),
@@ -134,6 +133,17 @@ class ProfileSelfieStep extends ConsumerWidget {
     );
   }
 
+  Future<void> _handleRetake(
+    BuildContext context,
+    WidgetRef ref,
+    AppStrings strings,
+  ) async {
+    // Clear existing selfie first
+    ref.read(profileViewModelProvider.notifier).clearSelfie();
+    // Immediately open camera for new capture
+    await _handleCapture(context, ref, strings);
+  }
+
   Future<void> _handleCapture(
     BuildContext context,
     WidgetRef ref,
@@ -163,7 +173,8 @@ class ProfileSelfieStep extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        SnackBarUtils.error(context, strings.somethingWentWrong);
+        // Show actual error message for debugging
+        SnackBarUtils.error(context, e.toString());
       }
     }
   }
