@@ -11,6 +11,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import '../../../viewmodels/profile_viewmodel.dart';
 import '../../widgets/location_status_card.dart';
+import '../liveness_camera_screen.dart';
 
 class ProfileSelfieStep extends ConsumerWidget {
   const ProfileSelfieStep({super.key});
@@ -49,12 +50,39 @@ class ProfileSelfieStep extends ConsumerWidget {
               border: Border.all(color: AppColors.border),
             ),
             child: state.selfieImagePath != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.file(
-                      File(state.selfieImagePath!),
-                      fit: BoxFit.cover,
-                    ),
+                ? Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.file(
+                          File(state.selfieImagePath!),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
+                      // Liveness score badge
+                      if (state.livenessScore != null)
+                        Positioned(
+                          top: 12,
+                          right: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'Liveness: ${(state.livenessScore! * 100).toStringAsFixed(0)}%',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -149,14 +177,19 @@ class ProfileSelfieStep extends ConsumerWidget {
     WidgetRef ref,
     AppStrings strings,
   ) async {
-    try {
-      await ref
-          .read(profileViewModelProvider.notifier)
-          .captureAndVerifySelfie();
-    } catch (e) {
-      if (context.mounted) {
-        SnackBarUtils.error(context, e.toString());
-      }
+    // Navigate to liveness camera screen
+    final result = await Navigator.of(context).push<LivenessResult>(
+      MaterialPageRoute(
+        builder: (context) => const LivenessCameraScreen(),
+      ),
+    );
+
+    if (result != null) {
+      // Liveness passed, save the result
+      ref.read(profileViewModelProvider.notifier).setLivenessCameraResult(
+        result.imagePath,
+        result.livenessScore,
+      );
     }
   }
 

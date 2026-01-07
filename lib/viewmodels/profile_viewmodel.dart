@@ -393,78 +393,25 @@ class ProfileViewModel extends Notifier<ProfileState> {
     return degrees * (math.pi / 180);
   }
 
-  /// Capture selfie and run passive liveness detection
-  /// Returns null if cancelled, throws exception if liveness fails
-  Future<void> captureAndVerifySelfie() async {
-    try {
-      state = state.copyWith(isLoading: true);
-
-      // Use image_picker to capture photo
-      final ImagePicker picker = ImagePicker();
-      final XFile? photo = await picker.pickImage(
-        source: ImageSource.camera,
-        preferredCameraDevice: CameraDevice.front,
-        imageQuality: 90,
-        maxWidth: 1920,
-        maxHeight: 1080,
-      );
-
-      if (photo == null) {
-        // User cancelled
-        state = state.copyWith(isLoading: false);
-        return;
-      }
-
-      // Run passive liveness detection on captured image
-      final livenessScore = await _runLivenessDetection(photo.path);
-
-      // Liveness threshold (0.5 = 50% confidence)
-      const livenessThreshold = 0.5;
-
-      if (livenessScore != null && livenessScore >= livenessThreshold) {
-        // Liveness passed - save the photo
-        state = state.copyWith(
-          selfieImagePath: photo.path,
-          livenessScore: livenessScore,
-          isLoading: false,
-        );
-      } else {
-        // Liveness failed
-        state = state.copyWith(isLoading: false);
-        throw AppException(
-          'Liveness check failed. Please try again with a clearer photo.',
-        );
-      }
-    } catch (e) {
-      state = state.copyWith(isLoading: false);
-      rethrow;
-    }
+  /// Set selfie from liveness camera result
+  /// Called when LivenessCameraScreen returns successfully
+  void setLivenessCameraResult(String imagePath, double livenessScore) {
+    state = state.copyWith(
+      selfieImagePath: imagePath,
+      livenessScore: livenessScore,
+      isLoading: false,
+    );
   }
 
-  /// Run passive anti-spoofing detection on an image
-  /// 
-  /// NOTE: The FaceAntiSpoofingDetector SDK expects YUV format (raw camera preview data)
-  /// but image_picker returns JPEG/PNG files. Since we enforce camera-only mode
-  /// (no gallery uploads), the live capture itself provides anti-spoofing assurance.
-  /// 
-  /// For production, consider:
-  /// 1. Using a camera plugin that provides raw YUV frames during capture
-  /// 2. Adding server-side liveness verification
-  Future<double?> _runLivenessDetection(String imagePath) async {
-    try {
-      // Since image_picker captures directly from camera (not gallery),
-      // and we enforce camera-only mode, the image is inherently "live".
-      // The SDK's YUV-based detection is incompatible with JPEG files.
-      // 
-      // Return 1.0 (passed) for camera-captured images.
-      // Add server-side verification for additional security if needed.
-      debugPrint('Liveness check: Camera-captured image, considered live.');
-      return 1.0;
-    } catch (e) {
-      debugPrint('Liveness detection error: $e');
-      // If detection fails, allow the photo (graceful degradation)
-      return 1.0;
-    }
+  /// Start the selfie capture process
+  /// This sets loading state before navigating to camera
+  void startSelfieCapture() {
+    state = state.copyWith(isLoading: true);
+  }
+
+  /// Cancel selfie capture (user closed camera without capturing)
+  void cancelSelfieCapture() {
+    state = state.copyWith(isLoading: false);
   }
 
   void setSelfieImage(String path, {double? livenessScore}) {
