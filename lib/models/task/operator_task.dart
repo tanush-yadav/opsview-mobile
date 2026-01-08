@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../auth/shift.dart';
 import 'checklist_item.dart';
 import 'task_meta_data.dart';
+import 'task_submission_response.dart';
 
 class OperatorTasksResponse {
   OperatorTasksResponse({required this.data});
@@ -49,6 +50,7 @@ class OperatorTask {
     required this.centerName,
     this.metaData,
     this.checklist,
+    this.submissions,
   });
 
   factory OperatorTask.fromJson(Map<String, dynamic> json) {
@@ -63,6 +65,15 @@ class OperatorTask {
     if (json['checklist'] != null) {
       final checklistList = json['checklist'] as List<dynamic>;
       checklist = checklistList.map((e) => ChecklistItem.fromJson(e)).toList();
+    }
+
+    // Parse submissions from API response
+    List<TaskSubmissionResponse>? submissions;
+    if (json['submissions'] != null) {
+      final submissionsList = json['submissions'] as List<dynamic>;
+      submissions = submissionsList
+          .map((e) => TaskSubmissionResponse.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
 
     return OperatorTask(
@@ -83,6 +94,7 @@ class OperatorTask {
       centerName: json['centerName'] ?? '',
       metaData: metaData,
       checklist: checklist,
+      submissions: submissions,
     );
   }
 
@@ -103,6 +115,7 @@ class OperatorTask {
   final String centerName;
   final TaskMetaData? metaData;
   final List<ChecklistItem>? checklist;
+  final List<TaskSubmissionResponse>? submissions;
 
   Map<String, dynamic> toJson() {
     return {
@@ -123,6 +136,7 @@ class OperatorTask {
       'centerName': centerName,
       'metaData': metaData?.toJson(),
       'checklist': checklist?.map((e) => e.toJson()).toList(),
+      'submissions': submissions?.map((e) => e.toJson()).toList(),
     };
   }
 
