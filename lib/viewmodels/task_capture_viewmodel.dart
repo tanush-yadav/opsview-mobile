@@ -1,4 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/painting.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +13,7 @@ import 'package:uuid/uuid.dart';
 import '../core/providers/app_state_provider.dart';
 import '../models/task/captured_photo.dart';
 import '../models/task/checklist_item.dart';
+import '../models/task/image_checklist_entry.dart';
 import '../models/task/task_enums.dart';
 import '../models/task/task_meta_data.dart';
 import '../services/database/app_database.dart';
@@ -19,8 +24,9 @@ class TaskCaptureState {
     this.task,
     this.isLoading = true,
     this.metaData,
-    this.checklist = const [],
+    this.checklistTemplate = const [],
     this.capturedPhotos = const [],
+    this.imageChecklistEntries = const [],
     this.observations = '',
     this.error,
     this.submissionId,
@@ -35,8 +41,16 @@ class TaskCaptureState {
   final Task? task;
   final bool isLoading;
   final TaskMetaData? metaData;
-  final List<ChecklistItem> checklist;
+  
+  /// Template checklist from task definition (used to create copies for each image)
+  final List<ChecklistItem> checklistTemplate;
+  
+  /// Captured photos for IMAGE type tasks (no checklist)
   final List<CapturedPhoto> capturedPhotos;
+  
+  /// Image + checklist entries for CHECKLIST type tasks
+  final List<ImageChecklistEntry> imageChecklistEntries;
+  
   final String observations;
   final String? error;
   final String? submissionId;
@@ -51,8 +65,9 @@ class TaskCaptureState {
     Task? task,
     bool? isLoading,
     TaskMetaData? metaData,
-    List<ChecklistItem>? checklist,
+    List<ChecklistItem>? checklistTemplate,
     List<CapturedPhoto>? capturedPhotos,
+    List<ImageChecklistEntry>? imageChecklistEntries,
     String? observations,
     String? error,
     String? submissionId,
@@ -67,8 +82,9 @@ class TaskCaptureState {
       task: task ?? this.task,
       isLoading: isLoading ?? this.isLoading,
       metaData: metaData ?? this.metaData,
-      checklist: checklist ?? this.checklist,
+      checklistTemplate: checklistTemplate ?? this.checklistTemplate,
       capturedPhotos: capturedPhotos ?? this.capturedPhotos,
+      imageChecklistEntries: imageChecklistEntries ?? this.imageChecklistEntries,
       observations: observations ?? this.observations,
       error: error,
       submissionId: submissionId ?? this.submissionId,
@@ -98,32 +114,33 @@ class TaskCaptureState {
     return distanceFromCenter! <= geofenceRadius;
   }
 
-  /// Whether this is an IMAGE type task (show photo capture)
+  /// Whether this is an IMAGE type task (show photo capture, no checklist)
   bool get isImageTask => task?.taskType == 'IMAGE';
 
-  /// Whether this is a CHECKLIST type task (show checklist questions)
+  /// Whether this is a CHECKLIST type task (images + per-image checklist)
   bool get isChecklistTask => task?.taskType == 'CHECKLIST';
 
-  /// Count of answered checklist items
-  int get answeredCount => checklist.where((item) => item.value != 'NA').length;
-
-  /// Required number of images for this task (default: 1)
-  /// TODO: Parse from task metaData when API provides no-img-cnt field
+  /// Required number of images for IMAGE tasks (default: 1)
+  /// TODO: Parse from task metaData when API provides noOfImages field
   int get requiredImageCount => 1;
 
-  /// Whether the image limit has been reached
+  /// Whether the image limit has been reached (only for IMAGE tasks)
   bool get hasReachedImageLimit => capturedPhotos.length >= requiredImageCount;
 
   /// Whether all required fields are complete
   bool get canComplete {
     if (isImageTask) {
       // Must have exactly the required number of images
-      return capturedPhotos.length == requiredImageCount;
+      return capturedPhotos.length >= requiredImageCount;
     } else if (isChecklistTask) {
-      return checklist.isNotEmpty &&
-          checklist
-              .where((item) => item.required)
-              .every((item) => item.value != 'NA');
+      // Must have at least one image with all required checklist items answered
+      if (imageChecklistEntries.isEmpty) return false;
+      
+      return imageChecklistEntries.every((entry) {
+        return entry.checklist
+            .where((item) => item.required)
+            .every((item) => item.value != 'NA');
+      });
     }
     return true;
   }
@@ -131,17 +148,40 @@ class TaskCaptureState {
 
 class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
   final _imagePicker = ImagePicker();
+  int _imageSequence = 0; // For generating unique filenames
 
   @override
   TaskCaptureState build() {
     return const TaskCaptureState();
   }
 
+  /// Generate a unique filename for API: {taskUUID}_{timestamp}_{sequence}.jpg
+  String _generateFilename() {
+    final taskUuid = state.task?.id ?? 'unknown';
+    // Use first 8 chars of UUID for brevity
+    final shortUuid = taskUuid.length >= 8 ? taskUuid.substring(0, 8) : taskUuid;
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    _imageSequence++;
+    return '${shortUuid}_${timestamp}_${_imageSequence.toString().padLeft(3, '0')}.jpg';
+  }
+
+  /// Create a fresh copy of the checklist template for a new image
+  List<ChecklistItem> _createChecklistCopy() {
+    return state.checklistTemplate.map((item) {
+      return ChecklistItem(
+        id: item.id,
+        question: item.question,
+        required: item.required,
+        value: 'NA', // Reset to unanswered
+      );
+    }).toList();
+  }
+
   /// Load task by its UUID (not the CODE)
   void loadTask(String taskUuid) {
     // CRITICAL: Reset state completely before loading new task
-    // This prevents cross-contamination of observations/photos between tasks
     state = const TaskCaptureState(isLoading: true);
+    _imageSequence = 0;
 
     final appState = ref.read(appStateProvider);
 
@@ -164,12 +204,12 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       }
     }
 
-    // Parse checklist from JSON
-    List<ChecklistItem> checklist = [];
+    // Parse checklist template from JSON
+    List<ChecklistItem> checklistTemplate = [];
     if (task.checklistJson != null) {
       try {
         final List<dynamic> checklistList = jsonDecode(task.checklistJson!);
-        checklist = checklistList
+        checklistTemplate = checklistList
             .map((e) => ChecklistItem.fromJson(e))
             .toList();
       } catch (e) {
@@ -177,7 +217,7 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       }
     }
 
-    // Check for existing submission by task UUID first, then by CODE (backward compat)
+    // Check for existing submission
     var submission = appState.taskSubmissions
         .where((s) => s.taskId == task.id)
         .firstOrNull;
@@ -189,39 +229,66 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
 
     String observations = '';
     List<CapturedPhoto> capturedPhotos = [];
+    List<ImageChecklistEntry> imageChecklistEntries = [];
     String? submissionId;
 
     if (submission != null) {
       submissionId = submission.id;
       observations = submission.observations ?? '';
 
-      // Load checklist answers from submission
-      try {
-        final List<dynamic> answersJson = jsonDecode(
-          submission.verificationAnswers,
-        );
-        checklist = checklist.map((item) {
-          final answerData = answersJson.firstWhere(
-            (a) => a['id'] == item.id,
-            orElse: () => null,
-          );
-          if (answerData != null) {
-            return item.copyWith(value: answerData['value']);
+      if (task.taskType == 'CHECKLIST') {
+        // Load imageChecklistEntries for CHECKLIST tasks
+        try {
+          final List<dynamic> entriesJson = jsonDecode(submission.verificationAnswers);
+          
+          // Each entry now contains localPath directly from toJson
+          for (var entryJson in entriesJson) {
+            imageChecklistEntries.add(
+              ImageChecklistEntry.fromJson(entryJson as Map<String, dynamic>),
+            );
           }
-          return item;
-        }).toList();
-      } catch (e) {
-        print('Error parsing verification answers: $e');
-      }
-
-      // Load captured photos
-      try {
-        final List<dynamic> photosJson = jsonDecode(submission.imagePaths);
-        capturedPhotos = photosJson.map((p) {
-          return CapturedPhoto(imagePath: p.toString());
-        }).toList();
-      } catch (e) {
-        print('Error parsing captured photos: $e');
+          print('Loaded ${imageChecklistEntries.length} entries from verificationAnswers');
+          for (var i = 0; i < imageChecklistEntries.length; i++) {
+            print('Entry $i path: ${imageChecklistEntries[i].localPath}');
+          }
+        } catch (e) {
+          print('Error parsing imageChecklistEntries: $e');
+          // Fallback: try old format (just paths, no checklist data)
+          try {
+            final List<dynamic> pathsJson = jsonDecode(submission.imagePaths);
+            for (var path in pathsJson) {
+              imageChecklistEntries.add(ImageChecklistEntry(
+                filename: _generateFilename(),
+                localPath: path.toString(),
+                checklist: checklistTemplate.map((item) {
+                  return ChecklistItem(
+                    id: item.id,
+                    question: item.question,
+                    required: item.required,
+                    value: 'NA',
+                  );
+                }).toList(),
+              ));
+            }
+          } catch (e2) {
+            print('Error parsing old format: $e2');
+          }
+        }
+      } else {
+        // Load captured photos for IMAGE tasks
+        try {
+          final List<dynamic> photosJson = jsonDecode(submission.imagePaths);
+          int seq = 0;
+          capturedPhotos = photosJson.map((p) {
+            seq++;
+            return CapturedPhoto(
+              imagePath: p.toString(),
+              filename: '${task.id.substring(0, 8)}_restored_${seq.toString().padLeft(3, '0')}.jpg',
+            );
+          }).toList();
+        } catch (e) {
+          print('Error parsing captured photos: $e');
+        }
       }
     }
 
@@ -229,9 +296,10 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       task: task,
       isLoading: false,
       metaData: metaData,
-      checklist: checklist,
+      checklistTemplate: checklistTemplate,
       observations: observations,
       capturedPhotos: capturedPhotos,
+      imageChecklistEntries: imageChecklistEntries,
       submissionId: submissionId,
       centerLat: appState.centerLat,
       centerLng: appState.centerLng,
@@ -295,16 +363,13 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
     await _detectLocation();
   }
 
-  void setChecklistAnswer(int index, String value) {
-    final updatedList = List<ChecklistItem>.from(state.checklist);
-    updatedList[index] = updatedList[index].copyWith(value: value);
-    state = state.copyWith(checklist: updatedList);
-  }
-
   void updateObservations(String text) {
     state = state.copyWith(observations: text);
   }
 
+  // ==================== IMAGE TASK METHODS ====================
+
+  /// Capture photo for IMAGE type tasks
   Future<void> capturePhoto(ImageSource source) async {
     try {
       final XFile? image = await _imagePicker.pickImage(
@@ -316,13 +381,30 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
 
       if (image == null) return;
 
-      addPhoto(CapturedPhoto(imagePath: image.path));
+      // Generate unique filename and copy to permanent path
+      final filename = _generateFilename();
+      final appDir = await getApplicationDocumentsDirectory();
+      final imagesDir = Directory('${appDir.path}/task_images');
+      if (!await imagesDir.exists()) {
+        await imagesDir.create(recursive: true);
+      }
+      
+      final permanentPath = '${imagesDir.path}/$filename';
+      await File(image.path).copy(permanentPath);
+      
+      // Clear any cached version of this path
+      imageCache.evict(permanentPath);
+      
+      addPhoto(CapturedPhoto(imagePath: permanentPath, filename: filename));
     } catch (e) {
+      print('Error capturing photo: $e');
       state = state.copyWith(error: 'Failed to capture photo');
     }
   }
 
   void addPhoto(CapturedPhoto photo) {
+    // Clear image cache for this path to avoid showing stale images
+    imageCache.evict(photo.imagePath);
     state = state.copyWith(capturedPhotos: [...state.capturedPhotos, photo]);
   }
 
@@ -332,31 +414,101 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
     state = state.copyWith(capturedPhotos: updatedPhotos);
   }
 
+  // ==================== CHECKLIST TASK METHODS ====================
+
+  /// Capture photo and add new image+checklist entry for CHECKLIST type tasks
+  Future<void> capturePhotoWithChecklist(ImageSource source) async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: source,
+        imageQuality: 80,
+        maxWidth: 1920,
+        maxHeight: 1080,
+      );
+
+      if (image == null) return;
+
+      // Generate unique filename and copy to permanent path
+      final filename = _generateFilename();
+      final appDir = await getApplicationDocumentsDirectory();
+      final imagesDir = Directory('${appDir.path}/task_images');
+      if (!await imagesDir.exists()) {
+        await imagesDir.create(recursive: true);
+      }
+      
+      final permanentPath = '${imagesDir.path}/$filename';
+      await File(image.path).copy(permanentPath);
+      
+      // Clear any cached version of this path
+      imageCache.evict(permanentPath);
+      
+      final newEntry = ImageChecklistEntry(
+        filename: filename,
+        localPath: permanentPath,
+        checklist: _createChecklistCopy(),
+      );
+      
+      state = state.copyWith(
+        imageChecklistEntries: [...state.imageChecklistEntries, newEntry],
+      );
+    } catch (e) {
+      print('Error capturing photo: $e');
+      state = state.copyWith(error: 'Failed to capture photo');
+    }
+  }
+
+  /// Set checklist answer for a specific image entry
+  void setImageChecklistAnswer(int imageIndex, int checklistIndex, String value) {
+    if (imageIndex < 0 || imageIndex >= state.imageChecklistEntries.length) return;
+
+    final entries = List<ImageChecklistEntry>.from(state.imageChecklistEntries);
+    final entry = entries[imageIndex];
+    final updatedChecklist = List<ChecklistItem>.from(entry.checklist);
+    
+    if (checklistIndex < 0 || checklistIndex >= updatedChecklist.length) return;
+    
+    updatedChecklist[checklistIndex] = updatedChecklist[checklistIndex].copyWith(value: value);
+    entries[imageIndex] = entry.copyWith(checklist: updatedChecklist);
+    
+    state = state.copyWith(imageChecklistEntries: entries);
+  }
+
+  /// Remove an image+checklist entry
+  void removeImageChecklistEntry(int index) {
+    if (index < 0 || index >= state.imageChecklistEntries.length) return;
+    
+    final entries = List<ImageChecklistEntry>.from(state.imageChecklistEntries);
+    entries.removeAt(index);
+    state = state.copyWith(imageChecklistEntries: entries);
+  }
+
+  // ==================== SUBMISSION ====================
+
   Future<bool> completeTask() async {
     if (state.task == null) return false;
 
     try {
       final db = ref.read(appDatabaseProvider);
-      // Use the task UUID, NOT the CODE
       final taskUuid = state.task!.id;
 
-      // Serialize checklist answers to JSON
-      final checklistAnswersJson = jsonEncode(
-        state.checklist
-            .map(
-              (item) => {
-                'id': item.id,
-                'question': item.question,
-                'value': item.value,
-              },
-            )
-            .toList(),
-      );
+      String verificationAnswersJson;
+      String imagePathsJson;
 
-      // Serialize image paths to JSON
-      final imagePathsJson = jsonEncode(
-        state.capturedPhotos.map((photo) => photo.imagePath).toList(),
-      );
+      if (state.isChecklistTask) {
+        // Build imageChecklist format for CHECKLIST tasks
+        verificationAnswersJson = jsonEncode(
+          state.imageChecklistEntries.map((entry) => entry.toJson()).toList(),
+        );
+        imagePathsJson = jsonEncode(
+          state.imageChecklistEntries.map((entry) => entry.localPath).toList(),
+        );
+      } else {
+        // IMAGE tasks - just paths, no checklist
+        verificationAnswersJson = '[]';
+        imagePathsJson = jsonEncode(
+          state.capturedPhotos.map((photo) => photo.imagePath).toList(),
+        );
+      }
 
       final latitude = state.currentLat;
       final longitude = state.currentLng;
@@ -368,7 +520,7 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
         )..where((t) => t.id.equals(state.submissionId!))).write(
           TaskSubmissionsCompanion(
             observations: Value(state.observations),
-            verificationAnswers: Value(checklistAnswersJson),
+            verificationAnswers: Value(verificationAnswersJson),
             imagePaths: Value(imagePathsJson),
             status: Value(SyncStatus.unsynced.toDbValue),
             submittedAt: Value(DateTime.now()),
@@ -377,16 +529,16 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
           ),
         );
       } else {
-        // Insert new record with task UUID (not CODE)
+        // Insert new record
         final newSubmissionId = const Uuid().v4();
         await db
             .into(db.taskSubmissions)
             .insert(
               TaskSubmissionsCompanion.insert(
                 id: newSubmissionId,
-                taskId: taskUuid, // Store UUID, not CODE
+                taskId: taskUuid,
                 observations: Value(state.observations),
-                verificationAnswers: checklistAnswersJson,
+                verificationAnswers: verificationAnswersJson,
                 imagePaths: imagePathsJson,
                 status: Value(SyncStatus.unsynced.toDbValue),
                 latitude: Value(latitude),
@@ -395,7 +547,7 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
             );
       }
 
-      // Update task status to SUBMITTED (query by UUID, not CODE)
+      // Update task status to SUBMITTED
       await (db.update(db.tasks)..where((t) => t.id.equals(taskUuid))).write(
         TasksCompanion(taskStatus: Value(TaskStatus.submitted.toDbValue)),
       );

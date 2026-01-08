@@ -78,12 +78,17 @@ class LoginViewModel extends Notifier<LoginState> {
             );
 
         // Fetch and store operator tasks
+        print('DEBUG: About to fetch tasks...');
         await _fetchAndStoreTasks(apiService, db);
+        print('DEBUG: Tasks fetched successfully');
 
         // Load app state from database so it's available globally
+        print('DEBUG: About to load app state...');
         await ref.read(appStateProvider.notifier).loadFromDatabase();
+        print('DEBUG: App state loaded');
 
         state = state.copyWith(isLoading: false, isSuccess: true);
+        print('DEBUG: Login success, returning true');
         return true;
       } else {
         final strings = ref.read(appStringsProvider);
@@ -151,7 +156,9 @@ class LoginViewModel extends Notifier<LoginState> {
           }
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Error in _fetchAndStoreTasks: $e');
+      print('Stack trace: $stackTrace');
       rethrow;
     }
   }

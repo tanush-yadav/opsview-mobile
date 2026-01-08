@@ -147,14 +147,15 @@ class TaskSyncService {
         'location': locationName,
       };
 
-      // 5a. Add checklist data for CHECKLIST type tasks
+      // 5a. Add imageChecklist data for CHECKLIST type tasks
       if (task != null && task.taskType == 'CHECKLIST') {
         try {
-          final List<dynamic> checklistAnswers =
+          final List<dynamic> imageChecklistEntries =
               jsonDecode(submission.verificationAnswers);
-          payload['checklist'] = checklistAnswers;
+          // The stored format is already [{filename, checklist: [...]}, ...]
+          payload['imageChecklist'] = imageChecklistEntries;
         } catch (e) {
-          // Failed to parse checklist, proceed without it
+          // Failed to parse imageChecklist, proceed without it
         }
       }
 
