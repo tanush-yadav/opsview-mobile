@@ -58,7 +58,7 @@ class ConfirmationScreen extends ConsumerWidget {
                     // Exam Code
                     _buildDetailItem(
                       label: strings.examCodeLabel,
-                      value: '#${appState.exam?.code ?? ''}',
+                      value: appState.exam?.code ?? '',
                     ),
                     const SizedBox(height: 16),
                     // Exam Name

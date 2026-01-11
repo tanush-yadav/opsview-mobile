@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' as material;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
@@ -29,13 +30,37 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
     final state = ref.read(profileViewModelProvider);
     _fullNameController = material.TextEditingController(text: state.fullName);
     _ageController = material.TextEditingController(text: state.age);
-    _mobileController = material.TextEditingController(text: state.mobileNumber);
-    _aadhaarController = material.TextEditingController(text: state.aadhaarNumber);
+    _mobileController = material.TextEditingController(
+      text: state.mobileNumber,
+    );
+    _aadhaarController = material.TextEditingController(
+      text: state.aadhaarNumber,
+    );
 
     // Initialize OTP controllers and focus nodes (4 digits)
     for (int i = 0; i < 4; i++) {
-      _otpControllers.add(material.TextEditingController(text: state.otpDigits[i]));
-      _otpFocusNodes.add(FocusNode());
+      _otpControllers.add(
+        material.TextEditingController(text: state.otpDigits[i]),
+      );
+      _otpFocusNodes.add(
+        FocusNode(
+          onKeyEvent: (node, event) {
+            if (event is KeyDownEvent &&
+                event.logicalKey == LogicalKeyboardKey.backspace) {
+              if (_otpControllers[i].text.isEmpty && i > 0) {
+                // Clear previous controller and update state
+                _otpControllers[i - 1].clear();
+                ref
+                    .read(profileViewModelProvider.notifier)
+                    .updateOtpDigit(i - 1, '');
+                _otpFocusNodes[i - 1].requestFocus();
+                return KeyEventResult.handled;
+              }
+            }
+            return KeyEventResult.ignored;
+          },
+        ),
+      );
     }
   }
 
@@ -113,14 +138,15 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
                       onChanged: viewModel.updateAge,
                       hasError: state.showAgeError,
                     ),
-                    if (state.showAgeError)
-                      _buildErrorText(strings.invalidAge),
+                    if (state.showAgeError) _buildErrorText(strings.invalidAge),
                     const SizedBox(height: 20),
                     // Mobile Number
                     _buildFieldLabel(strings.mobileNumber),
                     const SizedBox(height: 8),
                     _buildMobileField(state, strings),
-                    if (state.showMobileError && !state.showOtpInput && !state.isMobileVerified)
+                    if (state.showMobileError &&
+                        !state.showOtpInput &&
+                        !state.isMobileVerified)
                       _buildErrorText(strings.invalidMobile),
                     const SizedBox(height: 20),
                     // Aadhaar Number
@@ -140,11 +166,12 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
             width: double.infinity,
             height: 56,
             child: PrimaryButton(
-              onPressed:
-                  state.isDetailsValid ? () {
-                    FocusScope.of(context).unfocus();
-                    viewModel.goToSelfie();
-                  } : null,
+              onPressed: state.isDetailsValid
+                  ? () {
+                      FocusScope.of(context).unfocus();
+                      viewModel.goToSelfie();
+                    }
+                  : null,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -203,7 +230,11 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: hasError ? AppColors.error : AppColors.textMuted),
+          Icon(
+            icon,
+            size: 20,
+            color: hasError ? AppColors.error : AppColors.textMuted,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: material.TextField(
@@ -223,12 +254,10 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
     );
   }
 
-  Widget _buildMobileField(
-    ProfileState state,
-    AppStrings strings,
-  ) {
+  Widget _buildMobileField(ProfileState state, AppStrings strings) {
     final viewModel = ref.read(profileViewModelProvider.notifier);
-    final bool canVerify = state.mobileNumber.length >= 10 &&
+    final bool canVerify =
+        state.mobileNumber.length >= 10 &&
         !state.isMobileVerified &&
         !state.showOtpInput;
 
@@ -243,7 +272,11 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.phone_android, size: 20, color: AppColors.textMuted),
+              const Icon(
+                Icons.phone_android,
+                size: 20,
+                color: AppColors.textMuted,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: material.TextField(
@@ -263,14 +296,16 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
               GestureDetector(
                 onTap: canVerify ? viewModel.verifyMobile : null,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: state.isMobileVerified
                         ? AppColors.success.withValues(alpha: 0.1)
                         : canVerify
-                            ? AppColors.primary
-                            : AppColors.primary.withValues(alpha: 0.4),
+                        ? AppColors.primary
+                        : AppColors.primary.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -294,8 +329,8 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
                           color: state.isMobileVerified
                               ? AppColors.success
                               : canVerify
-                                  ? AppColors.textLight
-                                  : AppColors.textLight.withValues(alpha: 0.6),
+                              ? AppColors.textLight
+                              : AppColors.textLight.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -313,10 +348,7 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
     );
   }
 
-  Widget _buildOtpSection(
-    ProfileState state,
-    AppStrings strings,
-  ) {
+  Widget _buildOtpSection(ProfileState state, AppStrings strings) {
     final viewModel = ref.read(profileViewModelProvider.notifier);
 
     return Container(
@@ -424,7 +456,9 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
             width: double.infinity,
             height: 48,
             child: PrimaryButton(
-              onPressed: state.otpDigits.every((d) => d.isNotEmpty) && !state.isOtpLoading
+              onPressed:
+                  state.otpDigits.every((d) => d.isNotEmpty) &&
+                      !state.isOtpLoading
                   ? () {
                       FocusScope.of(context).unfocus();
                       viewModel.submitOtp();
