@@ -217,65 +217,74 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       }
     }
 
-    // Check for existing submission
-    var submission = appState.taskSubmissions
+    // Get submissions for this task
+    // For IMAGE tasks: show last submission only
+    // For CHECKLIST tasks: show all submissions
+    var taskSubmissions = appState.taskSubmissions
         .where((s) => s.taskId == task.id)
-        .firstOrNull;
+        .toList();
 
     // Fallback: try by CODE for old submissions
-    submission ??= appState.taskSubmissions
-        .where((s) => s.taskId == task.taskId)
-        .firstOrNull;
+    if (taskSubmissions.isEmpty) {
+      taskSubmissions = appState.taskSubmissions
+          .where((s) => s.taskId == task.taskId)
+          .toList();
+    }
+
+    // Sort by submittedAt descending (newest first)
+    taskSubmissions.sort((a, b) => b.submittedAt.compareTo(a.submittedAt));
 
     String observations = '';
     List<CapturedPhoto> capturedPhotos = [];
     List<ImageChecklistEntry> imageChecklistEntries = [];
     String? submissionId;
 
-    if (submission != null) {
-      submissionId = submission.id;
-      observations = submission.observations ?? '';
-
+    if (taskSubmissions.isNotEmpty) {
       if (task.taskType == 'CHECKLIST') {
-        // Load imageChecklistEntries for CHECKLIST tasks
-        try {
-          final List<dynamic> entriesJson = jsonDecode(submission.verificationAnswers);
-          
-          // Each entry now contains localPath directly from toJson
-          for (var entryJson in entriesJson) {
-            imageChecklistEntries.add(
-              ImageChecklistEntry.fromJson(entryJson as Map<String, dynamic>),
-            );
-          }
-          print('Loaded ${imageChecklistEntries.length} entries from verificationAnswers');
-          for (var i = 0; i < imageChecklistEntries.length; i++) {
-            print('Entry $i path: ${imageChecklistEntries[i].localPath}');
-          }
-        } catch (e) {
-          print('Error parsing imageChecklistEntries: $e');
-          // Fallback: try old format (just paths, no checklist data)
+        // CHECKLIST tasks: Load ALL submissions
+        for (final submission in taskSubmissions) {
           try {
-            final List<dynamic> pathsJson = jsonDecode(submission.imagePaths);
-            for (var path in pathsJson) {
-              imageChecklistEntries.add(ImageChecklistEntry(
-                filename: _generateFilename(),
-                localPath: path.toString(),
-                checklist: checklistTemplate.map((item) {
-                  return ChecklistItem(
-                    id: item.id,
-                    question: item.question,
-                    required: item.required,
-                    value: 'NA',
-                  );
-                }).toList(),
-              ));
+            final List<dynamic> entriesJson = jsonDecode(submission.verificationAnswers);
+            
+            for (var entryJson in entriesJson) {
+              imageChecklistEntries.add(
+                ImageChecklistEntry.fromJson(entryJson as Map<String, dynamic>),
+              );
             }
-          } catch (e2) {
-            print('Error parsing old format: $e2');
+          } catch (e) {
+            print('Error parsing imageChecklistEntries: $e');
+            // Fallback: try old format (just paths, no checklist data)
+            try {
+              final List<dynamic> pathsJson = jsonDecode(submission.imagePaths);
+              for (var path in pathsJson) {
+                imageChecklistEntries.add(ImageChecklistEntry(
+                  filename: _generateFilename(),
+                  localPath: path.toString(),
+                  checklist: checklistTemplate.map((item) {
+                    return ChecklistItem(
+                      id: item.id,
+                      question: item.question,
+                      required: item.required,
+                      value: 'NA',
+                    );
+                  }).toList(),
+                ));
+              }
+            } catch (e2) {
+              print('Error parsing old format: $e2');
+            }
           }
         }
+        // Use the most recent submission's ID and observations
+        submissionId = taskSubmissions.first.id;
+        observations = taskSubmissions.first.observations ?? '';
+        print('Loaded ${imageChecklistEntries.length} entries from ${taskSubmissions.length} submissions');
       } else {
-        // Load captured photos for IMAGE tasks
+        // IMAGE tasks: Load LAST submission only
+        final submission = taskSubmissions.first;
+        submissionId = submission.id;
+        observations = submission.observations ?? '';
+
         try {
           final List<dynamic> photosJson = jsonDecode(submission.imagePaths);
           int seq = 0;

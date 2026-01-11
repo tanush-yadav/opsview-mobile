@@ -153,6 +153,36 @@ class LoginViewModel extends Notifier<LoginState> {
                     checklistJson: Value(task.checklistJson),
                   ),
                 );
+
+            // Store submissions from API response (these are already synced)
+            if (task.submissions != null && task.submissions!.isNotEmpty) {
+              for (final submission in task.submissions!) {
+                // Check if submission already exists to avoid duplicates
+                final existing = await (db.select(db.taskSubmissions)
+                      ..where((t) => t.id.equals(submission.id)))
+                    .getSingleOrNull();
+
+                if (existing == null) {
+                  await db.into(db.taskSubmissions).insert(
+                    TaskSubmissionsCompanion.insert(
+                      id: submission.id,
+                      taskId: task.id,
+                      observations: Value(submission.message),
+                      verificationAnswers: submission.verificationAnswers != null
+                          ? jsonEncode(submission.verificationAnswers)
+                          : '[]',
+                      imagePaths: submission.imageUrl != null
+                          ? jsonEncode([submission.imageUrl])
+                          : '[]',
+                      status: Value('SYNCED'),
+                      latitude: Value(null),
+                      longitude: Value(null),
+                      syncedAt: Value(submission.submittedAt ?? DateTime.now()),
+                    ),
+                  );
+                }
+              }
+            }
           }
         }
       }
