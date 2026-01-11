@@ -42,7 +42,7 @@ class ProfileSyncService {
         'contact': profile.contact,
         'age': profile.age,
         'aadhaar': profile.aadhaar,
-        'livenessStatus': profile.livenessStatus ?? 'PASSED',
+        'livenessStatus': profile.livenessStatus,
         'livenessScore': profile.livenessScore ?? 0.0,
         'livenessAttemptedAt':
             profile.livenessAttemptedAt?.toUtc().toIso8601String() ??

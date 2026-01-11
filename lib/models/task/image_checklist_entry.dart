@@ -3,6 +3,15 @@ import 'checklist_item.dart';
 /// Entry representing an image with its associated checklist answers.
 /// Used for CHECKLIST type tasks where each image has its own checklist.
 class ImageChecklistEntry {
+
+  factory ImageChecklistEntry.fromJson(Map<String, dynamic> json, [String? overrideLocalPath]) {
+    final checklistList = json['checklist'] as List<dynamic>? ?? [];
+    return ImageChecklistEntry(
+      filename: json['filename'] ?? '',
+      localPath: overrideLocalPath ?? json['localPath'] ?? '',
+      checklist: checklistList.map((e) => ChecklistItem.fromJson(e)).toList(),
+    );
+  }
   ImageChecklistEntry({
     required this.filename,
     required this.localPath,
@@ -33,14 +42,5 @@ class ImageChecklistEntry {
       'localPath': localPath,
       'checklist': checklist.map((e) => e.toJson()).toList(),
     };
-  }
-
-  factory ImageChecklistEntry.fromJson(Map<String, dynamic> json, [String? overrideLocalPath]) {
-    final checklistList = json['checklist'] as List<dynamic>? ?? [];
-    return ImageChecklistEntry(
-      filename: json['filename'] ?? '',
-      localPath: overrideLocalPath ?? json['localPath'] ?? '',
-      checklist: checklistList.map((e) => ChecklistItem.fromJson(e)).toList(),
-    );
   }
 }

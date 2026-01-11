@@ -47,11 +47,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    final success = await ref.read(loginViewModelProvider.notifier).login(
-          examCode: examCode,
-          username: username,
-          password: password,
-        );
+    final success = await ref
+        .read(loginViewModelProvider.notifier)
+        .login(examCode: examCode, username: username, password: password);
 
     if (!mounted) return;
 
@@ -167,7 +165,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 8),
                           _buildBorderlessTextField(
                             controller: _passwordController,
-                            hintText: '••••••••',
+                            hintText: strings.passwordHint,
                             icon: Icons.lock_outline,
                             obscureText: _obscurePassword,
                             suffixIcon: GestureDetector(
@@ -203,7 +201,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   style: material.ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textLight,
-                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
+                    disabledBackgroundColor: AppColors.primary.withValues(
+                      alpha: 0.6,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28),
                     ),

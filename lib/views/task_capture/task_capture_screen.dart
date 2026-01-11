@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/localization/app_strings.dart';
+import '../../core/utils/app_logger.dart';
 import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/location_status_card.dart';
 import '../../core/theme/app_colors.dart';
@@ -28,6 +29,8 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   final TextEditingController _observationsController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _observationsInitialized = false;
+
+  AppStrings get strings => ref.watch(appStringsProvider);
 
   @override
   void initState() {
@@ -56,7 +59,9 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   // ==================== IMAGE TASK METHODS ====================
 
   void _takePhoto() {
-    ref.read(taskCaptureViewModelProvider.notifier).capturePhoto(ImageSource.camera);
+    ref
+        .read(taskCaptureViewModelProvider.notifier)
+        .capturePhoto(ImageSource.camera);
   }
 
   void _removePhoto(int index) {
@@ -66,15 +71,25 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   // ==================== CHECKLIST TASK METHODS ====================
 
   void _takePhotoWithChecklist() {
-    ref.read(taskCaptureViewModelProvider.notifier).capturePhotoWithChecklist(ImageSource.camera);
+    ref
+        .read(taskCaptureViewModelProvider.notifier)
+        .capturePhotoWithChecklist(ImageSource.camera);
   }
 
   void _removeImageChecklistEntry(int index) {
-    ref.read(taskCaptureViewModelProvider.notifier).removeImageChecklistEntry(index);
+    ref
+        .read(taskCaptureViewModelProvider.notifier)
+        .removeImageChecklistEntry(index);
   }
 
-  void _setImageChecklistAnswer(int imageIndex, int checklistIndex, String value) {
-    ref.read(taskCaptureViewModelProvider.notifier).setImageChecklistAnswer(imageIndex, checklistIndex, value);
+  void _setImageChecklistAnswer(
+    int imageIndex,
+    int checklistIndex,
+    String value,
+  ) {
+    ref
+        .read(taskCaptureViewModelProvider.notifier)
+        .setImageChecklistAnswer(imageIndex, checklistIndex, value);
   }
 
   // ==================== COMMON METHODS ====================
@@ -170,7 +185,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  task?.taskLabel ?? 'Task Details',
+                  task?.taskLabel ?? strings.taskDetails,
                   style: AppTextStyles.h3,
                 ),
                 Text(task?.centerName ?? '', style: AppTextStyles.bodySmall),
@@ -280,7 +295,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             Expanded(
               child: _buildSectionHeader(
                 icon: Icons.camera_alt_outlined,
-                title: 'PHOTO EVIDENCE',
+                title: strings.photoEvidence,
               ),
             ),
             // Photo count indicator
@@ -336,7 +351,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Required photo captured',
+                  strings.requiredPhotoCaptured,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w500,
@@ -354,7 +369,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
       onTap: () => FullScreenImageViewer.show(
         context,
         photo.imagePath,
-        title: 'Photo ${index + 1}',
+        title: strings.photoN(index + 1),
       ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -407,14 +422,18 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                   color: AppColors.textPrimary.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.zoom_in, color: AppColors.textLight, size: 14),
-                    SizedBox(width: 4),
+                    const Icon(
+                      Icons.zoom_in,
+                      color: AppColors.textLight,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 4),
                     Text(
-                      'Tap to view',
-                      style: TextStyle(
+                      strings.tapToView,
+                      style: const TextStyle(
                         color: AppColors.textLight,
                         fontSize: 11,
                       ),
@@ -482,12 +501,12 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              hasPhotos ? 'Add Another' : 'Take Photo',
+              hasPhotos ? strings.addAnother : strings.takePhoto,
               style: AppTextStyles.h4.copyWith(fontSize: 16),
             ),
             if (!hasPhotos) ...[
               const SizedBox(height: 4),
-              Text('Tap to capture evidence', style: AppTextStyles.muted),
+              Text(strings.tapToCaptureEvidence, style: AppTextStyles.muted),
             ],
           ],
         ),
@@ -510,7 +529,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             Expanded(
               child: _buildSectionHeader(
                 icon: Icons.camera_alt_outlined,
-                title: 'PHOTO VERIFICATION',
+                title: strings.photoVerification,
               ),
             ),
             // Photo count indicator
@@ -528,7 +547,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 ),
               ),
               child: Text(
-                '${entries.length} photo${entries.length != 1 ? 's' : ''}',
+                strings.photosCount(entries.length),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -539,12 +558,12 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        
+
         // Image + Checklist entries
         ...entries.asMap().entries.map((entry) {
           return _buildImageChecklistCard(entry.key, entry.value);
         }),
-        
+
         // Add More button (always visible for CHECKLIST tasks)
         _buildAddMoreCard(hasEntries),
       ],
@@ -553,8 +572,10 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
 
   Widget _buildImageChecklistCard(int imageIndex, ImageChecklistEntry entry) {
     // Debug: Print the path being used for each image
-    print('Building card $imageIndex with path: ${entry.localPath}');
-    
+    AppLogger.instance.d(
+      'Building card $imageIndex with path: ${entry.localPath}',
+    );
+
     return Container(
       key: ValueKey('image_card_${entry.filename}_$imageIndex'),
       margin: const EdgeInsets.only(bottom: 16),
@@ -571,19 +592,21 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             onTap: () => FullScreenImageViewer.show(
               context,
               entry.localPath,
-              title: 'Photo ${imageIndex + 1}',
+              title: strings.photoN(imageIndex + 1),
             ),
             child: Container(
               height: 180,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                 color: AppColors.textPrimary,
               ),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
                     child: Image.file(
                       File(entry.localPath),
                       key: ValueKey(entry.localPath),
@@ -617,13 +640,16 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'Photo ${imageIndex + 1}',
+                        strings.photoN(imageIndex + 1),
                         style: const TextStyle(
                           color: AppColors.textLight,
                           fontSize: 12,
@@ -658,19 +684,29 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                     bottom: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.textPrimary.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.zoom_in, color: AppColors.textLight, size: 14),
-                          SizedBox(width: 4),
+                          const Icon(
+                            Icons.zoom_in,
+                            color: AppColors.textLight,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            'Tap to view',
-                            style: TextStyle(color: AppColors.textLight, fontSize: 11),
+                            strings.tapToView,
+                            style: const TextStyle(
+                              color: AppColors.textLight,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
@@ -680,7 +716,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
               ),
             ),
           ),
-          
+
           // Checklist for this image
           Padding(
             padding: const EdgeInsets.all(16),
@@ -689,10 +725,14 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.checklist, size: 16, color: AppColors.primary),
+                    const Icon(
+                      Icons.checklist,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 6),
                     Text(
-                      'Verification',
+                      strings.verification,
                       style: AppTextStyles.label.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
@@ -717,7 +757,12 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     );
   }
 
-  Widget _buildChecklistItemForImage(int imageIndex, int checklistIndex, ChecklistItem item, int total) {
+  Widget _buildChecklistItemForImage(
+    int imageIndex,
+    int checklistIndex,
+    ChecklistItem item,
+    int total,
+  ) {
     return Padding(
       padding: EdgeInsets.only(bottom: checklistIndex < total - 1 ? 16 : 0),
       child: Column(
@@ -752,7 +797,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                     Text(item.question, style: AppTextStyles.body),
                     if (item.required)
                       Text(
-                        'Required',
+                        strings.mandatory,
                         style: AppTextStyles.mutedSmall.copyWith(
                           color: AppColors.error,
                         ),
@@ -769,17 +814,25 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
               children: [
                 Expanded(
                   child: _buildAnswerButton(
-                    label: 'Yes',
+                    label: strings.yes,
                     isSelected: item.value == 'YES',
-                    onTap: () => _setImageChecklistAnswer(imageIndex, checklistIndex, 'YES'),
+                    onTap: () => _setImageChecklistAnswer(
+                      imageIndex,
+                      checklistIndex,
+                      'YES',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _buildAnswerButton(
-                    label: 'No',
+                    label: strings.no,
                     isSelected: item.value == 'NO',
-                    onTap: () => _setImageChecklistAnswer(imageIndex, checklistIndex, 'NO'),
+                    onTap: () => _setImageChecklistAnswer(
+                      imageIndex,
+                      checklistIndex,
+                      'NO',
+                    ),
                   ),
                 ),
               ],
@@ -822,12 +875,15 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              hasPhotos ? 'Add More Photos' : 'Add Photo',
+              hasPhotos ? strings.addMorePhotos : strings.addPhoto,
               style: AppTextStyles.h4.copyWith(fontSize: 15),
             ),
             if (!hasPhotos) ...[
               const SizedBox(height: 4),
-              Text('Capture photo and answer verification', style: AppTextStyles.muted),
+              Text(
+                strings.captureEvidenceInstruction,
+                style: AppTextStyles.muted,
+              ),
             ],
           ],
         ),
@@ -887,10 +943,10 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             maxLines: 4,
             style: AppTextStyles.body,
             onChanged: _updateObservations,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Add any notes or observations...',
               hintStyle: AppTextStyles.muted,
-              contentPadding: const EdgeInsets.all(16),
+              contentPadding: EdgeInsets.all(16),
               border: InputBorder.none,
             ),
           ),
@@ -902,13 +958,13 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   Widget _buildBottomButton(TaskCaptureState state) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.backgroundWhite,
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 8,
-            offset: const Offset(0, -2),
+            offset: Offset(0, -2),
           ),
         ],
       ),

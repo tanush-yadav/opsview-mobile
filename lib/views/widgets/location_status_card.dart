@@ -166,7 +166,9 @@ class LocationStatusCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          isInsideGeofence ? 'Inside Zone' : 'Outside Zone',
+                          isInsideGeofence
+                              ? strings.insideZone
+                              : strings.outsideZone,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,

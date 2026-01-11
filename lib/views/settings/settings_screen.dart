@@ -281,7 +281,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Warning: Tasks incomplete or unsynced
+          // Warning: Tasks unsynced
           if (state.showLogoutWarning)
             Container(
               padding: const EdgeInsets.all(12),
@@ -303,17 +303,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          state.hasIncompleteTasks 
-                              ? 'Complete All Tasks'
-                              : strings.syncRequired,
+                          strings.syncRequired,
                           style: AppTextStyles.label.copyWith(
                             color: AppColors.warning,
                           ),
                         ),
                         Text(
-                          state.hasIncompleteTasks
-                              ? 'All tasks must be completed before logout'
-                              : strings.syncBeforeLogout,
+                          strings.syncBeforeLogout,
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.warning,
                           ),

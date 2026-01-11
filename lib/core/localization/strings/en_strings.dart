@@ -230,4 +230,41 @@ class EnStrings implements AppStrings {
   String get gallery => 'Gallery';
   @override
   String get cancel => 'Cancel';
+  @override
+  String get submitTask => 'Submit Task';
+
+  // Common
+  @override
+  String get insideZone => 'Inside Zone';
+  @override
+  String get outsideZone => 'Outside Zone';
+  @override
+  String get failedToLoadImage => 'Failed to load image';
+  @override
+  String get passwordHint => '••••••••';
+  @override
+  String get verifyingSession => 'Verifying Session...';
+  @override
+  String get tapToView => 'Tap to view';
+  @override
+  String get score => 'Score';
+  @override
+  String get liveness => 'Liveness';
+  @override
+  String get requiredPhotoCaptured => 'Required photo captured';
+  @override
+  String get addPhoto => 'Add Photo';
+  @override
+  String get addMorePhotos => 'Add More Photos';
+  @override
+  String get captureEvidenceInstruction =>
+      'Capture photo and answer verification';
+  @override
+  String photoN(int n) => 'Photo $n';
+  @override
+  String photosCount(int count) => '$count photo${count != 1 ? 's' : ''}';
+  @override
+  String get verification => 'Verification';
+  @override
+  String get photoVerification => 'PHOTO VERIFICATION';
 }

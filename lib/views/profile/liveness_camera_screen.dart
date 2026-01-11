@@ -5,28 +5,30 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:face_anti_spoofing_detector/face_anti_spoofing_detector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/localization/app_strings.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// A camera screen that performs real-time liveness detection
 /// using the FaceAntiSpoofingDetector SDK with YUV camera frames.
-/// 
+///
 /// Returns a [LivenessResult] containing the captured image path
 /// and the final liveness score if successful, or null if cancelled.
-class LivenessCameraScreen extends StatefulWidget {
+class LivenessCameraScreen extends ConsumerStatefulWidget {
   const LivenessCameraScreen({super.key});
 
   @override
-  State<LivenessCameraScreen> createState() => _LivenessCameraScreenState();
+  ConsumerState<LivenessCameraScreen> createState() =>
+      _LivenessCameraScreenState();
 }
 
 class LivenessResult {
+  LivenessResult({required this.imagePath, required this.livenessScore});
   final String imagePath;
   final double livenessScore;
-
-  LivenessResult({required this.imagePath, required this.livenessScore});
 }
 
-class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
+class _LivenessCameraScreenState extends ConsumerState<LivenessCameraScreen> {
   CameraController? _controller;
   List<CameraDescription>? _cameras;
   bool _isInitialized = false;
@@ -54,7 +56,7 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
       _cameras = await availableCameras();
       if (_cameras == null || _cameras!.isEmpty) {
         setState(() {
-          _statusMessage = 'No cameras available';
+          _statusMessage = ref.read(appStringsProvider).somethingWentWrong;
         });
         return;
       }
@@ -79,7 +81,7 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
 
       setState(() {
         _isInitialized = true;
-        _statusMessage = 'Position your face in the frame';
+        _statusMessage = ref.read(appStringsProvider).selfieInstructions;
       });
 
       // Start image stream for liveness detection
@@ -125,14 +127,18 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
           _consecutivePassCount++;
           if (_consecutivePassCount >= _requiredConsecutivePasses) {
             _livenessCheckPassed = true;
-            _statusMessage = 'Liveness verified! Tap to capture';
+            final strings = ref.read(appStringsProvider);
+            _statusMessage =
+                '${strings.liveness} ${strings.verified} ${strings.tapToCaptureEvidence}';
           } else {
-            _statusMessage = 'Verifying... (${_consecutivePassCount}/$_requiredConsecutivePasses)';
+            final strings = ref.read(appStringsProvider);
+            _statusMessage =
+                '${strings.verifyingSession} ($_consecutivePassCount/$_requiredConsecutivePasses)';
           }
         } else {
           _consecutivePassCount = 0;
           _livenessCheckPassed = false;
-          _statusMessage = 'Position your face clearly';
+          _statusMessage = ref.read(appStringsProvider).selfieInstructions;
         }
       });
     } catch (e) {
@@ -147,15 +153,15 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
     // Plane 0: Y (luminance)
     // Plane 1: U (chrominance)
     // Plane 2: V (chrominance)
-    
+
     final int width = image.width;
     final int height = image.height;
     final int ySize = width * height;
     final int uvSize = (width ~/ 2) * (height ~/ 2);
-    
+
     // Total size for YUV420: Y + U + V
     final Uint8List yuvBytes = Uint8List(ySize + uvSize * 2);
-    
+
     // Copy Y plane
     final yPlane = image.planes[0];
     int yIndex = 0;
@@ -170,20 +176,22 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
     if (image.planes.length >= 3) {
       final uPlane = image.planes[1];
       final vPlane = image.planes[2];
-      
+
       int uvIndex = ySize;
       for (int row = 0; row < height ~/ 2; row++) {
         for (int col = 0; col < width ~/ 2; col++) {
           // U plane
           final uRowStart = row * uPlane.bytesPerRow;
-          yuvBytes[uvIndex++] = uPlane.bytes[uRowStart + col * uPlane.bytesPerPixel!];
+          yuvBytes[uvIndex++] =
+              uPlane.bytes[uRowStart + col * uPlane.bytesPerPixel!];
         }
       }
       for (int row = 0; row < height ~/ 2; row++) {
         for (int col = 0; col < width ~/ 2; col++) {
           // V plane
           final vRowStart = row * vPlane.bytesPerRow;
-          yuvBytes[uvIndex++] = vPlane.bytes[vRowStart + col * vPlane.bytesPerPixel!];
+          yuvBytes[uvIndex++] =
+              vPlane.bytes[vRowStart + col * vPlane.bytesPerPixel!];
         }
       }
     }
@@ -216,10 +224,12 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
       await FaceAntiSpoofingDetector.destroy();
 
       if (mounted) {
-        Navigator.of(context).pop(LivenessResult(
-          imagePath: savedPath,
-          livenessScore: _currentLivenessScore,
-        ));
+        Navigator.of(context).pop(
+          LivenessResult(
+            imagePath: savedPath,
+            livenessScore: _currentLivenessScore,
+          ),
+        );
       }
     } catch (e) {
       setState(() {
@@ -280,11 +290,18 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 28,
+                    ),
                     onPressed: () => Navigator.of(context).pop(null),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(16),
@@ -292,7 +309,9 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
                     child: Text(
                       'Score: ${(_currentLivenessScore * 100).toStringAsFixed(0)}%',
                       style: TextStyle(
-                        color: _livenessCheckPassed ? Colors.green : Colors.orange,
+                        color: _livenessCheckPassed
+                            ? Colors.green
+                            : Colors.orange,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -310,7 +329,10 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
                 children: [
                   // Status message
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(20),
@@ -331,19 +353,27 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: _livenessCheckPassed ? Colors.green : Colors.white38,
+                          color: _livenessCheckPassed
+                              ? Colors.green
+                              : Colors.white38,
                           width: 4,
                         ),
-                        color: _livenessCheckPassed ? Colors.green.withOpacity(0.3) : Colors.transparent,
+                        color: _livenessCheckPassed
+                            ? Colors.green.withValues(alpha: 0.3)
+                            : Colors.transparent,
                       ),
                       child: _isCapturing
                           ? const Center(
-                              child: CircularProgressIndicator(color: Colors.white),
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
                             )
                           : Icon(
                               Icons.camera,
                               size: 36,
-                              color: _livenessCheckPassed ? Colors.white : Colors.white38,
+                              color: _livenessCheckPassed
+                                  ? Colors.white
+                                  : Colors.white38,
                             ),
                     ),
                   ),
@@ -359,10 +389,9 @@ class _LivenessCameraScreenState extends State<LivenessCameraScreen> {
 
 /// Paints an oval face frame with color based on liveness status
 class _FaceFramePainter extends CustomPainter {
+  _FaceFramePainter({required this.isLive, required this.score});
   final bool isLive;
   final double score;
-
-  _FaceFramePainter({required this.isLive, required this.score});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -382,28 +411,62 @@ class _FaceFramePainter extends CustomPainter {
 
     // Draw corner brackets for visual guidance
     final bracketPaint = Paint()
-      ..color = isLive ? Colors.green.withOpacity(0.5) : Colors.white.withOpacity(0.3)
+      ..color = isLive
+          ? Colors.green.withValues(alpha: 0.5)
+          : Colors.white.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
-    final bracketSize = 30.0;
+    const bracketSize = 30.0;
     final rect = ovalRect.inflate(20);
 
     // Top-left bracket
-    canvas.drawLine(Offset(rect.left, rect.top + bracketSize), Offset(rect.left, rect.top), bracketPaint);
-    canvas.drawLine(Offset(rect.left, rect.top), Offset(rect.left + bracketSize, rect.top), bracketPaint);
+    canvas.drawLine(
+      Offset(rect.left, rect.top + bracketSize),
+      Offset(rect.left, rect.top),
+      bracketPaint,
+    );
+    canvas.drawLine(
+      Offset(rect.left, rect.top),
+      Offset(rect.left + bracketSize, rect.top),
+      bracketPaint,
+    );
 
     // Top-right bracket
-    canvas.drawLine(Offset(rect.right - bracketSize, rect.top), Offset(rect.right, rect.top), bracketPaint);
-    canvas.drawLine(Offset(rect.right, rect.top), Offset(rect.right, rect.top + bracketSize), bracketPaint);
+    canvas.drawLine(
+      Offset(rect.right - bracketSize, rect.top),
+      Offset(rect.right, rect.top),
+      bracketPaint,
+    );
+    canvas.drawLine(
+      Offset(rect.right, rect.top),
+      Offset(rect.right, rect.top + bracketSize),
+      bracketPaint,
+    );
 
     // Bottom-left bracket
-    canvas.drawLine(Offset(rect.left, rect.bottom - bracketSize), Offset(rect.left, rect.bottom), bracketPaint);
-    canvas.drawLine(Offset(rect.left, rect.bottom), Offset(rect.left + bracketSize, rect.bottom), bracketPaint);
+    canvas.drawLine(
+      Offset(rect.left, rect.bottom - bracketSize),
+      Offset(rect.left, rect.bottom),
+      bracketPaint,
+    );
+    canvas.drawLine(
+      Offset(rect.left, rect.bottom),
+      Offset(rect.left + bracketSize, rect.bottom),
+      bracketPaint,
+    );
 
     // Bottom-right bracket
-    canvas.drawLine(Offset(rect.right - bracketSize, rect.bottom), Offset(rect.right, rect.bottom), bracketPaint);
-    canvas.drawLine(Offset(rect.right, rect.bottom), Offset(rect.right, rect.bottom - bracketSize), bracketPaint);
+    canvas.drawLine(
+      Offset(rect.right - bracketSize, rect.bottom),
+      Offset(rect.right, rect.bottom),
+      bracketPaint,
+    );
+    canvas.drawLine(
+      Offset(rect.right, rect.bottom),
+      Offset(rect.right, rect.bottom - bracketSize),
+      bracketPaint,
+    );
   }
 
   @override

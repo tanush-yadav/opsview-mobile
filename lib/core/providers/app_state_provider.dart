@@ -6,6 +6,7 @@ import '../../models/auth/center.dart' as model;
 import '../../models/auth/exam.dart' as model;
 import '../../models/auth/user.dart' as model;
 import '../../services/database/app_database.dart';
+import '../utils/app_logger.dart';
 
 class AppState {
   const AppState({
@@ -67,10 +68,10 @@ class AppStateNotifier extends Notifier<AppState> {
   }
 
   Future<void> loadFromDatabase() async {
-    print('loadFromDatabase: Starting...');
+    AppLogger.instance.d('loadFromDatabase: Starting...');
     final db = ref.read(appDatabaseProvider);
     final sessions = await db.select(db.sessions).get();
-    print('loadFromDatabase: Got ${sessions.length} sessions');
+    AppLogger.instance.d('loadFromDatabase: Got ${sessions.length} sessions');
 
     if (sessions.isNotEmpty) {
       final session = sessions.first;
@@ -81,46 +82,57 @@ class AppStateNotifier extends Notifier<AppState> {
 
       try {
         if (session.userJson != null) {
-          print('loadFromDatabase: Parsing user...');
+          AppLogger.instance.d('loadFromDatabase: Parsing user...');
           user = model.User.fromJson(jsonDecode(session.userJson!));
         }
         if (session.examJson != null) {
-          print('loadFromDatabase: Parsing exam...');
+          AppLogger.instance.d('loadFromDatabase: Parsing exam...');
           exam = model.Exam.fromJson(jsonDecode(session.examJson!));
         }
         if (session.centerJson != null) {
-          print('loadFromDatabase: Parsing center...');
+          AppLogger.instance.d('loadFromDatabase: Parsing center...');
           center = model.Center.fromJson(jsonDecode(session.centerJson!));
         }
       } catch (e) {
-        print('loadFromDatabase: Error parsing session data: $e');
+        AppLogger.instance.e(
+          'loadFromDatabase: Error parsing session data: $e',
+        );
       }
 
       // Load profile
-      print('loadFromDatabase: Loading profiles...');
+      AppLogger.instance.d('loadFromDatabase: Loading profiles...');
       List<Profile> profiles = [];
       try {
         profiles = await db.select(db.profiles).get();
-        print('loadFromDatabase: Got ${profiles.length} profiles');
+        AppLogger.instance.d(
+          'loadFromDatabase: Got ${profiles.length} profiles',
+        );
       } catch (e, stackTrace) {
-        print('loadFromDatabase: ERROR loading profiles: $e');
-        print('Stack trace: $stackTrace');
+        AppLogger.instance.e(
+          'loadFromDatabase: ERROR loading profiles: $e',
+          e,
+          stackTrace,
+        );
       }
 
       // Load tasks for selected shift
-      print('loadFromDatabase: Loading tasks for shift ${session.selectedShiftId}...');
+      AppLogger.instance.d(
+        'loadFromDatabase: Loading tasks for shift ${session.selectedShiftId}...',
+      );
       List<Task> tasks = [];
       if (session.selectedShiftId != null) {
         tasks = await (db.select(
           db.tasks,
         )..where((t) => t.shiftId.equals(session.selectedShiftId!))).get();
       }
-      print('loadFromDatabase: Got ${tasks.length} tasks');
+      AppLogger.instance.d('loadFromDatabase: Got ${tasks.length} tasks');
 
       // Load task submissions
-      print('loadFromDatabase: Loading task submissions...');
+      AppLogger.instance.d('loadFromDatabase: Loading task submissions...');
       final taskSubmissions = await db.select(db.taskSubmissions).get();
-      print('loadFromDatabase: Got ${taskSubmissions.length} submissions');
+      AppLogger.instance.d(
+        'loadFromDatabase: Got ${taskSubmissions.length} submissions',
+      );
 
       state = AppState(
         user: user,
@@ -133,10 +145,10 @@ class AppStateNotifier extends Notifier<AppState> {
         onboardingStep: session.onboardingStep,
         isLoaded: true,
       );
-      print('loadFromDatabase: State updated');
+      AppLogger.instance.d('loadFromDatabase: State updated');
     } else {
       state = state.copyWith(isLoaded: true);
-      print('loadFromDatabase: No sessions, setting isLoaded');
+      AppLogger.instance.d('loadFromDatabase: No sessions, setting isLoaded');
     }
   }
 

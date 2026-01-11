@@ -17,6 +17,7 @@ import '../models/task/image_checklist_entry.dart';
 import '../models/task/task_enums.dart';
 import '../models/task/task_meta_data.dart';
 import '../services/database/app_database.dart';
+import '../core/utils/app_logger.dart';
 import '../core/enums/location_status.dart';
 
 class TaskCaptureState {
@@ -41,16 +42,16 @@ class TaskCaptureState {
   final Task? task;
   final bool isLoading;
   final TaskMetaData? metaData;
-  
+
   /// Template checklist from task definition (used to create copies for each image)
   final List<ChecklistItem> checklistTemplate;
-  
+
   /// Captured photos for IMAGE type tasks (no checklist)
   final List<CapturedPhoto> capturedPhotos;
-  
+
   /// Image + checklist entries for CHECKLIST type tasks
   final List<ImageChecklistEntry> imageChecklistEntries;
-  
+
   final String observations;
   final String? error;
   final String? submissionId;
@@ -84,7 +85,8 @@ class TaskCaptureState {
       metaData: metaData ?? this.metaData,
       checklistTemplate: checklistTemplate ?? this.checklistTemplate,
       capturedPhotos: capturedPhotos ?? this.capturedPhotos,
-      imageChecklistEntries: imageChecklistEntries ?? this.imageChecklistEntries,
+      imageChecklistEntries:
+          imageChecklistEntries ?? this.imageChecklistEntries,
       observations: observations ?? this.observations,
       error: error,
       submissionId: submissionId ?? this.submissionId,
@@ -135,7 +137,7 @@ class TaskCaptureState {
     } else if (isChecklistTask) {
       // Must have at least one image with all required checklist items answered
       if (imageChecklistEntries.isEmpty) return false;
-      
+
       return imageChecklistEntries.every((entry) {
         return entry.checklist
             .where((item) => item.required)
@@ -159,7 +161,9 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
   String _generateFilename() {
     final taskUuid = state.task?.id ?? 'unknown';
     // Use first 8 chars of UUID for brevity
-    final shortUuid = taskUuid.length >= 8 ? taskUuid.substring(0, 8) : taskUuid;
+    final shortUuid = taskUuid.length >= 8
+        ? taskUuid.substring(0, 8)
+        : taskUuid;
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     _imageSequence++;
     return '${shortUuid}_${timestamp}_${_imageSequence.toString().padLeft(3, '0')}.jpg';
@@ -200,7 +204,7 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
         final metaDataMap = jsonDecode(task.metaDataJson!);
         metaData = TaskMetaData.fromJson(metaDataMap);
       } catch (e) {
-        print('Error parsing metaData: $e');
+        AppLogger.instance.e('Error parsing metaData: $e');
       }
     }
 
@@ -213,7 +217,7 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
             .map((e) => ChecklistItem.fromJson(e))
             .toList();
       } catch (e) {
-        print('Error parsing checklist: $e');
+        AppLogger.instance.e('Error parsing checklist: $e');
       }
     }
 
@@ -236,7 +240,7 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
 
     String observations = '';
     List<CapturedPhoto> capturedPhotos = [];
-    List<ImageChecklistEntry> imageChecklistEntries = [];
+    final List<ImageChecklistEntry> imageChecklistEntries = [];
     String? submissionId;
 
     if (taskSubmissions.isNotEmpty) {
@@ -244,41 +248,47 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
         // CHECKLIST tasks: Load ALL submissions
         for (final submission in taskSubmissions) {
           try {
-            final List<dynamic> entriesJson = jsonDecode(submission.verificationAnswers);
-            
-            for (var entryJson in entriesJson) {
+            final List<dynamic> entriesJson = jsonDecode(
+              submission.verificationAnswers,
+            );
+
+            for (final entryJson in entriesJson) {
               imageChecklistEntries.add(
                 ImageChecklistEntry.fromJson(entryJson as Map<String, dynamic>),
               );
             }
           } catch (e) {
-            print('Error parsing imageChecklistEntries: $e');
+            AppLogger.instance.e('Error parsing imageChecklistEntries: $e');
             // Fallback: try old format (just paths, no checklist data)
             try {
               final List<dynamic> pathsJson = jsonDecode(submission.imagePaths);
-              for (var path in pathsJson) {
-                imageChecklistEntries.add(ImageChecklistEntry(
-                  filename: _generateFilename(),
-                  localPath: path.toString(),
-                  checklist: checklistTemplate.map((item) {
-                    return ChecklistItem(
-                      id: item.id,
-                      question: item.question,
-                      required: item.required,
-                      value: 'NA',
-                    );
-                  }).toList(),
-                ));
+              for (final path in pathsJson) {
+                imageChecklistEntries.add(
+                  ImageChecklistEntry(
+                    filename: _generateFilename(),
+                    localPath: path.toString(),
+                    checklist: checklistTemplate.map((item) {
+                      return ChecklistItem(
+                        id: item.id,
+                        question: item.question,
+                        required: item.required,
+                        value: 'NA',
+                      );
+                    }).toList(),
+                  ),
+                );
               }
             } catch (e2) {
-              print('Error parsing old format: $e2');
+              AppLogger.instance.e('Error parsing old format: $e2');
             }
           }
         }
         // Use the most recent submission's ID and observations
         submissionId = taskSubmissions.first.id;
         observations = taskSubmissions.first.observations ?? '';
-        print('Loaded ${imageChecklistEntries.length} entries from ${taskSubmissions.length} submissions');
+        AppLogger.instance.d(
+          'Loaded ${imageChecklistEntries.length} entries from ${taskSubmissions.length} submissions',
+        );
       } else {
         // IMAGE tasks: Load LAST submission only
         final submission = taskSubmissions.first;
@@ -292,11 +302,12 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
             seq++;
             return CapturedPhoto(
               imagePath: p.toString(),
-              filename: '${task.id.substring(0, 8)}_restored_${seq.toString().padLeft(3, '0')}.jpg',
+              filename:
+                  '${task.id.substring(0, 8)}_restored_${seq.toString().padLeft(3, '0')}.jpg',
             );
           }).toList();
         } catch (e) {
-          print('Error parsing captured photos: $e');
+          AppLogger.instance.e('Error parsing captured photos: $e');
         }
       }
     }
@@ -397,16 +408,16 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       if (!await imagesDir.exists()) {
         await imagesDir.create(recursive: true);
       }
-      
+
       final permanentPath = '${imagesDir.path}/$filename';
       await File(image.path).copy(permanentPath);
-      
+
       // Clear any cached version of this path
       imageCache.evict(permanentPath);
-      
+
       addPhoto(CapturedPhoto(imagePath: permanentPath, filename: filename));
     } catch (e) {
-      print('Error capturing photo: $e');
+      AppLogger.instance.e('Error capturing photo: $e');
       state = state.copyWith(error: 'Failed to capture photo');
     }
   }
@@ -444,48 +455,57 @@ class TaskCaptureViewModel extends Notifier<TaskCaptureState> {
       if (!await imagesDir.exists()) {
         await imagesDir.create(recursive: true);
       }
-      
+
       final permanentPath = '${imagesDir.path}/$filename';
       await File(image.path).copy(permanentPath);
-      
+
       // Clear any cached version of this path
       imageCache.evict(permanentPath);
-      
+
       final newEntry = ImageChecklistEntry(
         filename: filename,
         localPath: permanentPath,
         checklist: _createChecklistCopy(),
       );
-      
+
       state = state.copyWith(
         imageChecklistEntries: [...state.imageChecklistEntries, newEntry],
       );
     } catch (e) {
-      print('Error capturing photo: $e');
+      AppLogger.instance.e('Error capturing photo: $e');
       state = state.copyWith(error: 'Failed to capture photo');
     }
   }
 
   /// Set checklist answer for a specific image entry
-  void setImageChecklistAnswer(int imageIndex, int checklistIndex, String value) {
-    if (imageIndex < 0 || imageIndex >= state.imageChecklistEntries.length) return;
+  void setImageChecklistAnswer(
+    int imageIndex,
+    int checklistIndex,
+    String value,
+  ) {
+    if (imageIndex < 0 || imageIndex >= state.imageChecklistEntries.length) {
+      return;
+    }
 
     final entries = List<ImageChecklistEntry>.from(state.imageChecklistEntries);
     final entry = entries[imageIndex];
     final updatedChecklist = List<ChecklistItem>.from(entry.checklist);
-    
+
     if (checklistIndex < 0 || checklistIndex >= updatedChecklist.length) return;
-    
-    updatedChecklist[checklistIndex] = updatedChecklist[checklistIndex].copyWith(value: value);
+
+    updatedChecklist[checklistIndex] = updatedChecklist[checklistIndex]
+        .copyWith(value: value);
     entries[imageIndex] = entry.copyWith(checklist: updatedChecklist);
-    
+
     state = state.copyWith(imageChecklistEntries: entries);
   }
 
   /// Remove an image+checklist entry
   void removeImageChecklistEntry(int index) {
-    if (index < 0 || index >= state.imageChecklistEntries.length) return;
-    
+    if (index < 0 || index >= state.imageChecklistEntries.length) {
+      return;
+    }
+
     final entries = List<ImageChecklistEntry>.from(state.imageChecklistEntries);
     entries.removeAt(index);
     state = state.copyWith(imageChecklistEntries: entries);

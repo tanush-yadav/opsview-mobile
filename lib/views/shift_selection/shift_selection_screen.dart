@@ -6,7 +6,6 @@ import '../../core/localization/app_strings.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/utils/snackbar_utils.dart';
 import '../../models/auth/shift.dart' as model;
 import '../../viewmodels/shift_selection_viewmodel.dart';
 

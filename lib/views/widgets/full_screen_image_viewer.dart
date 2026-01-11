@@ -2,15 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/localization/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 
 /// A full-screen image viewer that displays an image with pinch-to-zoom.
-class FullScreenImageViewer extends StatelessWidget {
-  const FullScreenImageViewer({
-    super.key,
-    required this.imagePath,
-    this.title,
-  });
+class FullScreenImageViewer extends ConsumerWidget {
+  const FullScreenImageViewer({super.key, required this.imagePath, this.title});
 
   final String imagePath;
   final String? title;
@@ -19,26 +17,21 @@ class FullScreenImageViewer extends StatelessWidget {
   static void show(BuildContext context, String imagePath, {String? title}) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => FullScreenImageViewer(
-          imagePath: imagePath,
-          title: title,
-        ),
+        builder: (_) =>
+            FullScreenImageViewer(imagePath: imagePath, title: title),
       ),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
         title: title != null
-            ? Text(
-                title!,
-                style: const TextStyle(color: Colors.white),
-              )
+            ? Text(title!, style: const TextStyle(color: Colors.white))
             : null,
         elevation: 0,
       ),
@@ -52,19 +45,19 @@ class FullScreenImageViewer extends StatelessWidget {
             errorBuilder: (context, error, stackTrace) {
               return Container(
                 color: AppColors.surfaceLight,
-                child: const Center(
+                child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.broken_image,
                         size: 64,
                         color: AppColors.textMuted,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text(
-                        'Failed to load image',
-                        style: TextStyle(color: AppColors.textMuted),
+                        ref.read(appStringsProvider).failedToLoadImage,
+                        style: const TextStyle(color: AppColors.textMuted),
                       ),
                     ],
                   ),

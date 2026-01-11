@@ -100,12 +100,10 @@ class TaskSyncService {
           final center = model.Center.fromJson(centerMap);
           locationName = center.name;
 
-          if (center.lat != null &&
-              center.lng != null &&
-              submission.latitude != null &&
+          if (submission.latitude != null &&
               submission.longitude != null) {
-            final centerLat = double.tryParse(center.lat!);
-            final centerLng = double.tryParse(center.lng!);
+            final centerLat = double.tryParse(center.lat);
+            final centerLng = double.tryParse(center.lng);
 
             if (centerLat != null && centerLng != null) {
               distFromCenter = Geolocator.distanceBetween(
@@ -126,18 +124,16 @@ class TaskSyncService {
 
       // 4. Prepare Images
       List<File> files = [];
-      if (submission.imagePaths != null) {
-        try {
-          final List<dynamic> paths = jsonDecode(submission.imagePaths!);
-          files = paths
-              .map((e) => File(e.toString()))
-              .where((f) => f.existsSync())
-              .toList();
-        } catch (e) {
-          // Handle parsing error
-        }
+      try {
+        final List<dynamic> paths = jsonDecode(submission.imagePaths);
+        files = paths
+            .map((e) => File(e.toString()))
+            .where((f) => f.existsSync())
+            .toList();
+      } catch (e) {
+        // Handle parsing error
       }
-
+    
       // 5. Prepare Payload
       final payload = <String, dynamic>{
         'taskMessage': submission.observations ?? '',

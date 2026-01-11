@@ -1,13 +1,8 @@
-import 'dart:io';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:drift/drift.dart';
-import 'package:face_anti_spoofing_detector/face_anti_spoofing_detector.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import '../core/constants/app_constants.dart';

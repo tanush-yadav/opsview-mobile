@@ -12,6 +12,7 @@ import '../models/auth/login_response.dart';
 import '../models/task/operator_task.dart';
 import '../services/api/api_service.dart';
 import '../services/database/app_database.dart';
+import '../core/utils/app_logger.dart';
 
 class LoginState {
   const LoginState({
@@ -78,17 +79,17 @@ class LoginViewModel extends Notifier<LoginState> {
             );
 
         // Fetch and store operator tasks
-        print('DEBUG: About to fetch tasks...');
+        AppLogger.instance.d('DEBUG: About to fetch tasks...');
         await _fetchAndStoreTasks(apiService, db);
-        print('DEBUG: Tasks fetched successfully');
+        AppLogger.instance.d('DEBUG: Tasks fetched successfully');
 
         // Load app state from database so it's available globally
-        print('DEBUG: About to load app state...');
+        AppLogger.instance.d('DEBUG: About to load app state...');
         await ref.read(appStateProvider.notifier).loadFromDatabase();
-        print('DEBUG: App state loaded');
+        AppLogger.instance.d('DEBUG: App state loaded');
 
         state = state.copyWith(isLoading: false, isSuccess: true);
-        print('DEBUG: Login success, returning true');
+        AppLogger.instance.d('DEBUG: Login success, returning true');
         return true;
       } else {
         final strings = ref.read(appStringsProvider);
@@ -158,28 +159,33 @@ class LoginViewModel extends Notifier<LoginState> {
             if (task.submissions != null && task.submissions!.isNotEmpty) {
               for (final submission in task.submissions!) {
                 // Check if submission already exists to avoid duplicates
-                final existing = await (db.select(db.taskSubmissions)
-                      ..where((t) => t.id.equals(submission.id)))
-                    .getSingleOrNull();
+                final existing = await (db.select(
+                  db.taskSubmissions,
+                )..where((t) => t.id.equals(submission.id))).getSingleOrNull();
 
                 if (existing == null) {
-                  await db.into(db.taskSubmissions).insert(
-                    TaskSubmissionsCompanion.insert(
-                      id: submission.id,
-                      taskId: task.id,
-                      observations: Value(submission.message),
-                      verificationAnswers: submission.verificationAnswers != null
-                          ? jsonEncode(submission.verificationAnswers)
-                          : '[]',
-                      imagePaths: submission.imageUrl != null
-                          ? jsonEncode([submission.imageUrl])
-                          : '[]',
-                      status: Value('SYNCED'),
-                      latitude: Value(null),
-                      longitude: Value(null),
-                      syncedAt: Value(submission.submittedAt ?? DateTime.now()),
-                    ),
-                  );
+                  await db
+                      .into(db.taskSubmissions)
+                      .insert(
+                        TaskSubmissionsCompanion.insert(
+                          id: submission.id,
+                          taskId: task.id,
+                          observations: Value(submission.message),
+                          verificationAnswers:
+                              submission.verificationAnswers != null
+                              ? jsonEncode(submission.verificationAnswers)
+                              : '[]',
+                          imagePaths: submission.imageUrl != null
+                              ? jsonEncode([submission.imageUrl])
+                              : '[]',
+                          status: const Value('SYNCED'),
+                          latitude: const Value(null),
+                          longitude: const Value(null),
+                          syncedAt: Value(
+                            submission.submittedAt ?? DateTime.now(),
+                          ),
+                        ),
+                      );
                 }
               }
             }
@@ -187,8 +193,7 @@ class LoginViewModel extends Notifier<LoginState> {
         }
       }
     } catch (e, stackTrace) {
-      print('Error in _fetchAndStoreTasks: $e');
-      print('Stack trace: $stackTrace');
+      AppLogger.instance.e('Error in _fetchAndStoreTasks: $e', e, stackTrace);
       rethrow;
     }
   }

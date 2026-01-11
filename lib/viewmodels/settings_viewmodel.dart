@@ -20,7 +20,6 @@ class SettingsState {
     this.profiles = const [],
     this.selectedShiftId,
     this.isSyncing = false,
-    this.hasIncompleteTasks = false,
     this.hasUnsyncedTasks = false,
     this.isLoading = false,
   });
@@ -32,7 +31,6 @@ class SettingsState {
   final List<Profile> profiles;
   final String? selectedShiftId;
   final bool isSyncing;
-  final bool hasIncompleteTasks; // Tasks not yet submitted
   final bool hasUnsyncedTasks; // Submissions not yet synced
   final bool isLoading;
 
@@ -43,10 +41,10 @@ class SettingsState {
   }
 
   /// Can only logout if ALL tasks are completed AND all are synced
-  bool get canLogout => !hasIncompleteTasks && !hasUnsyncedTasks && !isSyncing;
+  bool get canLogout => !hasUnsyncedTasks && !isSyncing;
 
   /// Show warning if either incomplete or unsynced
-  bool get showLogoutWarning => hasIncompleteTasks || hasUnsyncedTasks;
+  bool get showLogoutWarning => hasUnsyncedTasks;
 
   SettingsState copyWith({
     model.User? user,
@@ -68,7 +66,6 @@ class SettingsState {
       profiles: profiles ?? this.profiles,
       selectedShiftId: selectedShiftId ?? this.selectedShiftId,
       isSyncing: isSyncing ?? this.isSyncing,
-      hasIncompleteTasks: hasIncompleteTasks ?? this.hasIncompleteTasks,
       hasUnsyncedTasks: hasUnsyncedTasks ?? this.hasUnsyncedTasks,
       isLoading: isLoading ?? this.isLoading,
     );
@@ -87,15 +84,6 @@ class SettingsViewModel extends Notifier<SettingsState> {
   SettingsState build() {
     final appState = ref.watch(appStateProvider);
 
-    // Check for incomplete tasks (tasks without submissions or with PENDING status)
-    final completedTaskIds = appState.taskSubmissions
-        .map((s) => s.taskId)
-        .toSet();
-    final allTaskIds = appState.tasks.map((t) => t.id).toSet();
-    final hasIncompleteTasks = allTaskIds
-        .difference(completedTaskIds)
-        .isNotEmpty;
-
     // Check for unsynced submissions
     final hasUnsyncedTasks = appState.taskSubmissions.any(
       (s) => s.status == SyncStatus.unsynced.toDbValue,
@@ -108,7 +96,6 @@ class SettingsViewModel extends Notifier<SettingsState> {
       service: appState.user?.service,
       profiles: appState.profiles,
       selectedShiftId: appState.selectedShiftId,
-      hasIncompleteTasks: hasIncompleteTasks,
       hasUnsyncedTasks: hasUnsyncedTasks,
     );
   }

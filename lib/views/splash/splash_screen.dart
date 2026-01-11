@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
+import '../../core/localization/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../viewmodels/splash_viewmodel.dart';
@@ -25,8 +26,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     if (!mounted) return;
 
-    final route =
-        await ref.read(splashViewModelProvider.notifier).getInitialRoute();
+    final route = await ref
+        .read(splashViewModelProvider.notifier)
+        .getInitialRoute();
 
     if (!mounted) return;
 
@@ -35,37 +37,35 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final strings = ref.watch(appStringsProvider);
+    return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       child: SafeArea(
         child: Column(
           children: [
-            Spacer(flex: 2),
+            const Spacer(flex: 2),
             // Shield Icon
-            Icon(
+            const Icon(
               Icons.shield_outlined,
               size: 80,
               color: AppColors.primary,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             // App Name
-            Text('OpsView', style: AppTextStyles.h1),
-            Spacer(flex: 3),
+            const Text('OpsView', style: AppTextStyles.h1),
+            const Spacer(flex: 3),
             // Loading Section
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Column(
                 children: [
-                  Text(
-                    'Verifying Session...',
-                    style: AppTextStyles.muted,
-                  ),
-                  SizedBox(height: 12),
-                  LinearProgressIndicator(),
+                  Text(strings.verifyingSession, style: AppTextStyles.muted),
+                  const SizedBox(height: 12),
+                  const LinearProgressIndicator(),
                 ],
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
           ],
         ),
       ),

@@ -139,4 +139,23 @@ abstract class AppStrings {
   String get camera;
   String get gallery;
   String get cancel;
+  String get submitTask;
+
+  // Common
+  String get insideZone;
+  String get outsideZone;
+  String get failedToLoadImage;
+  String get passwordHint;
+  String get verifyingSession;
+  String get tapToView;
+  String get score;
+  String get liveness;
+  String get requiredPhotoCaptured;
+  String get addPhoto;
+  String get addMorePhotos;
+  String get captureEvidenceInstruction;
+  String photoN(int n);
+  String photosCount(int count);
+  String get verification;
+  String get photoVerification;
 }
