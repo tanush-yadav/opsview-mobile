@@ -18,9 +18,6 @@ abstract class AppConstants {
   // Shift Types
   static const String shiftTypeExamDay = 'ExamDay';
   static const String shiftTypeMockDay = 'MockDay';
-
-  // Support
-  static const String supportPhoneNumber = '+911234567890';
 }
 
 /// Onboarding steps for user flow tracking

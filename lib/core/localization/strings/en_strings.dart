@@ -267,4 +267,24 @@ class EnStrings implements AppStrings {
   String get verification => 'Verification';
   @override
   String get photoVerification => 'PHOTO VERIFICATION';
+  @override
+  String get newSubmission => 'New Submission';
+  @override
+  String get addNewSubmission => 'Add New Submission';
+  @override
+  String get addOptionalNotes => 'Add optional notes...';
+  @override
+  String get na => 'N/A';
+  @override
+  String get noSubmissionsYet => 'No submissions yet';
+  @override
+  String get tapToAddFirstSubmission =>
+      'Tap the button below to add your first submission';
+  @override
+  String get notes => 'Notes';
+  @override
+  String get previousSubmission => 'PREVIOUS SUBMISSION';
+  @override
+  String submissionsCount(int count) =>
+      '$count ${count == 1 ? 'Submission' : 'Submissions'}';
 }

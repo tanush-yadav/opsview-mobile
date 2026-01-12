@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/exceptions/app_exception.dart';
 import '../../models/api_response.dart';
+import '../../models/task/operator_task.dart';
 import 'dio_client.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
@@ -111,9 +112,13 @@ class ApiService {
     return ApiResponse.fromJson(response.data);
   }
 
-  Future<ApiResponse> getOperatorTasks() async {
+  Future<OperatorTasksResponse?> getOperatorTasks() async {
     final response = await _dio.get(ApiConstants.operatorTasks);
-    return ApiResponse.fromJson(response.data);
+    final apiResponse = ApiResponse.fromJson(response.data);
+
+    if (!apiResponse.isSuccess || apiResponse.data == null) return null;
+
+    return OperatorTasksResponse.fromJson({'data': apiResponse.data});
   }
 
   Future<ApiResponse> updateTask({
@@ -134,6 +139,18 @@ class ApiService {
       data: formData,
       options: Options(contentType: 'multipart/form-data', headers: headers),
     );
+    return ApiResponse.fromJson(response.data);
+  }
+
+  // Signals
+  Future<ApiResponse> sendSignal(List<Map<String, dynamic>> signals) async {
+    final response = await _dio.post(ApiConstants.signals, data: signals);
+    return ApiResponse.fromJson(response.data);
+  }
+
+  // Common
+  Future<ApiResponse> getPlaceName(double lat, double lng) async {
+    final response = await _dio.get(ApiConstants.placeName(lat, lng));
     return ApiResponse.fromJson(response.data);
   }
 }

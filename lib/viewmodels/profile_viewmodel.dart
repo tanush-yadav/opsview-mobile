@@ -486,4 +486,6 @@ class ProfileViewModel extends Notifier<ProfileState> {
 }
 
 final profileViewModelProvider =
-    NotifierProvider<ProfileViewModel, ProfileState>(ProfileViewModel.new);
+    NotifierProvider.autoDispose<ProfileViewModel, ProfileState>(
+      ProfileViewModel.new,
+    );

@@ -30,14 +30,9 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
       final appState = ref.read(appStateProvider);
       final currentStep = OnboardingStep.fromString(appState.onboardingStep);
 
-      // If onboarding step is not 'training', redirect to appropriate screen
-      if (currentStep != OnboardingStep.training) {
-        if (currentStep == OnboardingStep.completed) {
-          context.push(AppRoutes.home);
-        } else if (currentStep == OnboardingStep.profile) {
-          context.push(AppRoutes.profile);
-        }
-        // For other states, stay on this screen (shouldn't happen normally)
+      // If onboarding step is 'completed', redirect to home screen
+      if (currentStep == OnboardingStep.completed) {
+        context.push(AppRoutes.home);
       }
     });
   }

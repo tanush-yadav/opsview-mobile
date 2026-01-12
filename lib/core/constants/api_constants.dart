@@ -16,4 +16,11 @@ abstract class ApiConstants {
   static String exam(String id) => '/exams/$id';
   static const String operatorTasks = '/tasks/operator-tasks';
   static String updateTask(String id) => '/tasks/$id/update-task';
+
+  // Signals
+  static const String signals = '/signals';
+
+  // Common
+  static String placeName(double lat, double lng) =>
+      '/common/place-name?lat=$lat&lng=$lng';
 }

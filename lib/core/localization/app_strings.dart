@@ -158,4 +158,13 @@ abstract class AppStrings {
   String photosCount(int count);
   String get verification;
   String get photoVerification;
+  String get newSubmission;
+  String get addNewSubmission;
+  String get addOptionalNotes;
+  String get na;
+  String get noSubmissionsYet;
+  String get tapToAddFirstSubmission;
+  String get notes;
+  String get previousSubmission;
+  String submissionsCount(int count);
 }

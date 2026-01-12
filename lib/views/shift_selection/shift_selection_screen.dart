@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -26,86 +27,103 @@ class ShiftSelectionScreen extends ConsumerWidget {
     final state = ref.watch(shiftSelectionViewModelProvider);
 
     if (state.isLoading) {
-      return const Scaffold(
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(child: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              // Title
-              Text(strings.selectShift, style: AppTextStyles.h1),
-              const SizedBox(height: 8),
-              // Subtitle
-              Text(strings.chooseAssignment, style: AppTextStyles.muted),
-              const SizedBox(height: 24),
-              // Toggle buttons
-              _buildToggleButtons(context, ref, strings, state),
-              const SizedBox(height: 24),
-              // Scrollable shifts list
-              Expanded(
-                child: state.groupedShifts.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.event_busy_outlined,
-                              size: 64,
-                              color: AppColors.textMuted,
+      child: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+
+                  // Title
+                  Text(strings.selectShift, style: AppTextStyles.h1),
+                  const SizedBox(height: 8),
+                  // Subtitle
+                  Text(strings.chooseAssignment, style: AppTextStyles.muted),
+                  const SizedBox(height: 24),
+                  // Toggle buttons
+                  _buildToggleButtons(context, ref, strings, state),
+                  const SizedBox(height: 24),
+                  // Scrollable shifts list
+                  Expanded(
+                    child: state.groupedShifts.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.event_busy_outlined,
+                                  size: 64,
+                                  color: AppColors.textMuted,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  strings.noShiftsAvailable,
+                                  style: AppTextStyles.muted,
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 16),
-                            Text(
-                              strings.noShiftsAvailable,
-                              style: AppTextStyles.muted,
+                          )
+                        : SingleChildScrollView(
+                            physics: const ClampingScrollPhysics(),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: state.groupedShifts.entries.map((
+                                entry,
+                              ) {
+                                return _buildDateGroup(
+                                  context,
+                                  ref,
+                                  entry.key,
+                                  entry.value,
+                                  state.selectedShift,
+                                );
+                              }).toList(),
                             ),
-                          ],
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: state.groupedShifts.entries.map((entry) {
-                            return _buildDateGroup(
-                              context,
-                              ref,
-                              entry.key,
-                              entry.value,
-                              state.selectedShift,
-                            );
-                          }).toList(),
+                          ),
+                  ),
+                  // Confirm button
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: PrimaryButton(
+                      onPressed: state.selectedShift != null
+                          ? () => _handleConfirm(context, ref, strings)
+                          : null,
+                      child: Text(
+                        strings.confirmShift,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-              ),
-              // Confirm button
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: PrimaryButton(
-                  onPressed: state.selectedShift != null
-                      ? () => _handleConfirm(context, ref, strings)
-                      : null,
-                  child: Text(
-                    strings.confirmShift,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: material.FloatingActionButton(
+              onPressed: ref
+                  .read(shiftSelectionViewModelProvider.notifier)
+                  .callSupport,
+              backgroundColor: AppColors.primary,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.phone, color: AppColors.textLight),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -204,9 +222,7 @@ class ShiftSelectionScreen extends ConsumerWidget {
             const SizedBox(width: 8),
             Text(
               date,
-              style: AppTextStyles.labelSmall.copyWith(
-                letterSpacing: 1,
-              ),
+              style: AppTextStyles.labelSmall.copyWith(letterSpacing: 1),
             ),
           ],
         ),
@@ -219,13 +235,7 @@ class ShiftSelectionScreen extends ConsumerWidget {
               .isShiftFuture(shift);
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _buildShiftCard(
-              context,
-              ref,
-              shift,
-              isSelected,
-              isFuture,
-            ),
+            child: _buildShiftCard(context, ref, shift, isSelected, isFuture),
           );
         }),
         const SizedBox(height: 12),
@@ -248,8 +258,8 @@ class ShiftSelectionScreen extends ConsumerWidget {
       onTap: isFuture
           ? null
           : () => ref
-              .read(shiftSelectionViewModelProvider.notifier)
-              .selectShift(shift),
+                .read(shiftSelectionViewModelProvider.notifier)
+                .selectShift(shift),
       child: Opacity(
         opacity: isFuture ? 0.5 : 1.0,
         child: Container(
@@ -350,8 +360,14 @@ class ShiftSelectionScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleConfirm(BuildContext context, WidgetRef ref, AppStrings strings) async {
-    final selectedShift = ref.read(shiftSelectionViewModelProvider).selectedShift;
+  Future<void> _handleConfirm(
+    BuildContext context,
+    WidgetRef ref,
+    AppStrings strings,
+  ) async {
+    final selectedShift = ref
+        .read(shiftSelectionViewModelProvider)
+        .selectedShift;
     if (selectedShift != null) {
       await ref.read(shiftSelectionViewModelProvider.notifier).confirmShift();
 

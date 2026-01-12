@@ -1,34 +1,32 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/localization/app_strings.dart';
-import '../../core/utils/app_logger.dart';
 import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/location_status_card.dart';
+import '../widgets/smart_image.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../models/task/captured_photo.dart';
 import '../../models/task/checklist_item.dart';
 import '../../models/task/image_checklist_entry.dart';
 import '../../models/task/task_meta_data.dart';
-import '../../viewmodels/task_capture_viewmodel.dart';
+import '../../viewmodels/new_submission_viewmodel.dart';
 
-class TaskCaptureScreen extends ConsumerStatefulWidget {
-  const TaskCaptureScreen({super.key, required this.taskId});
+class NewSubmissionScreen extends ConsumerStatefulWidget {
+  const NewSubmissionScreen({super.key, required this.taskId});
   final String taskId;
 
   @override
-  ConsumerState<TaskCaptureScreen> createState() => _TaskCaptureScreenState();
+  ConsumerState<NewSubmissionScreen> createState() =>
+      _NewSubmissionScreenState();
 }
 
-class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
+class _NewSubmissionScreenState extends ConsumerState<NewSubmissionScreen> {
   final TextEditingController _observationsController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  bool _observationsInitialized = false;
 
   AppStrings get strings => ref.watch(appStringsProvider);
 
@@ -36,17 +34,8 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Clear observations controller and reset flag before loading new task
-      _observationsController.clear();
-      _observationsInitialized = false;
-      ref.read(taskCaptureViewModelProvider.notifier).loadTask(widget.taskId);
+      ref.read(newSubmissionViewModelProvider.notifier).loadTask(widget.taskId);
     });
-  }
-
-  @override
-  void deactivate() {
-    ref.invalidate(taskCaptureViewModelProvider);
-    super.deactivate();
   }
 
   @override
@@ -56,29 +45,25 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     super.dispose();
   }
 
-  // ==================== IMAGE TASK METHODS ====================
-
   void _takePhoto() {
     ref
-        .read(taskCaptureViewModelProvider.notifier)
+        .read(newSubmissionViewModelProvider.notifier)
         .capturePhoto(ImageSource.camera);
   }
 
   void _removePhoto(int index) {
-    ref.read(taskCaptureViewModelProvider.notifier).removePhoto(index);
+    ref.read(newSubmissionViewModelProvider.notifier).removePhoto(index);
   }
-
-  // ==================== CHECKLIST TASK METHODS ====================
 
   void _takePhotoWithChecklist() {
     ref
-        .read(taskCaptureViewModelProvider.notifier)
+        .read(newSubmissionViewModelProvider.notifier)
         .capturePhotoWithChecklist(ImageSource.camera);
   }
 
   void _removeImageChecklistEntry(int index) {
     ref
-        .read(taskCaptureViewModelProvider.notifier)
+        .read(newSubmissionViewModelProvider.notifier)
         .removeImageChecklistEntry(index);
   }
 
@@ -88,37 +73,27 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     String value,
   ) {
     ref
-        .read(taskCaptureViewModelProvider.notifier)
+        .read(newSubmissionViewModelProvider.notifier)
         .setImageChecklistAnswer(imageIndex, checklistIndex, value);
   }
 
-  // ==================== COMMON METHODS ====================
-
   void _updateObservations(String text) {
-    ref.read(taskCaptureViewModelProvider.notifier).updateObservations(text);
+    ref.read(newSubmissionViewModelProvider.notifier).updateObservations(text);
   }
 
-  Future<void> _completeTask() async {
-    final viewModel = ref.read(taskCaptureViewModelProvider.notifier);
-    final success = await viewModel.completeTask();
+  Future<void> _submit() async {
+    final success = await ref
+        .read(newSubmissionViewModelProvider.notifier)
+        .submitNewSubmission();
     if (success && mounted) {
-      context.pop();
+      context.pop(true); // Return true to indicate successful submission
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(taskCaptureViewModelProvider);
-    final strings = ref.watch(appStringsProvider);
-    final viewModel = ref.read(taskCaptureViewModelProvider.notifier);
-
-    // Sync observations controller when state loads for the first time
-    if (!_observationsInitialized && state.observations.isNotEmpty) {
-      _observationsInitialized = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _observationsController.text = state.observations;
-      });
-    }
+    final state = ref.watch(newSubmissionViewModelProvider);
+    final viewModel = ref.read(newSubmissionViewModelProvider.notifier);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
@@ -143,11 +118,9 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                           isInsideGeofence: state.isInsideGeofence,
                         ),
                         const SizedBox(height: 24),
-                        // Show instructions from metaData if available
                         if (state.metaData != null)
                           _buildInstructionsSection(state.metaData!),
                         const SizedBox(height: 24),
-                        // Conditionally show IMAGE or CHECKLIST content
                         if (state.isImageTask) ...[
                           _buildPhotoEvidenceSection(state),
                           const SizedBox(height: 24),
@@ -162,14 +135,13 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                     ),
                   ),
           ),
-          _buildBottomButton(state),
+          _buildSubmitButton(state),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(TaskCaptureState state) {
-    final task = state.task;
+  Widget _buildHeader(NewSubmissionState state) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       color: AppColors.backgroundWhite,
@@ -184,11 +156,11 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(strings.newSubmission, style: AppTextStyles.h3),
                 Text(
-                  task?.taskLabel ?? strings.taskDetails,
-                  style: AppTextStyles.h3,
+                  state.task?.taskLabel ?? '',
+                  style: AppTextStyles.bodySmall,
                 ),
-                Text(task?.centerName ?? '', style: AppTextStyles.bodySmall),
               ],
             ),
           ),
@@ -281,7 +253,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
 
   // ==================== IMAGE TASK UI ====================
 
-  Widget _buildPhotoEvidenceSection(TaskCaptureState state) {
+  Widget _buildPhotoEvidenceSection(NewSubmissionState state) {
     final photos = state.capturedPhotos;
     final requiredCount = state.requiredImageCount;
     final hasReachedLimit = state.hasReachedImageLimit;
@@ -289,7 +261,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header with photo count
         Row(
           children: [
             Expanded(
@@ -298,7 +269,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 title: strings.photoEvidence,
               ),
             ),
-            // Photo count indicator
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
@@ -329,9 +299,7 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
         ...photos.asMap().entries.map((entry) {
           return _buildCapturedPhotoCard(entry.key, entry.value);
         }),
-        // Only show "Take Photo" if limit not reached
         if (!hasReachedLimit) _buildTakePhotoCard(photos.isNotEmpty),
-        // Show completion message if limit reached
         if (hasReachedLimit)
           Container(
             padding: const EdgeInsets.all(12),
@@ -383,11 +351,10 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.file(
-                File(photo.imagePath),
+              child: SmartImage(
+                path: photo.imagePath,
                 key: ValueKey(photo.imagePath),
                 fit: BoxFit.cover,
-                gaplessPlayback: false,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     decoration: BoxDecoration(
@@ -412,7 +379,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 },
               ),
             ),
-            // Tap to view hint
             Positioned(
               bottom: 8,
               left: 8,
@@ -442,7 +408,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 ),
               ),
             ),
-            // Delete button
             Positioned(
               top: 8,
               right: 8,
@@ -514,16 +479,15 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     );
   }
 
-  // ==================== CHECKLIST TASK UI (IMAGE + PER-IMAGE CHECKLIST) ====================
+  // ==================== CHECKLIST TASK UI ====================
 
-  Widget _buildImageChecklistSection(TaskCaptureState state) {
+  Widget _buildImageChecklistSection(NewSubmissionState state) {
     final entries = state.imageChecklistEntries;
     final hasEntries = entries.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
         Row(
           children: [
             Expanded(
@@ -532,7 +496,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                 title: strings.photoVerification,
               ),
             ),
-            // Photo count indicator
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
@@ -558,24 +521,15 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
           ],
         ),
         const SizedBox(height: 12),
-
-        // Image + Checklist entries
         ...entries.asMap().entries.map((entry) {
           return _buildImageChecklistCard(entry.key, entry.value);
         }),
-
-        // Add More button (always visible for CHECKLIST tasks)
         _buildAddMoreCard(hasEntries),
       ],
     );
   }
 
   Widget _buildImageChecklistCard(int imageIndex, ImageChecklistEntry entry) {
-    // Debug: Print the path being used for each image
-    AppLogger.instance.d(
-      'Building card $imageIndex with path: ${entry.localPath}',
-    );
-
     return Container(
       key: ValueKey('image_card_${entry.filename}_$imageIndex'),
       margin: const EdgeInsets.only(bottom: 16),
@@ -587,7 +541,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image preview with delete button
           GestureDetector(
             onTap: () => FullScreenImageViewer.show(
               context,
@@ -607,11 +560,10 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(12),
                     ),
-                    child: Image.file(
-                      File(entry.localPath),
+                    child: SmartImage(
+                      path: entry.localPath,
                       key: ValueKey(entry.localPath),
                       fit: BoxFit.cover,
-                      gaplessPlayback: false,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           decoration: BoxDecoration(
@@ -635,7 +587,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                       },
                     ),
                   ),
-                  // Photo number badge
                   Positioned(
                     top: 8,
                     left: 8,
@@ -658,7 +609,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                       ),
                     ),
                   ),
-                  // Delete button
                   Positioned(
                     top: 8,
                     right: 8,
@@ -679,7 +629,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                       ),
                     ),
                   ),
-                  // Tap to view hint
                   Positioned(
                     bottom: 8,
                     left: 8,
@@ -716,8 +665,6 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
               ),
             ),
           ),
-
-          // Checklist for this image
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -798,7 +745,8 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
                     if (item.required)
                       Text(
                         strings.mandatory,
-                        style: AppTextStyles.mutedSmall.copyWith(
+                        style: AppTextStyles.muted.copyWith(
+                          fontSize: 11,
                           color: AppColors.error,
                         ),
                       ),
@@ -807,48 +755,90 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(left: 32),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildAnswerButton(
-                    label: strings.yes,
-                    isSelected: item.value == 'YES',
-                    onTap: () => _setImageChecklistAnswer(
-                      imageIndex,
-                      checklistIndex,
-                      'YES',
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildAnswerButton(
-                    label: strings.no,
-                    isSelected: item.value == 'NO',
-                    onTap: () => _setImageChecklistAnswer(
-                      imageIndex,
-                      checklistIndex,
-                      'NO',
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const SizedBox(width: 32),
+              _buildChecklistOption(
+                imageIndex,
+                checklistIndex,
+                'YES',
+                item.value == 'YES',
+                strings.yes,
+              ),
+              const SizedBox(width: 8),
+              _buildChecklistOption(
+                imageIndex,
+                checklistIndex,
+                'NO',
+                item.value == 'NO',
+                strings.no,
+              )
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAddMoreCard(bool hasPhotos) {
+  Widget _buildChecklistOption(
+    int imageIndex,
+    int checklistIndex,
+    String value,
+    bool isSelected,
+    String label,
+  ) {
+    Color bgColor;
+    Color textColor;
+    Color borderColor;
+
+    if (isSelected) {
+      if (value == 'YES') {
+        bgColor = AppColors.success;
+        textColor = AppColors.textLight;
+        borderColor = AppColors.success;
+      } else if (value == 'NO') {
+        bgColor = AppColors.error;
+        textColor = AppColors.textLight;
+        borderColor = AppColors.error;
+      } else {
+        bgColor = AppColors.textMuted;
+        textColor = AppColors.textLight;
+        borderColor = AppColors.textMuted;
+      }
+    } else {
+      bgColor = AppColors.backgroundWhite;
+      textColor = AppColors.textSecondary;
+      borderColor = AppColors.border;
+    }
+
+    return GestureDetector(
+      onTap: () => _setImageChecklistAnswer(imageIndex, checklistIndex, value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: textColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddMoreCard(bool hasEntries) {
     return GestureDetector(
       onTap: _takePhotoWithChecklist,
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: hasPhotos ? 20 : 40),
+        padding: EdgeInsets.symmetric(vertical: hasEntries ? 24 : 48),
         decoration: BoxDecoration(
           color: AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(12),
@@ -861,8 +851,8 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
@@ -870,20 +860,17 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
               child: const Icon(
                 Icons.add_a_photo_outlined,
                 color: AppColors.primary,
-                size: 26,
+                size: 28,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
-              hasPhotos ? strings.addMorePhotos : strings.addPhoto,
-              style: AppTextStyles.h4.copyWith(fontSize: 15),
+              hasEntries ? strings.addAnother : strings.takePhoto,
+              style: AppTextStyles.h4.copyWith(fontSize: 16),
             ),
-            if (!hasPhotos) ...[
+            if (!hasEntries) ...[
               const SizedBox(height: 4),
-              Text(
-                strings.captureEvidenceInstruction,
-                style: AppTextStyles.muted,
-              ),
+              Text(strings.tapToCaptureEvidence, style: AppTextStyles.muted),
             ],
           ],
         ),
@@ -891,100 +878,89 @@ class _TaskCaptureScreenState extends ConsumerState<TaskCaptureScreen> {
     );
   }
 
-  Widget _buildAnswerButton({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? AppColors.primary : AppColors.textPrimary,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // ==================== OBSERVATIONS ====================
 
   Widget _buildObservationsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(
-          icon: Icons.description_outlined,
-          title: 'OBSERVATIONS',
+          icon: Icons.notes_outlined,
+          title: strings.observations,
         ),
         const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primary),
-          ),
-          child: TextField(
-            controller: _observationsController,
-            maxLines: 4,
-            style: AppTextStyles.body,
-            onChanged: _updateObservations,
-            decoration: const InputDecoration(
-              hintText: 'Add any notes or observations...',
-              hintStyle: AppTextStyles.muted,
-              contentPadding: EdgeInsets.all(16),
-              border: InputBorder.none,
+        TextField(
+          controller: _observationsController,
+          maxLines: 4,
+          onChanged: _updateObservations,
+          decoration: InputDecoration(
+            hintText: strings.addOptionalNotes,
+            hintStyle: AppTextStyles.muted,
+            filled: true,
+            fillColor: AppColors.surfaceLight,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
             ),
+            contentPadding: const EdgeInsets.all(16),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildBottomButton(TaskCaptureState state) {
+  // ==================== SUBMIT BUTTON ====================
+
+  Widget _buildSubmitButton(NewSubmissionState state) {
+    final canSubmit = state.canSubmit && !state.isSubmitting;
+
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.backgroundWhite,
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow,
+            color: Colors.black.withValues(alpha: 0.05),
+            offset: const Offset(0, -4),
             blurRadius: 8,
-            offset: Offset(0, -2),
           ),
         ],
       ),
       child: SafeArea(
         top: false,
-        child: ElevatedButton(
-          onPressed: state.canComplete ? _completeTask : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: AppColors.textLight,
-            disabledBackgroundColor: AppColors.border,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        child: SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            onPressed: canSubmit ? _submit : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: canSubmit
+                  ? AppColors.primary
+                  : AppColors.surfaceLight,
+              foregroundColor: canSubmit
+                  ? AppColors.textLight
+                  : AppColors.textMuted,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
             ),
-            minimumSize: const Size(double.infinity, 52),
-          ),
-          child: Text(
-            'Submit Task',
-            style: AppTextStyles.button.copyWith(fontSize: 16),
+            child: state.isSubmitting
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.textLight,
+                    ),
+                  )
+                : Text(
+                    strings.submitTask,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
         ),
       ),

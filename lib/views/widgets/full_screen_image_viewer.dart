@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/theme/app_colors.dart';
+import 'smart_image.dart';
 
 /// A full-screen image viewer that displays an image with pinch-to-zoom.
 class FullScreenImageViewer extends ConsumerWidget {
@@ -39,8 +38,8 @@ class FullScreenImageViewer extends ConsumerWidget {
         child: InteractiveViewer(
           minScale: 0.5,
           maxScale: 4.0,
-          child: Image.file(
-            File(imagePath),
+          child: SmartImage(
+            path: imagePath,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
               return Container(

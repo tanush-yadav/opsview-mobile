@@ -7,7 +7,8 @@ import '../../views/profile/profile_flow_screen.dart';
 import '../../views/shift_selection/shift_selection_screen.dart';
 import '../../views/training/training_screen.dart';
 import '../../views/home/home_screen.dart';
-import '../../views/task_capture/task_capture_screen.dart';
+import '../../views/task_details/task_preview_screen.dart';
+import '../../views/task_details/new_submission_screen.dart';
 import '../../views/settings/settings_screen.dart';
 
 abstract class AppRoutes {
@@ -18,7 +19,7 @@ abstract class AppRoutes {
   static const shiftSelection = '/shift-selection';
   static const training = '/training';
   static const home = '/home';
-  static const taskCapture = '/task-capture';
+  static const taskPreview = '/task';
   static const settings = '/settings';
 }
 
@@ -53,12 +54,23 @@ final appRouter = GoRouter(
       path: AppRoutes.home,
       builder: (context, state) => const HomeScreen(),
     ),
+    // New: Task Preview (read-only submissions view)
     GoRoute(
-      path: AppRoutes.taskCapture,
+      path: '${AppRoutes.taskPreview}/:taskId',
       builder: (context, state) {
-        final taskId = state.uri.queryParameters['taskId'];
-        return TaskCaptureScreen(taskId: taskId ?? '');
+        final taskId = state.pathParameters['taskId'] ?? '';
+        return TaskPreviewScreen(taskId: taskId);
       },
+      routes: [
+        // Nested: New Submission
+        GoRoute(
+          path: 'new',
+          builder: (context, state) {
+            final taskId = state.pathParameters['taskId'] ?? '';
+            return NewSubmissionScreen(taskId: taskId);
+          },
+        ),
+      ],
     ),
     GoRoute(
       path: AppRoutes.settings,

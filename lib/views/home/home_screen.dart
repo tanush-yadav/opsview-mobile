@@ -270,9 +270,19 @@ class HomeScreen extends ConsumerWidget {
     Task task,
     AppStrings strings,
   ) {
+    // Check if task has any submissions
+    final hasSubmissions = task.taskStatus == TaskStatus.submitted.toDbValue;
+
     return GestureDetector(
-      onTap: () =>
-          context.push('${AppRoutes.taskCapture}?taskId=${task.id}'),
+      onTap: () {
+        if (hasSubmissions) {
+          // Has submissions: go to TaskPreviewScreen (read-only)
+          context.push('${AppRoutes.taskPreview}/${task.id}');
+        } else {
+          // No submissions: go directly to NewSubmissionScreen
+          context.push('${AppRoutes.taskPreview}/${task.id}/new');
+        }
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -368,7 +378,9 @@ class HomeScreen extends ConsumerWidget {
     final viewModel = ref.read(homeViewModelProvider.notifier);
     final syncStatus = viewModel.getSyncStatus(task.id);
 
-    final color = syncStatus == SyncStatus.synced ? AppColors.synced : AppColors.unsynced;
+    final color = syncStatus == SyncStatus.synced
+        ? AppColors.synced
+        : AppColors.unsynced;
 
     return Row(
       children: [
@@ -378,7 +390,10 @@ class HomeScreen extends ConsumerWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
-        Text(syncStatus.toUIValue, style: AppTextStyles.bodySmall.copyWith(color: color)),
+        Text(
+          syncStatus.toUIValue,
+          style: AppTextStyles.bodySmall.copyWith(color: color),
+        ),
       ],
     );
   }

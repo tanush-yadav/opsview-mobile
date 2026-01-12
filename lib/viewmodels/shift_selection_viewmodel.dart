@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/constants/app_constants.dart';
 import '../core/providers/app_state_provider.dart';
@@ -201,6 +202,18 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
     // Update in-memory app state
     ref.read(appStateProvider.notifier).updateSelectedShift(shiftId);
     ref.read(appStateProvider.notifier).updateOnboardingStep(onboardingStep);
+  }
+
+  Future<void> callSupport() async {
+    final appState = ref.read(appStateProvider);
+    final contact = appState.center?.spoc2Contact;
+
+    if (contact != null && contact.isNotEmpty) {
+      final uri = Uri.parse('tel:$contact');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    }
   }
 }
 

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/constants/app_constants.dart';
 import '../core/providers/app_state_provider.dart';
 import '../models/task/task_enums.dart';
 import '../services/database/app_database.dart';
@@ -101,7 +100,7 @@ class HomeViewModel extends Notifier<HomeState> {
   }
 
   /// Get sync status for a task by its UUID
-  /// Also checks by CODE for backward compatibility with old submissions
+  /// Returns UNSYNCED if ANY submission for this task is unsynced
   SyncStatus getSyncStatus(String taskUuid) {
     final appState = ref.read(appStateProvider);
 
@@ -109,35 +108,35 @@ class HomeViewModel extends Notifier<HomeState> {
     final task = appState.tasks.where((t) => t.id == taskUuid).firstOrNull;
     final taskCode = task?.taskId;
 
-    // Try to find submission by UUID first (new format)
-    var submission = appState.taskSubmissions
-        .where((s) => s.taskId == taskUuid)
-        .firstOrNull;
+    // Get all submissions for this task (by UUID or CODE)
+    final submissions = appState.taskSubmissions
+        .where(
+          (s) =>
+              s.taskId == taskUuid ||
+              (taskCode != null && s.taskId == taskCode),
+        )
+        .toList();
 
-    // Fallback: try by CODE (old submissions before UUID fix)
-    if (submission == null && taskCode != null) {
-      submission = appState.taskSubmissions
-          .where((s) => s.taskId == taskCode)
-          .firstOrNull;
-    }
+    // If no submission exists, the task hasn't been submitted yet
+    if (submissions.isEmpty) return SyncStatus.unsynced;
 
-    // If no submission exists, the task hasn't been submitted yet (pending)
-    if (submission == null) return SyncStatus.unsynced;
+    // Check if ANY submission is unsynced
+    final hasUnsynced = submissions.any(
+      (s) => s.status == SyncStatus.unsynced.toDbValue,
+    );
 
-    try {
-      return SyncStatus.values.firstWhere(
-        (e) => e.toDbValue == submission!.status,
-        orElse: () => SyncStatus.unsynced,
-      );
-    } catch (_) {
-      return SyncStatus.unsynced;
-    }
+    return hasUnsynced ? SyncStatus.unsynced : SyncStatus.synced;
   }
 
   Future<void> callSupport() async {
-    final uri = Uri.parse('tel:${AppConstants.supportPhoneNumber}');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+    final appState = ref.read(appStateProvider);
+    final contact = appState.center?.spoc2Contact;
+
+    if (contact != null && contact.isNotEmpty) {
+      final uri = Uri.parse('tel:$contact');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
     }
   }
 }

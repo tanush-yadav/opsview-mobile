@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart'
+    hide Colors, CircularProgressIndicator;
 
 import '../../../core/localization/app_strings.dart';
 import '../../../core/router/app_router.dart';
@@ -11,7 +13,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/snackbar_utils.dart';
 import '../../../viewmodels/profile_viewmodel.dart';
 import '../../widgets/location_status_card.dart';
-import '../liveness_camera_screen.dart';
+import 'liveness_camera_screen.dart';
 
 class ProfileSelfieStep extends ConsumerWidget {
   const ProfileSelfieStep({super.key});
@@ -67,7 +69,10 @@ class ProfileSelfieStep extends ConsumerWidget {
                           top: 12,
                           right: 12,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.green,
                               borderRadius: BorderRadius.circular(12),
@@ -177,19 +182,21 @@ class ProfileSelfieStep extends ConsumerWidget {
     WidgetRef ref,
     AppStrings strings,
   ) async {
-    // Navigate to liveness camera screen
-    final result = await Navigator.of(context).push<LivenessResult>(
-      MaterialPageRoute(
-        builder: (context) => const LivenessCameraScreen(),
-      ),
+    // Navigate to liveness camera screen using dialog to avoid go_router conflicts
+    final result = await showGeneralDialog<LivenessResult>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return const LivenessCameraScreen();
+      },
     );
 
     if (result != null) {
       // Liveness passed, save the result
-      ref.read(profileViewModelProvider.notifier).setLivenessCameraResult(
-        result.imagePath,
-        result.livenessScore,
-      );
+      ref
+          .read(profileViewModelProvider.notifier)
+          .setLivenessCameraResult(result.imagePath, result.livenessScore);
     }
   }
 

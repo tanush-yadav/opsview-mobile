@@ -1,9 +1,9 @@
 class ApiResponse {
-
   ApiResponse({
     required this.status,
     required this.code,
     this.data,
+    this.message,
     this.notify,
   });
 
@@ -12,19 +12,22 @@ class ApiResponse {
       status: json['status'] ?? '',
       code: json['code'] ?? '',
       data: json['data'],
-      notify: json['notify'] != null ? NotifyInfo.fromJson(json['notify']) : null,
+      message: json['message'],
+      notify: json['notify'] != null
+          ? NotifyInfo.fromJson(json['notify'])
+          : null,
     );
   }
   final String status;
   final String code;
   final dynamic data;
+  final String? message;
   final NotifyInfo? notify;
 
   bool get isSuccess => status == 'SUCCESS';
 }
 
 class NotifyInfo {
-
   NotifyInfo({
     required this.message,
     required this.type,
