@@ -121,15 +121,12 @@ class TaskPreviewViewModel extends Notifier<TaskPreviewState> {
           final List<dynamic> checklistJson = jsonDecode(
             submission.verificationAnswers,
           );
-          for (int i = 0; i < imagePaths.length; i++) {
+          // New format: [{filename, checklist: [{id, question, required, value}]}]
+          for (int i = 0; i < checklistJson.length; i++) {
+            final entry = checklistJson[i] as Map<String, dynamic>;
+            final localPath = i < imagePaths.length ? imagePaths[i] : '';
             checklistEntries.add(
-              ImageChecklistEntry(
-                filename: submission.id,
-                localPath: imagePaths[i],
-                checklist: checklistJson
-                    .map((e) => ChecklistItem.fromJson(e))
-                    .toList(),
-              ),
+              ImageChecklistEntry.fromJson(entry, localPath),
             );
           }
         }

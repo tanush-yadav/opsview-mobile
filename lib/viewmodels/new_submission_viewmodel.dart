@@ -395,13 +395,13 @@ class NewSubmissionViewModel extends Notifier<NewSubmissionState> {
       String imagePathsJson;
 
       if (state.isChecklistTask) {
-        // Store checklist in flat API format: [{id, question, value, required}...]
-        // Use checklist from first entry (all entries have same answers)
+        // Store imageChecklist in API format: [{filename, checklist: [{id, question, required, value}]}]
         if (state.imageChecklistEntries.isNotEmpty) {
           verificationAnswersJson = jsonEncode(
-            state.imageChecklistEntries.first.checklist
-                .map((item) => item.toJson())
-                .toList(),
+            state.imageChecklistEntries.map((entry) => {
+              'filename': entry.filename,
+              'checklist': entry.checklist.map((item) => item.toJson()).toList(),
+            }).toList(),
           );
         } else {
           verificationAnswersJson = '[]';
