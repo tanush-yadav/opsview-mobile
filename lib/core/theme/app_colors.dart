@@ -5,6 +5,7 @@ abstract class AppColors {
   static const Color primary = Color(0xFF3B82F6);
   static const Color primaryLight = Color(0xFF60A5FA);
   static const Color primaryDark = Color(0xFF2563EB);
+  static const Color primaryDeep = Color(0xFF0F172A); // Dark Navy
 
   // Backgrounds
   static const Color backgroundLight = Color(0xFFE8E8E8);

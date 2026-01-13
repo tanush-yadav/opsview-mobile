@@ -8,7 +8,7 @@ class OpsViewApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShadcnApp.router(
-      title: 'OpsView',
+      title: 'Opsview',
       theme: ThemeData(
         colorScheme: LegacyColorSchemes.lightBlue(),
         radius: 0.5,

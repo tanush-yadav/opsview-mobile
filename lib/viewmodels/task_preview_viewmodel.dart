@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/providers/app_state_provider.dart';
-import '../models/task/checklist_item.dart';
+
 import '../models/task/image_checklist_entry.dart';
 import '../models/task/task_meta_data.dart';
 import '../services/database/app_database.dart';

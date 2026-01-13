@@ -44,15 +44,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           children: [
             const Spacer(flex: 2),
-            // Shield Icon
-            const Icon(
-              Icons.shield_outlined,
-              size: 80,
-              color: AppColors.primary,
+            // Logo
+            Image.asset(
+              'assets/images/logo.png',
+              width: 300,
+              color: AppColors.primaryDeep,
             ),
-            const SizedBox(height: 16),
-            // App Name
-            const Text('OpsView', style: AppTextStyles.h1),
             const Spacer(flex: 3),
             // Loading Section
             Padding(
