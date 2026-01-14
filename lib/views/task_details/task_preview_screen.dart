@@ -208,6 +208,7 @@ class _TaskPreviewScreenState extends ConsumerState<TaskPreviewScreen> {
         _buildSectionHeader(
           icon: Icons.history,
           title: strings.previousSubmission,
+          iconColor: Colors.red, // DEBUG
         ),
         const SizedBox(height: 12),
         ...state.submissions.asMap().entries.map((entry) {
@@ -249,6 +250,62 @@ class _TaskPreviewScreenState extends ConsumerState<TaskPreviewScreen> {
     SubmissionPreview submission,
     TaskPreviewState state,
   ) {
+    // If it's a CHECKLIST task, we want to show 1:1 mapping (Image + Checklist)
+    // The viewmodel already prepares checklistEntries with localPath populated.
+    if (state.isChecklistTask && submission.checklistEntries.isNotEmpty) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+          color: AppColors.cardBackground,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: submission.checklistEntries.asMap().entries.map((entry) {
+                   final imgIndex = entry.key;
+                   final checklistEntry = entry.value;
+                   return _buildImageChecklistPair(imgIndex, checklistEntry, context);
+                }).toList(),
+              ),
+            ),
+            // Observations at the bottom of the card
+            if (submission.observations != null &&
+                submission.observations!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${strings.notes}:',
+                        style: AppTextStyles.label.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(submission.observations!, style: AppTextStyles.body),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    // Fallback for regular IMAGE tasks (just images, no per-image checklist)
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -302,12 +359,6 @@ class _TaskPreviewScreenState extends ConsumerState<TaskPreviewScreen> {
                 ),
               ),
             ),
-          // Checklist entries (if CHECKLIST task)
-          if (state.isChecklistTask && submission.checklistEntries.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: _buildChecklistPreview(submission.checklistEntries.first),
-            ),
           // Observations
           if (submission.observations != null &&
               submission.observations!.isNotEmpty)
@@ -340,6 +391,60 @@ class _TaskPreviewScreenState extends ConsumerState<TaskPreviewScreen> {
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageChecklistPair(int index, ImageChecklistEntry entry, BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+           // Image Thumbnail
+           GestureDetector(
+              onTap: () => FullScreenImageViewer.show(
+                context,
+                entry.localPath,
+                title: strings.photoN(index + 1),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 100,
+                  height: 120,
+                  child: SmartImage(
+                    path: entry.localPath,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: AppColors.surfaceLight,
+                        child: const Icon(Icons.image, color: AppColors.textMuted),
+                      );
+                    },
+                  ),
+                ),
+              ),
+           ),
+           const SizedBox(width: 12),
+           // Checklist
+           Expanded(
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                 Text(
+                    strings.photoN(index + 1),
+                    style: AppTextStyles.label.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                 ),
+                 const SizedBox(height: 8),
+                 ...entry.checklist.map((item) => _buildChecklistItemPreview(item)),
+               ],
+             ),
+           ),
         ],
       ),
     );

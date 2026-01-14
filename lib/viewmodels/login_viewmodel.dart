@@ -195,9 +195,11 @@ class LoginViewModel extends Notifier<LoginState> {
             id: submission.id,
             taskId: taskId,
             observations: Value(submission.message),
-            verificationAnswers: submission.checklist != null
-                ? jsonEncode(submission.checklist)
-                : '[]',
+            verificationAnswers: submission.imageChecklist != null
+                ? jsonEncode(submission.imageChecklist)
+                : (submission.checklist != null
+                    ? jsonEncode(submission.checklist)
+                    : '[]'),
             imagePaths: submission.urls != null && submission.urls!.isNotEmpty
                 ? jsonEncode(submission.urls!.map((e) => e.url).toList())
                 : '[]',

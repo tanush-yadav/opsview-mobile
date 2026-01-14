@@ -31,6 +31,7 @@ class TaskSubmissionResponse {
     this.location,
     this.syncedAt,
     this.checklist,
+    this.imageChecklist,
   });
 
   factory TaskSubmissionResponse.fromJson(Map<String, dynamic> json) {
@@ -63,6 +64,7 @@ class TaskSubmissionResponse {
           ? DateTime.tryParse(json['syncedAt'])
           : null,
       checklist: checklist,
+      imageChecklist: json['imageChecklist'] as List<dynamic>?,
     );
   }
 
@@ -76,6 +78,7 @@ class TaskSubmissionResponse {
   final String? location;
   final DateTime? syncedAt;
   final List<ChecklistItem>? checklist;
+  final List<dynamic>? imageChecklist;
 
   Map<String, dynamic> toJson() {
     return {

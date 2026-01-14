@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/providers/app_state_provider.dart';
 
 import '../models/task/image_checklist_entry.dart';
+import '../models/task/checklist_item.dart';
 import '../models/task/task_meta_data.dart';
 import '../services/database/app_database.dart';
 import '../core/utils/app_logger.dart';
@@ -121,13 +122,49 @@ class TaskPreviewViewModel extends Notifier<TaskPreviewState> {
           final List<dynamic> checklistJson = jsonDecode(
             submission.verificationAnswers,
           );
-          // New format: [{filename, checklist: [{id, question, required, value}]}]
-          for (int i = 0; i < checklistJson.length; i++) {
-            final entry = checklistJson[i] as Map<String, dynamic>;
-            final localPath = i < imagePaths.length ? imagePaths[i] : '';
-            checklistEntries.add(
-              ImageChecklistEntry.fromJson(entry, localPath),
-            );
+
+          if (checklistJson.isNotEmpty &&
+              checklistJson.first is Map &&
+              !checklistJson.first.containsKey('checklist')) {
+            // Legacy format: List of ChecklistItems
+            // We'll create one entry associated with the first image (or all images if we want to repeat)
+            // For now, let's treat it as one checklist for the whole submission.
+            // But our UI expects 1:1.
+            // Best effort: Attach the full checklist to the first image.
+            final legacyChecklist = checklistJson
+                .map((e) => ChecklistItem.fromJson(e))
+                .toList();
+            
+            for (int i = 0; i < imagePaths.length; i++) {
+                // If we want to show the checklist for EVERY image implies duplication? 
+                // Or just show it for the first one. 
+                // Let's show it for the first one to avoid clutter, or maybe duplication is safer?
+                // The user said "if someone submits two images, they definitely answered the checklist for both".
+                // So replication seems appropriate for the "Mental Model", but technically it was one captured checklist.
+                // Let's attach to first image.
+                if (i == 0) {
+                     checklistEntries.add(ImageChecklistEntry(
+                        filename: 'legacy',
+                        localPath: imagePaths[i],
+                        checklist: legacyChecklist,
+                     ));
+                } else {
+                     checklistEntries.add(ImageChecklistEntry(
+                        filename: 'legacy_$i',
+                        localPath: imagePaths[i],
+                        checklist: [],
+                     ));
+                }
+            }
+          } else {
+            // New format: [{filename, checklist: [{id, question, required, value}]}]
+            for (int i = 0; i < checklistJson.length; i++) {
+              final entry = checklistJson[i] as Map<String, dynamic>;
+              final localPath = i < imagePaths.length ? imagePaths[i] : '';
+              checklistEntries.add(
+                ImageChecklistEntry.fromJson(entry, localPath),
+              );
+            }
           }
         }
 
