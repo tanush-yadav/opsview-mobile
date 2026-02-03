@@ -11,8 +11,10 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/snackbar_utils.dart';
+import '../../../core/enums/location_status.dart';
 import '../../../viewmodels/profile_viewmodel.dart';
 import '../../widgets/location_status_card.dart';
+import '../../widgets/location_permission_blocker_dialog.dart';
 import 'liveness_camera_screen.dart';
 
 class ProfileSelfieStep extends ConsumerWidget {
@@ -23,6 +25,14 @@ class ProfileSelfieStep extends ConsumerWidget {
     final strings = ref.watch(appStringsProvider);
     final state = ref.watch(profileViewModelProvider);
     final viewModel = ref.read(profileViewModelProvider.notifier);
+
+    // Show blocker dialog if location permission is denied
+    if (state.locationStatus == LocationStatus.permissionDenied) {
+      return LocationPermissionBlockerDialog(
+        strings: strings,
+        onRetry: viewModel.retryLocationDetection,
+      );
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),

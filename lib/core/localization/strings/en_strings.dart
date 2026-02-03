@@ -121,6 +121,15 @@ class EnStrings implements AppStrings {
   String get detectingLocation => 'Detecting location...';
   @override
   String get faceVerification => 'Face Verification';
+  @override
+  String get locationPermissionRequired => 'Location Permission Required';
+  @override
+  String get locationPermissionDeniedMessage =>
+      'Location access is required to verify you are at the designated location. Please enable location permission in your device settings to continue.';
+  @override
+  String get openSettings => 'Open Settings';
+  @override
+  String get retry => 'Retry';
 
   // Training
   @override

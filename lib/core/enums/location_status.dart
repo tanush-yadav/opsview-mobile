@@ -1,1 +1,1 @@
-enum LocationStatus { idle, detecting, detected, error }
+enum LocationStatus { idle, detecting, detected, error, permissionDenied }

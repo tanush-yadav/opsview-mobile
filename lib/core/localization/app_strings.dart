@@ -79,6 +79,10 @@ abstract class AppStrings {
   String get locationNotDetected;
   String get detectingLocation;
   String get faceVerification;
+  String get locationPermissionRequired;
+  String get locationPermissionDeniedMessage;
+  String get openSettings;
+  String get retry;
 
   // Training
   String get trainingRequired;

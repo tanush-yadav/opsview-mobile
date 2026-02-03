@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/localization/app_strings.dart';
+import '../../core/enums/location_status.dart';
 import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/location_status_card.dart';
+import '../widgets/location_permission_blocker_dialog.dart';
 import '../widgets/smart_image.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -94,6 +96,17 @@ class _NewSubmissionScreenState extends ConsumerState<NewSubmissionScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(newSubmissionViewModelProvider);
     final viewModel = ref.read(newSubmissionViewModelProvider.notifier);
+
+    // Show blocker dialog if location permission is denied
+    if (state.locationStatus == LocationStatus.permissionDenied) {
+      return Scaffold(
+        backgroundColor: AppColors.backgroundWhite,
+        body: LocationPermissionBlockerDialog(
+          strings: strings,
+          onRetry: viewModel.retryLocationDetection,
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,

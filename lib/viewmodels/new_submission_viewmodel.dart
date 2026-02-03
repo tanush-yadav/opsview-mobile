@@ -223,13 +223,13 @@ class NewSubmissionViewModel extends Notifier<NewSubmissionState> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          state = state.copyWith(locationStatus: LocationStatus.error);
+          state = state.copyWith(locationStatus: LocationStatus.permissionDenied);
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        state = state.copyWith(locationStatus: LocationStatus.error);
+        state = state.copyWith(locationStatus: LocationStatus.permissionDenied);
         return;
       }
 

@@ -84,6 +84,35 @@ class _ProfileFlowScreenState extends ConsumerState<ProfileFlowScreen> {
       padding: const EdgeInsets.all(24),
       child: Row(
         children: [
+          // Back button
+          GestureDetector(
+            onTap: () {
+              if (isStep2Active) {
+                // Go back to details step
+                ref.read(profileViewModelProvider.notifier).goToDetails();
+              } else {
+                // Go back to shift selection
+                context.go(AppRoutes.shiftSelection);
+              }
+            },
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.surfaceLight,
+                border: Border.all(color: AppColors.border),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.arrow_back,
+                  size: 18,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
           // Step 1
           _buildStepCircle(
             number: '1',
