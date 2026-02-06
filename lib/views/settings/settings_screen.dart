@@ -144,12 +144,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildIdentityCard(SettingsState state, AppStrings strings) {
+    final hasProfile = state.profile != null;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary, width: 1.5),
+        border: Border.all(
+          color: hasProfile ? AppColors.primary : AppColors.border,
+          width: 1.5,
+        ),
       ),
       child: Column(
         children: [
@@ -178,8 +183,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 16),
           // Name
           Text(
-            state.profile?.name ?? '',
-            style: AppTextStyles.h3.copyWith(color: AppColors.primary),
+            hasProfile
+                ? (state.profile?.name ?? '')
+                : strings.profileNotCreated,
+            style: AppTextStyles.h3.copyWith(
+              color: hasProfile ? AppColors.primary : AppColors.textMuted,
+            ),
           ),
           const SizedBox(height: 4),
           // Role
@@ -191,10 +200,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             children: [
               _buildInfoChip('ID: ${state.user?.id.substring(0, 8) ?? ''}'),
               const SizedBox(width: 8),
-              if (state.profile != null)
+              if (hasProfile)
                 _buildInfoChip('${strings.age}: ${state.profile!.age}'),
               const SizedBox(width: 8),
-              _buildStatusChip(strings.onDuty),
+              if (hasProfile) _buildStatusChip(strings.onDuty),
             ],
           ),
         ],
@@ -277,12 +286,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     SettingsViewModel viewModel,
     AppStrings strings,
   ) {
+    final hasProfile = state.profile != null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Warning: Tasks unsynced
-          if (state.showLogoutWarning)
+          // Warning: Tasks unsynced (only when profile exists and has unsynced tasks)
+          if (hasProfile && state.showLogoutWarning)
             Container(
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 12),
@@ -320,12 +331,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ],
               ),
             ),
-          // Sync Button
+          // Sync Button (disabled when no profile exists — nothing to sync)
           SizedBox(
             width: double.infinity,
             height: 48,
             child: material.OutlinedButton(
-              onPressed: state.isSyncing
+              onPressed: !hasProfile || state.isSyncing
                   ? null
                   : () async {
                       final success = await viewModel.syncData();
@@ -338,7 +349,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       }
                     },
               style: material.OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.primary),
+                side: BorderSide(
+                  color: hasProfile ? AppColors.primary : AppColors.textMuted,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -352,12 +365,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.sync, color: AppColors.primary),
+                        Icon(
+                          Icons.sync,
+                          color: hasProfile
+                              ? AppColors.primary
+                              : AppColors.textMuted,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           strings.syncData,
                           style: AppTextStyles.button.copyWith(
-                            color: AppColors.primary,
+                            color: hasProfile
+                                ? AppColors.primary
+                                : AppColors.textMuted,
                           ),
                         ),
                       ],
@@ -365,7 +385,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          // Logout Button - disabled unless all tasks completed AND synced
+          // Logout Button - always enabled when no profile (nothing to lose),
+          // otherwise requires all tasks synced
           SizedBox(
             width: double.infinity,
             height: 48,

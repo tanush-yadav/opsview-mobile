@@ -199,6 +199,8 @@ class EnStrings implements AppStrings {
   @override
   String get logout => 'Log Out';
   @override
+  String get profileNotCreated => 'Profile Not Created';
+  @override
   String get syncSuccess => 'Sync process completed';
   @override
   String get syncFailed => 'Sync failed. Please try again.';

@@ -122,6 +122,7 @@ abstract class AppStrings {
   String get syncBeforeLogout;
   String get syncData;
   String get logout;
+  String get profileNotCreated;
   String get syncSuccess;
   String get syncFailed;
 
