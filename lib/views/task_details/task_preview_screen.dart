@@ -93,12 +93,24 @@ class _TaskPreviewScreenState extends ConsumerState<TaskPreviewScreen> {
       color: AppColors.backgroundWhite,
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () {
-              debugPrint('[TaskPreview] Back button tapped, calling context.pop()');
-              context.pop();
-            },
-            child: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                debugPrint('[TaskPreview] Back button tapped, calling context.pop()');
+                context.pop();
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(Icons.arrow_back, color: AppColors.textPrimary, size: 20),
+              ),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(

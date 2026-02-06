@@ -76,9 +76,18 @@ class HomeScreen extends ConsumerWidget {
       color: AppColors.backgroundWhite,
       child: Row(
         children: [
-          GestureDetector(
+          material.InkWell(
             onTap: () => context.replace(AppRoutes.shiftSelection),
-            child: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(Icons.arrow_back, color: AppColors.textPrimary, size: 20),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
