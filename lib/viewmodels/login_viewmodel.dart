@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:opsview/models/task/task_enums.dart';
@@ -120,20 +121,32 @@ class LoginViewModel extends Notifier<LoginState> {
     AppDatabase db,
   ) async {
     try {
+      debugPrint('[Login] _fetchAndStoreTasks: Fetching tasks from backend...');
       final operatorTasksResponse = await apiService.getOperatorTasks();
 
-      if (operatorTasksResponse == null) return;
+      if (operatorTasksResponse == null) {
+        debugPrint('[Login] _fetchAndStoreTasks: Response is NULL');
+        return;
+      }
 
+      debugPrint('[Login] _fetchAndStoreTasks: Got ${operatorTasksResponse.data.length} shifts');
+      
+      int totalTasks = 0;
       for (final shiftWithTasks in operatorTasksResponse.data) {
+        debugPrint('[Login] _fetchAndStoreTasks: Shift ${shiftWithTasks.shift.id} has ${shiftWithTasks.tasks.length} tasks');
         for (final task in shiftWithTasks.tasks) {
           await _storeTask(db, task);
+          totalTasks++;
         }
       }
+      
+      debugPrint('[Login] _fetchAndStoreTasks: Stored $totalTasks tasks total');
 
       if (operatorTasksResponse.data.isNotEmpty) {
         await _sendTasksDownloadedSignal(apiService);
       }
     } catch (e, stackTrace) {
+      debugPrint('[Login] _fetchAndStoreTasks: ERROR - $e');
       AppLogger.instance.e('Error in _fetchAndStoreTasks: $e', e, stackTrace);
       rethrow;
     }

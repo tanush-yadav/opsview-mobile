@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -57,14 +58,23 @@ class HomeViewModel extends Notifier<HomeState> {
   HomeState build() {
     final appState = ref.watch(appStateProvider);
     final shiftId = appState.selectedShiftId;
+    
+    debugPrint('[Home] build: selectedShiftId=$shiftId');
+    debugPrint('[Home] build: appState.tasks.length=${appState.tasks.length}');
 
     if (shiftId == null) {
+      debugPrint('[Home] build: No shiftId, returning empty state');
       return const HomeState();
     }
 
     // Get tasks from app state (sorted by seqNumber)
     final tasks = List<Task>.from(appState.tasks)
       ..sort((a, b) => a.seqNumber.compareTo(b.seqNumber));
+    
+    debugPrint('[Home] build: Filtered ${tasks.length} tasks for shiftId=$shiftId');
+    for (final t in tasks) {
+      debugPrint('[Home]   - Task: ${t.id} | ${t.taskLabel} | shiftId=${t.shiftId}');
+    }
 
     // Get shift info from exam
     final exam = appState.exam;
