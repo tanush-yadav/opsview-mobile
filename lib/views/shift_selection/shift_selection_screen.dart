@@ -9,6 +9,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../models/auth/shift.dart' as model;
 import '../../viewmodels/shift_selection_viewmodel.dart';
+import '../widgets/profile_button.dart';
 
 class ShiftSelectionScreen extends ConsumerWidget {
   const ShiftSelectionScreen({super.key});
@@ -40,7 +41,14 @@ class ShiftSelectionScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16),
+                  // Profile button row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [
+                      ProfileButton(),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
 
                   // Title
                   Text(strings.selectShift, style: AppTextStyles.h1),

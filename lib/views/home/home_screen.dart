@@ -10,6 +10,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../services/database/app_database.dart';
 import '../../viewmodels/home_viewmodel.dart';
 import '../../models/task/task_enums.dart';
+import '../widgets/profile_button.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -109,21 +110,7 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () => context.push(AppRoutes.settings),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
-              ),
-              child: const Icon(
-                Icons.person_outline,
-                color: AppColors.textMuted,
-              ),
-            ),
-          ),
+          const ProfileButton(),
         ],
       ),
     );

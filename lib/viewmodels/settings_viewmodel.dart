@@ -40,8 +40,8 @@ class SettingsState {
     return profiles.where((p) => p.shiftId == selectedShiftId).firstOrNull;
   }
 
-  /// Can only logout if ALL tasks are completed AND all are synced
-  bool get canLogout => !hasUnsyncedTasks && !isSyncing;
+  /// Can logout if no profile exists (nothing to sync) or all tasks are synced
+  bool get canLogout => profile == null || (!hasUnsyncedTasks && !isSyncing);
 
   /// Show warning if either incomplete or unsynced
   bool get showLogoutWarning => hasUnsyncedTasks;
