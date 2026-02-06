@@ -136,6 +136,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             hintText: strings.examCodeHint,
                             icon: Icons.tag,
                             inputFormatters: [LowerCaseTextFormatter()],
+                            enabled: !loginState.isLoading,
                           ),
                           const Divider(height: 24, color: AppColors.border),
                           // Username Field
@@ -152,6 +153,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             hintText: strings.usernameHint,
                             icon: Icons.person_outline,
                             inputFormatters: [LowerCaseTextFormatter()],
+                            enabled: !loginState.isLoading,
                           ),
                           const Divider(height: 24, color: AppColors.border),
                           // Password Field
@@ -168,6 +170,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             hintText: strings.passwordHint,
                             icon: Icons.lock_outline,
                             obscureText: _obscurePassword,
+                            enabled: !loginState.isLoading,
                             suffixIcon: GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -239,6 +242,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     required String hintText,
     required IconData icon,
     bool obscureText = false,
+    bool enabled = true,
     Widget? suffixIcon,
     List<TextInputFormatter>? inputFormatters,
   }) {
@@ -250,6 +254,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: material.TextField(
             controller: controller,
             obscureText: obscureText,
+            enabled: enabled,
             inputFormatters: inputFormatters,
             decoration: material.InputDecoration(
               hintText: hintText,

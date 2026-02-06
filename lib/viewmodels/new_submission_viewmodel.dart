@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -237,6 +238,9 @@ class NewSubmissionViewModel extends Notifier<NewSubmissionState> {
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
         ),
+      ).timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => throw TimeoutException('Location detection timed out'),
       );
 
       double? distance;
@@ -255,6 +259,9 @@ class NewSubmissionViewModel extends Notifier<NewSubmissionState> {
         currentLng: position.longitude,
         distanceFromCenter: distance,
       );
+    } on TimeoutException {
+      // Timeout is acceptable - allow user to proceed without blocking
+      state = state.copyWith(locationStatus: LocationStatus.detected);
     } catch (e) {
       state = state.copyWith(locationStatus: LocationStatus.error);
     }

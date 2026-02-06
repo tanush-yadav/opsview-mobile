@@ -61,6 +61,7 @@ class LivenessCameraState {
 class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
   static const int _requiredConsecutivePasses = 3;
   static const double _livenessThreshold = 0.5;
+  static const double _minBrightnessVariance = 500.0; // Reject blank/covered images
 
   CameraController? _controller;
   CameraImage? _latestFrame;
@@ -134,6 +135,25 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
     try {
       final yuvBytes = _convertToYUV(image);
 
+      // BUG-07 Fix: Check image variance to reject blank/dark images
+      final yPlane = image.planes[0];
+      final variance = _calculateBrightnessVariance(yPlane.bytes, image.width, image.height);
+      
+      // If variance is too low, image is likely blank/covered/dark
+      // A normal face image has variance > 1000, blank images have < 100
+      if (variance < _minBrightnessVariance) {
+        if (ref.mounted) {
+          state = state.copyWith(
+            livenessScore: 0.0,
+            consecutivePassCount: 0,
+            livenessCheckPassed: false,
+            statusMessage: 'Please uncover the camera',
+            isProcessing: false,
+          );
+        }
+        return;
+      }
+
       final faceRect = Rect.fromLTWH(
         image.width * 0.15,
         image.height * 0.1,
@@ -183,6 +203,30 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
         state = state.copyWith(isProcessing: false);
       }
     }
+  }
+
+  /// Calculate brightness variance of Y channel to detect blank/covered images
+  double _calculateBrightnessVariance(Uint8List yBytes, int width, int height) {
+    // Sample every 10th pixel for performance
+    const sampleStep = 10;
+    int sum = 0;
+    int count = 0;
+    
+    for (int i = 0; i < yBytes.length; i += sampleStep) {
+      sum += yBytes[i];
+      count++;
+    }
+    
+    if (count == 0) return 0;
+    final mean = sum / count;
+    
+    double varianceSum = 0;
+    for (int i = 0; i < yBytes.length; i += sampleStep) {
+      final diff = yBytes[i] - mean;
+      varianceSum += diff * diff;
+    }
+    
+    return varianceSum / count;
   }
 
   Uint8List _convertToYUV(CameraImage image) {

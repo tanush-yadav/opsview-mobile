@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -25,13 +26,16 @@ class TaskSyncService {
 
   /// Get all tasks that haven't been synced to backend yet
   Future<List<TaskSubmission>> getUnsyncedTasks() async {
-    return (_db.select(
+    final tasks = await (_db.select(
       _db.taskSubmissions,
     )..where((t) => t.status.equals(SyncStatus.unsynced.toDbValue))).get();
+    debugPrint('[TaskSync] getUnsyncedTasks: Found ${tasks.length} unsynced tasks');
+    return tasks;
   }
 
   /// Sync a single task to the backend
   Future<bool> syncTask(TaskSubmission submission) async {
+    debugPrint('[TaskSync] syncTask: Starting sync for submission ${submission.id}');
     try {
       // 2. Fetch Task and Profile Info
       String profileId = 'Unknown';
@@ -149,6 +153,8 @@ class TaskSyncService {
       // 6. Prepare Headers (x-lat and x-lng are handled by interceptor)
       final headers = {'Accept': '*/*', 'x-profileid': profileId};
 
+      debugPrint('[TaskSync] syncTask: Calling API for task $apiTaskId with ${files.length} files');
+
       // 7. Call API
       final response = await _api.updateTask(
         taskId: apiTaskId, // Use the resolved UUID
@@ -156,6 +162,8 @@ class TaskSyncService {
         payload: payload,
         headers: headers,
       );
+
+      debugPrint('[TaskSync] syncTask: API response isSuccess=${response.isSuccess}');
 
       if (response.isSuccess) {
         // Mark as synced locally
@@ -167,12 +175,17 @@ class TaskSyncService {
             syncedAt: Value(DateTime.now()),
           ),
         );
+        debugPrint('[TaskSync] syncTask: Marked as synced locally');
         if (shiftId != null) {
           _sendSyncStatusSignal(apiTaskId, shiftId);
         }
         return true;
+      } else {
+        debugPrint('[TaskSync] syncTask: API failed, response not successful');
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('[TaskSync] syncTask: ERROR - $e');
+      debugPrint('[TaskSync] syncTask: Stack - $stack');
       return false;
     }
     return false;
@@ -180,16 +193,23 @@ class TaskSyncService {
 
   /// Sync all unsynced tasks
   Future<int> syncAllTasks() async {
+    debugPrint('[TaskSync] syncAllTasks: Starting...');
     final unsyncedTasks = await getUnsyncedTasks();
+    debugPrint('[TaskSync] syncAllTasks: ${unsyncedTasks.length} tasks to sync');
     int syncedCount = 0;
 
     for (final task in unsyncedTasks) {
+      debugPrint('[TaskSync] syncAllTasks: Syncing task ${task.id}...');
       final success = await syncTask(task);
       if (success) {
         syncedCount++;
+        debugPrint('[TaskSync] syncAllTasks: Task ${task.id} synced successfully');
+      } else {
+        debugPrint('[TaskSync] syncAllTasks: Task ${task.id} sync FAILED');
       }
     }
 
+    debugPrint('[TaskSync] syncAllTasks: Completed, synced $syncedCount/${unsyncedTasks.length}');
     return syncedCount;
   }
 

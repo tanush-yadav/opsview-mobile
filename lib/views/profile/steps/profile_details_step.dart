@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import '../../../core/localization/app_strings.dart';
+import '../../../core/providers/connectivity_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/snackbar_utils.dart';
@@ -165,25 +167,44 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
           SizedBox(
             width: double.infinity,
             height: 56,
-            child: PrimaryButton(
-              onPressed: state.isDetailsValid
-                  ? () {
-                      FocusScope.of(context).unfocus();
-                      viewModel.goToSelfie();
-                    }
-                  : null,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    strings.continueToSelfie,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+            child: Consumer(
+              builder: (context, ref, _) {
+                // BUG-08 Fix: Enforce OTP verification when internet is available
+                final connectivityAsync = ref.watch(connectivityProvider);
+                final isOnline = connectivityAsync.when(
+                  data: (results) => results.any((r) =>
+                      r == ConnectivityResult.wifi ||
+                      r == ConnectivityResult.mobile ||
+                      r == ConnectivityResult.ethernet),
+                  loading: () => false,
+                  error: (_, __) => false,
+                );
+                
+                // When online, require OTP verification; when offline, allow bypass
+                final canProceed = state.isDetailsValid && 
+                    (!isOnline || state.isMobileVerified);
+                
+                return PrimaryButton(
+                  onPressed: canProceed
+                      ? () {
+                          FocusScope.of(context).unfocus();
+                          viewModel.goToSelfie();
+                        }
+                      : null,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        strings.continueToSelfie,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -497,28 +518,19 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
           const Icon(Icons.credit_card, size: 20, color: AppColors.textMuted),
           const SizedBox(width: 12),
           Expanded(
-            child: state.isAadhaarVisible
-                ? material.TextField(
-                    controller: _aadhaarController,
-                    onChanged: viewModel.updateAadhaarNumber,
-                    keyboardType: TextInputType.number,
-                    style: AppTextStyles.body,
-                    decoration: const material.InputDecoration(
-                      border: material.InputBorder.none,
-                      filled: false,
-                      contentPadding: EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  )
-                : GestureDetector(
-                    onTap: viewModel.toggleAadhaarVisibility,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: Text(
-                        state.aadhaarNumber.isEmpty ? '' : state.maskedAadhaar,
-                        style: AppTextStyles.body,
-                      ),
-                    ),
-                  ),
+            child: material.TextField(
+              controller: _aadhaarController,
+              onChanged: viewModel.updateAadhaarNumber,
+              keyboardType: TextInputType.number,
+              obscureText: !state.isAadhaarVisible,
+              obscuringCharacter: '•',
+              style: AppTextStyles.body,
+              decoration: const material.InputDecoration(
+                border: material.InputBorder.none,
+                filled: false,
+                contentPadding: EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
           ),
           GestureDetector(
             onTap: viewModel.toggleAadhaarVisibility,

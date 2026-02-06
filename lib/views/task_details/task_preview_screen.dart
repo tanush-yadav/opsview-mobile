@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -41,9 +42,11 @@ class _TaskPreviewScreenState extends ConsumerState<TaskPreviewScreen> {
   }
 
   Future<void> _addNewSubmission() async {
+    debugPrint('[TaskPreview] _addNewSubmission: Pushing to new submission screen');
     final result = await context.push<bool>(
       '${AppRoutes.taskPreview}/${widget.taskId}/new',
     );
+    debugPrint('[TaskPreview] _addNewSubmission: Returned with result=$result');
     if (result == true) {
       // Reload to show the new submission
       ref.read(taskPreviewViewModelProvider.notifier).reload();
@@ -91,7 +94,10 @@ class _TaskPreviewScreenState extends ConsumerState<TaskPreviewScreen> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => context.pop(),
+            onTap: () {
+              debugPrint('[TaskPreview] Back button tapped, calling context.pop()');
+              context.pop();
+            },
             child: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           ),
           const SizedBox(width: 16),

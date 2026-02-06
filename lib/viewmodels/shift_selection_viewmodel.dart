@@ -188,8 +188,9 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
       // Profile exists but training NOT completed → go to training
       onboardingStep = OnboardingStep.training.value;
     } else {
-      // No profile → start profile creation
-      onboardingStep = OnboardingStep.profile.value;
+      // No profile → user must select shift again
+      // This ensures users who exit during profile creation return to shift selection
+      onboardingStep = OnboardingStep.shiftSelection.value;
     }
 
     await (db.update(db.sessions)..where((t) => const Constant(true))).write(

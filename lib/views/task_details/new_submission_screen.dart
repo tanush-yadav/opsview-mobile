@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -88,7 +89,10 @@ class _NewSubmissionScreenState extends ConsumerState<NewSubmissionScreen> {
         .read(newSubmissionViewModelProvider.notifier)
         .submitNewSubmission();
     if (success && mounted) {
+      debugPrint('[NewSubmission] _submit: Success, calling context.pop(true)');
       context.pop(true); // Return true to indicate successful submission
+    } else {
+      debugPrint('[NewSubmission] _submit: Failed or not mounted, success=$success mounted=$mounted');
     }
   }
 
@@ -161,7 +165,10 @@ class _NewSubmissionScreenState extends ConsumerState<NewSubmissionScreen> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => context.pop(),
+            onTap: () {
+              debugPrint('[NewSubmission] Back button tapped, calling context.pop()');
+              context.pop();
+            },
             child: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           ),
           const SizedBox(width: 16),

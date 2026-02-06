@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:drift/drift.dart';
@@ -12,6 +13,7 @@ import '../core/providers/app_state_provider.dart';
 import '../services/api/api_service.dart';
 import '../services/database/app_database.dart';
 import '../core/enums/location_status.dart';
+
 
 enum ProfileStep { details, selfie }
 
@@ -331,11 +333,15 @@ class ProfileViewModel extends Notifier<ProfileState> {
         return;
       }
 
-      // Get current position
+      // Get current position with 3-second timeout to prevent indefinite blocking
+      // (BUG-01: exam centres may have signal jammers)
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
         ),
+      ).timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => throw TimeoutException('Location detection timed out'),
       );
 
       // Calculate distance from center
@@ -352,6 +358,10 @@ class ProfileViewModel extends Notifier<ProfileState> {
         currentLng: position.longitude,
         distanceFromCenter: distance,
       );
+    } on TimeoutException {
+      // Timeout is acceptable - allow user to proceed without blocking
+      // Location can be captured during photo submission instead
+      state = state.copyWith(locationStatus: LocationStatus.detected);
     } catch (e) {
       state = state.copyWith(locationStatus: LocationStatus.error);
     }
