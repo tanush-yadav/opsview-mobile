@@ -200,9 +200,8 @@ class ShiftSelectionViewModel extends Notifier<ShiftSelectionState> {
       ),
     );
 
-    // Update in-memory app state
-    ref.read(appStateProvider.notifier).updateSelectedShift(shiftId);
-    ref.read(appStateProvider.notifier).updateOnboardingStep(onboardingStep);
+    // Reload app state (tasks, profiles, etc.) for the new shift
+    await ref.read(appStateProvider.notifier).loadFromDatabase();
   }
 
   Future<void> callSupport() async {

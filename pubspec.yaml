@@ -38,6 +38,9 @@ dependencies:
   # Passive Liveness Detection
   face_anti_spoofing_detector: ^0.0.3
 
+  # Face Detection (ML Kit)
+  google_mlkit_face_detection: ^0.12.0
+
   # Navigation
   go_router: ^17.0.1
 

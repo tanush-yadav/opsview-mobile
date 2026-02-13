@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import '../../core/localization/app_strings.dart';
+import '../../core/providers/app_state_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -380,7 +381,15 @@ class ShiftSelectionScreen extends ConsumerWidget {
       await ref.read(shiftSelectionViewModelProvider.notifier).confirmShift();
 
       if (context.mounted) {
-        context.go(AppRoutes.profile);
+        final onboardingStep = ref.read(appStateProvider).onboardingStep;
+        switch (onboardingStep) {
+          case 'completed':
+            context.go(AppRoutes.home);
+          case 'training':
+            context.go(AppRoutes.training);
+          default:
+            context.go(AppRoutes.profile);
+        }
       }
     }
   }

@@ -329,33 +329,44 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
                         : AppColors.primary.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (state.isMobileVerified) ...[
-                        const Icon(
-                          Icons.check,
-                          size: 14,
-                          color: AppColors.success,
+                  child: state.isOtpLoading && !state.showOtpInput
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: material.CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.textLight,
+                          ),
+                        )
+                      : MediaQuery.withNoTextScaling(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (state.isMobileVerified) ...[
+                                const Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: AppColors.success,
+                                ),
+                                const SizedBox(width: 4),
+                              ],
+                              Text(
+                                state.isMobileVerified
+                                    ? strings.verified.toUpperCase()
+                                    : strings.verify,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: state.isMobileVerified
+                                      ? AppColors.success
+                                      : canVerify
+                                      ? AppColors.textLight
+                                      : AppColors.textLight.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(width: 4),
-                      ],
-                      Text(
-                        state.isMobileVerified
-                            ? strings.verified.toUpperCase()
-                            : strings.verify,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: state.isMobileVerified
-                              ? AppColors.success
-                              : canVerify
-                              ? AppColors.textLight
-                              : AppColors.textLight.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ],
@@ -385,12 +396,15 @@ class _ProfileDetailsStepState extends ConsumerState<ProfileDetailsStep> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                strings.enterOtpSentToMobile,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textMuted,
+              Flexible(
+                child: Text(
+                  strings.enterOtpSentToMobile,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               GestureDetector(
                 onTap: () {
                   viewModel.cancelOtpVerification();

@@ -185,18 +185,22 @@ class HomeScreen extends ConsumerWidget {
                 ]
               : null,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
-              ),
-            ),
-            const SizedBox(width: 6),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected ? AppColors.textPrimary : AppColors.textMuted,
+                  ),
+                ),
+                const SizedBox(width: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
@@ -214,7 +218,9 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
             ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );

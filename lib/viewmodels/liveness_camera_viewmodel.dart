@@ -1,16 +1,17 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:face_anti_spoofing_detector/face_anti_spoofing_detector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 
+import '../core/utils/camera_image_utils.dart';
+
 // State class
 class LivenessCameraState {
-
   const LivenessCameraState({
     this.isInitialized = false,
     this.isProcessing = false,
@@ -22,6 +23,7 @@ class LivenessCameraState {
     this.capturedImagePath,
     this.errorMessage,
   });
+
   final bool isInitialized;
   final bool isProcessing;
   final bool isCapturing;
@@ -50,7 +52,8 @@ class LivenessCameraState {
       livenessScore: livenessScore ?? this.livenessScore,
       statusMessage: statusMessage ?? this.statusMessage,
       livenessCheckPassed: livenessCheckPassed ?? this.livenessCheckPassed,
-      consecutivePassCount: consecutivePassCount ?? this.consecutivePassCount,
+      consecutivePassCount:
+          consecutivePassCount ?? this.consecutivePassCount,
       capturedImagePath: capturedImagePath ?? this.capturedImagePath,
       errorMessage: errorMessage ?? this.errorMessage,
     );
@@ -61,23 +64,27 @@ class LivenessCameraState {
 class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
   static const int _requiredConsecutivePasses = 3;
   static const double _livenessThreshold = 0.5;
-  static const double _minBrightnessVariance = 500.0; // Reject blank/covered images
+  static const double _minBrightnessVariance = 500.0;
+  static const int _frameSkipInterval = 2;
 
   CameraController? _controller;
   CameraImage? _latestFrame;
   int _frameWidth = 0;
   int _frameHeight = 0;
+  late final FaceDetector _faceDetector;
+  CameraDescription? _cameraDescription;
+  int _frameSkipCount = 0;
 
   CameraController? get controller => _controller;
 
   @override
   LivenessCameraState build() {
-    // Register cleanup when provider is disposed
     ref.onDispose(() {
       try {
         _controller?.stopImageStream();
       } catch (_) {}
       _controller?.dispose();
+      _faceDetector.close();
       FaceAntiSpoofingDetector.destroy();
     });
     return const LivenessCameraState();
@@ -85,6 +92,17 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
 
   Future<void> initialize() async {
     try {
+      _faceDetector = FaceDetector(
+        options: FaceDetectorOptions(
+          enableClassification: false,
+          enableLandmarks: false,
+          enableContours: false,
+          enableTracking: false,
+          performanceMode: FaceDetectorMode.fast,
+          minFaceSize: 0.25,
+        ),
+      );
+
       await FaceAntiSpoofingDetector.initialize();
 
       final cameras = await availableCameras();
@@ -100,6 +118,7 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
         (c) => c.lensDirection == CameraLensDirection.front,
         orElse: () => cameras.first,
       );
+      _cameraDescription = frontCamera;
 
       _controller = CameraController(
         frontCamera,
@@ -130,17 +149,19 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
     _frameHeight = image.height;
 
     if (state.isProcessing || state.isCapturing) return;
+
+    _frameSkipCount++;
+    if (_frameSkipCount % (_frameSkipInterval + 1) != 0) return;
+
     state = state.copyWith(isProcessing: true);
 
     try {
-      final yuvBytes = _convertToYUV(image);
-
-      // BUG-07 Fix: Check image variance to reject blank/dark images
-      final yPlane = image.planes[0];
-      final variance = _calculateBrightnessVariance(yPlane.bytes, image.width, image.height);
-      
-      // If variance is too low, image is likely blank/covered/dark
-      // A normal face image has variance > 1000, blank images have < 100
+      // Step 1: Reject blank/covered camera
+      final variance = CameraImageUtils.calculateBrightnessVariance(
+        image.planes[0].bytes,
+        image.width,
+        image.height,
+      );
       if (variance < _minBrightnessVariance) {
         if (ref.mounted) {
           state = state.copyWith(
@@ -154,13 +175,42 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
         return;
       }
 
-      final faceRect = Rect.fromLTWH(
-        image.width * 0.15,
-        image.height * 0.1,
-        image.width * 0.7,
-        image.height * 0.8,
+      // Step 2: ML Kit face detection
+      final inputImage = CameraImageUtils.buildInputImage(
+        image,
+        _cameraDescription,
+      );
+      final faces = await _faceDetector.processImage(inputImage);
+      if (!ref.mounted) return;
+
+      if (faces.isEmpty) {
+        state = state.copyWith(
+          livenessScore: 0.0,
+          consecutivePassCount: 0,
+          livenessCheckPassed: false,
+          statusMessage: 'Position your face in the frame',
+          isProcessing: false,
+        );
+        return;
+      }
+
+      // Step 3: Get real face bounding box (largest face)
+      final detectedFace = faces.reduce(
+        (a, b) => a.boundingBox.width * a.boundingBox.height >
+                b.boundingBox.width * b.boundingBox.height
+            ? a
+            : b,
+      );
+      final mlKitRect = detectedFace.boundingBox;
+      final faceRect = Rect.fromLTRB(
+        mlKitRect.left.clamp(0, image.width.toDouble()),
+        mlKitRect.top.clamp(0, image.height.toDouble()),
+        mlKitRect.right.clamp(0, image.width.toDouble()),
+        mlKitRect.bottom.clamp(0, image.height.toDouble()),
       );
 
+      // Step 4: Anti-spoofing with real face rect
+      final yuvBytes = CameraImageUtils.convertToYUV(image);
       final score = await FaceAntiSpoofingDetector.detect(
         yuvBytes: yuvBytes,
         previewWidth: image.width,
@@ -168,36 +218,10 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
         orientation: 0,
         faceContour: faceRect,
       );
-
-      // Check if still mounted after async operation
       if (!ref.mounted) return;
 
-      final newScore = score ?? 0.0;
-      int newPassCount = state.consecutivePassCount;
-      bool passed = state.livenessCheckPassed;
-      String message = state.statusMessage;
-
-      if (newScore >= _livenessThreshold) {
-        newPassCount++;
-        if (newPassCount >= _requiredConsecutivePasses) {
-          passed = true;
-          message = 'Liveness verified! Tap to capture.';
-        } else {
-          message = 'Verifying... ($newPassCount/$_requiredConsecutivePasses)';
-        }
-      } else {
-        newPassCount = 0;
-        passed = false;
-        message = 'Position your face in the frame';
-      }
-
-      state = state.copyWith(
-        livenessScore: newScore,
-        consecutivePassCount: newPassCount,
-        livenessCheckPassed: passed,
-        statusMessage: message,
-        isProcessing: false,
-      );
+      // Step 5: Evaluate score
+      _evaluateScore(score ?? 0.0);
     } catch (e) {
       if (ref.mounted) {
         state = state.copyWith(isProcessing: false);
@@ -205,104 +229,32 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
     }
   }
 
-  /// Calculate brightness variance of Y channel to detect blank/covered images
-  double _calculateBrightnessVariance(Uint8List yBytes, int width, int height) {
-    // Sample every 10th pixel for performance
-    const sampleStep = 10;
-    int sum = 0;
-    int count = 0;
-    
-    for (int i = 0; i < yBytes.length; i += sampleStep) {
-      sum += yBytes[i];
-      count++;
-    }
-    
-    if (count == 0) return 0;
-    final mean = sum / count;
-    
-    double varianceSum = 0;
-    for (int i = 0; i < yBytes.length; i += sampleStep) {
-      final diff = yBytes[i] - mean;
-      varianceSum += diff * diff;
-    }
-    
-    return varianceSum / count;
-  }
+  void _evaluateScore(double score) {
+    int passCount = state.consecutivePassCount;
+    bool passed = state.livenessCheckPassed;
+    String message;
 
-  Uint8List _convertToYUV(CameraImage image) {
-    final int width = image.width;
-    final int height = image.height;
-    final int ySize = width * height;
-    final int uvSize = (width ~/ 2) * (height ~/ 2);
-
-    final Uint8List yuvBytes = Uint8List(ySize + uvSize * 2);
-
-    final yPlane = image.planes[0];
-    int yIndex = 0;
-    for (int row = 0; row < height; row++) {
-      final rowStart = row * yPlane.bytesPerRow;
-      for (int col = 0; col < width; col++) {
-        yuvBytes[yIndex++] = yPlane.bytes[rowStart + col];
+    if (score >= _livenessThreshold) {
+      passCount++;
+      if (passCount >= _requiredConsecutivePasses) {
+        passed = true;
+        message = 'Liveness verified! Tap to capture.';
+      } else {
+        message = 'Verifying... ($passCount/$_requiredConsecutivePasses)';
       }
+    } else {
+      passCount = 0;
+      passed = false;
+      message = 'Hold steady, verifying face...';
     }
 
-    if (image.planes.length >= 3) {
-      final uPlane = image.planes[1];
-      final vPlane = image.planes[2];
-
-      int uvIndex = ySize;
-      for (int row = 0; row < height ~/ 2; row++) {
-        for (int col = 0; col < width ~/ 2; col++) {
-          final uRowStart = row * uPlane.bytesPerRow;
-          yuvBytes[uvIndex++] =
-              uPlane.bytes[uRowStart + col * uPlane.bytesPerPixel!];
-        }
-      }
-      for (int row = 0; row < height ~/ 2; row++) {
-        for (int col = 0; col < width ~/ 2; col++) {
-          final vRowStart = row * vPlane.bytesPerRow;
-          yuvBytes[uvIndex++] =
-              vPlane.bytes[vRowStart + col * vPlane.bytesPerPixel!];
-        }
-      }
-    }
-
-    return yuvBytes;
-  }
-
-  Uint8List _convertYUVToRGB(CameraImage image) {
-    final int width = image.width;
-    final int height = image.height;
-    final yPlane = image.planes[0];
-    final uPlane = image.planes[1];
-    final vPlane = image.planes[2];
-
-    final Uint8List rgb = Uint8List(width * height * 3);
-
-    int rgbIndex = 0;
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        final yIndex = y * yPlane.bytesPerRow + x;
-        final uvIndex =
-            (y ~/ 2) * uPlane.bytesPerRow + (x ~/ 2) * uPlane.bytesPerPixel!;
-
-        final yValue = yPlane.bytes[yIndex];
-        final uValue = uPlane.bytes[uvIndex];
-        final vValue = vPlane.bytes[uvIndex];
-
-        final int r = (yValue + 1.370705 * (vValue - 128)).round().clamp(0, 255);
-        final int g = (yValue - 0.337633 * (uValue - 128) - 0.698001 * (vValue - 128))
-            .round()
-            .clamp(0, 255);
-        final int b = (yValue + 1.732446 * (uValue - 128)).round().clamp(0, 255);
-
-        rgb[rgbIndex++] = r;
-        rgb[rgbIndex++] = g;
-        rgb[rgbIndex++] = b;
-      }
-    }
-
-    return rgb;
+    state = state.copyWith(
+      livenessScore: score,
+      consecutivePassCount: passCount,
+      livenessCheckPassed: passed,
+      statusMessage: message,
+      isProcessing: false,
+    );
   }
 
   Future<void> capturePhoto() async {
@@ -316,31 +268,26 @@ class LivenessCameraViewModel extends Notifier<LivenessCameraState> {
 
     try {
       final frame = _latestFrame!;
-      final width = _frameWidth;
-      final height = _frameHeight;
+      final rgbBytes = CameraImageUtils.convertYUVToRGB(frame);
 
-      // Create an image from the YUV data
-      final rgbBytes = _convertYUVToRGB(frame);
-
-      // Create image using the image package
-      var image = img.Image(width: width, height: height);
+      var image = img.Image(width: _frameWidth, height: _frameHeight);
       int rgbIndex = 0;
-      for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-          final r = rgbBytes[rgbIndex++];
-          final g = rgbBytes[rgbIndex++];
-          final b = rgbBytes[rgbIndex++];
-          image.setPixelRgb(x, y, r, g, b);
+      for (int y = 0; y < _frameHeight; y++) {
+        for (int x = 0; x < _frameWidth; x++) {
+          image.setPixelRgb(
+            x,
+            y,
+            rgbBytes[rgbIndex++],
+            rgbBytes[rgbIndex++],
+            rgbBytes[rgbIndex++],
+          );
         }
       }
 
-      // Fix front camera orientation:
-      // 1. Rotate 90° anti-clockwise (for portrait mode on Android)
+      // Fix front camera orientation (portrait mode on Android)
       image = img.copyRotate(image, angle: 270);
 
-      // Encode to JPEG
       final jpegBytes = img.encodeJpg(image, quality: 90);
-
       final directory = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final savedPath = '${directory.path}/selfie_$timestamp.jpg';

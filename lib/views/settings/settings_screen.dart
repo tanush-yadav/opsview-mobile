@@ -157,6 +157,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final hasProfile = state.profile != null;
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
@@ -205,14 +206,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Text(state.userRole, style: AppTextStyles.body),
           const SizedBox(height: 12),
           // Info chips
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               _buildInfoChip('ID: ${state.user?.id.substring(0, 8) ?? ''}'),
-              const SizedBox(width: 8),
               if (hasProfile)
                 _buildInfoChip('${strings.age}: ${state.profile!.age}'),
-              const SizedBox(width: 8),
               if (hasProfile) _buildStatusChip(strings.onDuty),
             ],
           ),

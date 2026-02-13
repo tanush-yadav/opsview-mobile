@@ -104,36 +104,40 @@ class LocationStatusCard extends StatelessWidget {
                   ),
                 ),
                 if (isDetected) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        strings.distanceFromCentre,
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.success,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          formattedDistance,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textLight,
+                  if (formattedDistance.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        Text(
+                          strings.distanceFromCentre,
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.textMuted,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.success,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            formattedDistance,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textLight,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   // Inside/Outside geofence indicator
                   Container(

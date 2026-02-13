@@ -142,12 +142,14 @@ class _TaskPreviewScreenState extends ConsumerState<TaskPreviewScreen> {
       children: [
         Icon(icon, size: 18, color: iconColor ?? AppColors.primary),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: AppTextStyles.label.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+        Flexible(
+          child: Text(
+            title,
+            style: AppTextStyles.label.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
           ),
         ),
       ],
