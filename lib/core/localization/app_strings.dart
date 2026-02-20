@@ -125,6 +125,9 @@ abstract class AppStrings {
   String get profileNotCreated;
   String get syncSuccess;
   String get syncFailed;
+  String get syncAlreadySynced;
+  String get syncNoInternet;
+  String get syncPartialSuccess;
 
   // Task Capture
   String get taskDetails;

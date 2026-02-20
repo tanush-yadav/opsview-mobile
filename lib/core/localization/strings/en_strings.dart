@@ -201,9 +201,15 @@ class EnStrings implements AppStrings {
   @override
   String get profileNotCreated => 'Profile Not Created';
   @override
-  String get syncSuccess => 'Sync process completed';
+  String get syncSuccess => 'All data synced successfully';
   @override
   String get syncFailed => 'Sync failed. Please try again.';
+  @override
+  String get syncAlreadySynced => 'All data is already up to date';
+  @override
+  String get syncNoInternet => 'No internet connection. Please check your network.';
+  @override
+  String get syncPartialSuccess => 'Some data failed to sync. Please try again.';
 
   // Task Capture
   @override

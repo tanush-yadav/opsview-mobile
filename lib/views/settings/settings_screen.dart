@@ -350,12 +350,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               onPressed: !hasProfile || state.isSyncing
                   ? null
                   : () async {
-                      final success = await viewModel.syncData();
+                      final result = await viewModel.syncData();
                       if (context.mounted) {
-                        if (success) {
-                          SnackBarUtils.success(context, strings.syncSuccess);
-                        } else {
-                          SnackBarUtils.error(context, strings.syncFailed);
+                        switch (result) {
+                          case SyncResult.success:
+                            SnackBarUtils.success(context, strings.syncSuccess);
+                          case SyncResult.alreadySynced:
+                            SnackBarUtils.info(context, strings.syncAlreadySynced);
+                          case SyncResult.noInternet:
+                            SnackBarUtils.warning(context, strings.syncNoInternet);
+                          case SyncResult.partialSuccess:
+                            SnackBarUtils.warning(context, strings.syncPartialSuccess);
+                          case SyncResult.error:
+                            SnackBarUtils.error(context, strings.syncFailed);
                         }
                       }
                     },

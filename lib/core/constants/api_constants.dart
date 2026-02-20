@@ -1,5 +1,5 @@
 abstract class ApiConstants {
-  static const String baseUrl = 'https://dev-opsview.avyxon.com/api';
+  static const String baseUrl = 'https://ops-api.trustview.in/api';
 
   // Auth
   static const String login = '/auth/op-login';

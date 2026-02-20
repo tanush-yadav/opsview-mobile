@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,6 +11,19 @@ import '../services/database/app_database.dart';
 import '../services/sync/profile_sync_service.dart';
 import '../services/sync/task_sync_service.dart';
 import '../models/task/task_enums.dart';
+
+enum SyncResult {
+  /// All data was already synced, nothing to do
+  alreadySynced,
+  /// Data synced successfully
+  success,
+  /// Some items synced, some failed
+  partialSuccess,
+  /// No internet connection
+  noInternet,
+  /// Sync failed due to an error
+  error,
+}
 
 class SettingsState {
   const SettingsState({
@@ -100,28 +114,59 @@ class SettingsViewModel extends Notifier<SettingsState> {
     );
   }
 
-  Future<bool> syncData() async {
+  Future<SyncResult> syncData() async {
     state = state.copyWith(isSyncing: true);
 
     try {
+      // Check internet connectivity first
+      final connectivityResults = await Connectivity().checkConnectivity();
+      final hasInternet = connectivityResults.any((r) =>
+          r == ConnectivityResult.wifi ||
+          r == ConnectivityResult.mobile ||
+          r == ConnectivityResult.ethernet);
+
+      if (!hasInternet) {
+        state = state.copyWith(isSyncing: false);
+        return SyncResult.noInternet;
+      }
+
       final profileSync = ref.read(profileSyncServiceProvider);
       final taskSync = ref.read(taskSyncServiceProvider);
 
+      // Check if there's anything to sync
+      final unsyncedProfiles = await profileSync.getUnsyncedProfiles();
+      final unsyncedTasks = await taskSync.getUnsyncedTasks();
+      final totalToSync = unsyncedProfiles.length + unsyncedTasks.length;
+
+      if (totalToSync == 0) {
+        state = state.copyWith(isSyncing: false);
+        return SyncResult.alreadySynced;
+      }
+
       // Sync Profile
-      await profileSync.syncAllProfiles();
+      final profilesSynced = await profileSync.syncAllProfiles();
 
       // Sync Tasks
-      await taskSync.syncAllTasks();
+      final tasksSynced = await taskSync.syncAllTasks();
+
+      final totalSynced = profilesSynced + tasksSynced;
 
       // Refresh App State to reflect changes (e.g. sync status)
       await ref.read(appStateProvider.notifier).loadFromDatabase();
 
       // Re-evaluate sync status by querying DB directly for accuracy
       await refreshSyncStatus();
-      return true;
+
+      if (totalSynced == totalToSync) {
+        return SyncResult.success;
+      } else if (totalSynced > 0) {
+        return SyncResult.partialSuccess;
+      } else {
+        return SyncResult.error;
+      }
     } catch (e) {
       state = state.copyWith(isSyncing: false);
-      return false;
+      return SyncResult.error;
     }
   }
 
